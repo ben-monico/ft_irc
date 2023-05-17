@@ -1,0 +1,12 @@
+TCP makes sure data arrives as it should
+IP is responsible for data routing, not data integrity
+
+SOCK_DGRAM
+Datagram Sockets dont use TCP, so data is not guaranteed to arrive. if it does, its error free tho.
+They dont maintain 2way connection because its generally unimportant packets, they slap an IP and shoot.
+Just like a letter. Used in Multiplayer games, streaming audio, video calls, etc.
+ACK (ackowledgement) is a packet the recipient sends back to confirm he got the sender's packet.
+If the sender doesnt get an ACK, resend it. In games, they just dgaf, because SPEED matters.
+Encapsulate the packet in some way and hit sendto().
+
+
