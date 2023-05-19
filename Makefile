@@ -1,6 +1,7 @@
 NAME		=	ircserv
 
-SRCS		=	$(SRCS_DIR)/main.cpp
+SRCS		=	src/main.cpp \
+				src/utils.cpp
 
 SRCS_DIR	=	src
 

@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 00:00:24 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/19 17:45:53 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/19 19:42:07 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,16 @@
 # include <netdb.h>
 # include <signal.h>
 # include <unistd.h>
+# include <arpa/inet.h>
+# include <netinet/in.h>
 
-# define PORT "6768"
+# include <sys/wait.h>
+# include <stdio.h>
+# include <errno.h>
+
+# define PORT "3490"
 # define BACKLOG 10
+# define MAXDATASIZE 100 
 
 
 void err_out(std::string str);
