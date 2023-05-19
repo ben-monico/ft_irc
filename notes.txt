@@ -24,11 +24,12 @@ EXTERNAL FUNCS
 // inet_ntoa 		converts a network representation to an Internet addressq
 
 // send				sends data on a socket
-// recv 				receives data from a socket
+// recv 			receives data from a socket
+
 // signal 			specifies a signal action
 // lseek 			repositions the file offset
 // fstat 			gets file status
-// fcntl 			manipulates fd
+// fcntl 			manipulates fd, only usable as fcntl(fd, F_SETFL, O_NONBLOCK);
 // poll 			polls a set of file descriptors
 
 #SOCKETS
@@ -149,13 +150,13 @@ EXTERNAL FUNCS
 	
 	##connect()
 		int connect(int sockfd, struct sockaddr *serv_addr, int addrlen);
-		serv_addr is a struct sockaddr containing the destination port and IP address, and addrlen is the length in bytes of the server address structure - gotten from getaddrinfo()
+			serv_addr is a struct sockaddr containing the destination port and IP address, and addrlen is the length in bytes of the server address structure - gotten from getaddrinfo()
 		int c = connect(sockfd, res->ai_addr, res->ai_addrlen);
 		-1 on error
 
 	##listen()
 		int listen(int sockfd, int backlog);
-		backlog is nbr of connections allowed in the incoming queue.They wait in queue until you accept. Usually 20 - 10.
+			backlog is nbr of connections allowed in the incoming queue.They wait in queue until you accept. Usually 20 - 10.
 		-1 on error
 		we need to call bind() before listen() so the server runs on a specific port.
 		In order:
@@ -166,4 +167,79 @@ EXTERNAL FUNCS
 			accept();
 	
 	##accept()
+		int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+		addr is a local sockaddr_storage struct which stores where the info of the incoming connection will go. addrlen is sizeof(local struct)
+		-1 on error
+		return a new fd to communicate.
+
+	##send() recv()
+		int send(int sockfd, const void *msg, int len, int flags);
+			sockfd - fd to send data to;
+			msg - pointer to data u wanna send;
+			len - sizeof data;
+			flags - (?) usually 0.
+		returns bytes sent, which might be < len. If so, you need to resend the excedent.
+
+		int recv(int sockfd, void *buf, int len, int flags);
+			buf - read to it;
+			len - maximum len of buf;
+		returns bytes read to buf. if ret == 0 either u closed the connection or the remote side has.
+
+		-1 on error.
+	
+	##close()
+		done with sending and receiving? close the socketfd.
+
+	#BLOCKING
+		When we socket() an fd, the kernel sets it to blocking. To unblock, we use fcntl(fd, F_SETFL, O_NONBLOCK). This allows you to poll the socket for info.
+		Trying to read from a non-blocking socket with no data, its not allowed to block, so you get -1 error.
+		Putting a program in a busy-wait looking for data on a socket is a bad practice.
+
+	#POLL()
+		We want to monitor a bunch of sockets and handle the ones which have data ready. 
+		Polling is very slow for big numbers. libevent might speed it up.
+		The idea is having the OS letting us know when data is ready so our process can sleep without costing resources.
+		Get an array of structs of poll fds with info on the socket fds we want to know and what events to monitor. The Os will block on poll() until one of those events occurs or  user defined timeout.
+		A listen() socket should return ready to read when an incoming connection can be accepted().
+
+		int poll(struct pollfd fds[], nfds_t nfds, int timeout);
+			fds - array of info/sockets to monitor;
+			nfds - nbr of elements in the array;
+			timeout - in ms (if negative, waits forever)
+		struct pollfd {
+			int fd; // the socket descriptor
+			short events; // bitmap of events we're interested in
+			short revents; // when poll() returns, bitmap of events that occurred
+		};
+			fd - socket fd we want to monitor;
+			events -	POLLIN -- alert when data is ready to recv() on the socket;
+						POLLOUT -- alert when I can send data to this socket without blocking.
+		Pass the pollfds to poll(), and on return check revents for POLLIN or POLLOUT set.
+		e.g.:
+		if (int pollin_happened = pfds[0].revents & POLLIN)
+			printf("File descriptor %d is ready to read\n", pfds[0].fd);
+		Returns number of entries which have non-zero revents field, stop searching after number was reached.
+
+		Make sure the array has enough space, or realloc().
+		e.g. of a chat server:
+			Start listener socket, add it to the set of fds to poll().
+			Add new connections to array of pollfds structs. If a connection closes, we remove it.
+			When connection is ready to read, we read its data and send to others, so they can see it.
+	
+	#PARTIAL SEND()S
+		Implement this for partial sends():
+		int sendall(int s, char *buf, int *len)
+		{
+			int total = 0; // how many bytes we've sent
+			int bytesleft = *len; // how many we have left to send
+			int n;
+			while(total < *len) {
+				n = send(s, buf+total, bytesleft, 0);
+				if (n == -1) { break; }
+				total += n;
+				bytesleft -= n;
+			}
+			*len = total; // return number actually sent here
+			return (n == -1) ? -1 : 0; // return -1 on failure, 0 on success
+		}
 		
