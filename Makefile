@@ -1,39 +1,33 @@
-NAME = ircserv
+NAME		=	ircserv
 
-BUILTINS_DIR =	builtins/
+SRCS		=	$(SRCS_DIR)/main.cpp
 
-SRC_DIR = src/
+SRCS_DIR	=	src
 
-OBJ_DIR = obj/
+OBJS		=	$(subst $(SRCS_DIR), $(OBJS_DIR), $(SRCS:.cpp=.o))
 
-SOURCES = 	main.cpp
+OBJS_DIR	=	obj
 
-SRCS = $(addprefix $(SRC_DIR), $(SOURCES))
+INC			=	-I.
 
-OBJECTS = $(SOURCES:.c=.o)
+CC			=	c++ -std=c++98 -Wall -Wextra -Werror -g
 
-OBJS =	$(addprefix $(OBJ_DIR), $(OBJECTS))
-
-CC = c++ -std=c++98 -Wall -Wextra -Werror -Wshadow -g 
-
-$(OBJ_DIR)%.o: $(SRC_DIR)%.c | $(OBJ_DIR)
-	@$(CC) $(CFLAGS) $(DEBUG) $(INC) -c $< -o $@
 
 all:		$(NAME)
 
-$(NAME):	$(OBJS)  $(SRCS)
-			@$(CC) $(OBJS) -o $(NAME)
-			@clear
+$(OBJS_DIR)/%.o :	$(SRCS_DIR)/%.cpp
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(INC) -c $< -o $@
 
-$(OBJ_DIR):
-			mkdir -p $(OBJ_DIR)$(BUILTINS_DIR)
-
-re: fclean all
+$(NAME):	$(MLX) $(OBJS)
+	$(CC) $(OBJS) -o $(NAME) $(INC)
 
 clean:
-	@rm -f $(OBJS)
+	rm -rf $(OBJS_DIR)
 
-fclean: clean
-	@rm -f $(NAME)
+fclean:	clean
+	rm -rf $(NAME)
 
-.PHONY: all re clean fclean
+re:	fclean all
+
+.PHONY: all clean fclean re
