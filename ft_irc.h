@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 00:00:24 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/19 19:42:07 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/22 19:14:31 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 # include <stdio.h>
 # include <errno.h>
 
-# define PORT "3490"
+# define PORT "6768"
 # define BACKLOG 10
 # define MAXDATASIZE 100 
 
