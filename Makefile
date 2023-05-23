@@ -34,5 +34,8 @@ re:	fclean all
 e:	re
 	@clear
 	./$(NAME)
-
-.PHONY: all clean fclean re e
+cl:
+	@clear
+	@c++ -std=c++98 -Wall -Wextra -Werror -g -I. src/client.cpp -o client
+	./client
+.PHONY: all clean fclean re e cl
