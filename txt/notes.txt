@@ -60,6 +60,7 @@ EXTERNAL FUNCS
 	So, convert the numbers to NBO when they go out and to Host Byte ORder when they are coming in.
 
 #STRUCTS
+
 	struct addrinfo {
 		int ai_flags; // AI_PASSIVE, AI_CANONNAME, etc.
 		int ai_family; // AF_INET, AF_INET6, AF_UNSPEC - specifies IPv4 or IPv6 or multismth
@@ -70,28 +71,30 @@ EXTERNAL FUNCS
 		char *ai_canonname; // full canonical hostname
 		struct addrinfo *ai_next; // linked list, next node
 	};
+	getaddrinfo() returns a pointer to a new linked list containing the resolved net addrs. associated to a hostname.
 
-	getaddrinfo() returns a pointer to a new linked list with deez structs.
 
 	struct sockaddr {
-		unsigned short sa_family; // address family, AF_xxx
-		char sa_data[14]; // 14 bytes of protocol address
+		unsigned short sa_family; // AD_INET, AF_INET6
+		char sa_data[14]; // holds the actual address data. if IPV4 holds a 2 byte ort number and 4 byte ipv4 address
 	};
+	Holds address info for different socket types
 
-	struct sockaddr_in { (only for IPv4)
+	struct sockaddr_in | sockaddr_in6 {
 		short int sin_family; // Address family, AF_INET explicitely
 		unsigned short int sin_port; // Port number
-		struct in_addr sin_addr; // Internet address
+		struct in_addr sin_addr; // holds the IP itself in network byte order
 		unsigned char sin_zero[8]; // Same size as struct sockaddr (should be bzero'd)
 	};
-
 	a pointer to a struct sockaddr_in can be cast to a pointer to a struct sockaddr and vice-versa.
+	Use connect() and pass pointer to a sockaddr_in with the destination address
 
 	struct in_addr {
 		uint32_t s_addr; // that's a 32-bit int (4 bytes)
 	};
+	simple representation of IPV4 addresses
 
-	So if you have declared ina to be of type struct sockaddr_in, then ina.sin_addr.s_addr references the 4-byte IP
+	So if you have declared in_addr to be of type struct sockaddr_in, then ina.sin_addr.s_addr references the 4-byte IP
 	address
 
 	struct sockaddr_storage {
@@ -110,8 +113,7 @@ EXTERNAL FUNCS
 
 #SYSCALLS
 	##getaddrinfo()
-		Used to be gethostbyname() to lookup DNS and load the info in a struct sockaddr_in.
-		now, we have getaddrinfo() that does all that, DNS &service name lookup and fills structs.
+		Fills necessary structs
 		int getaddrinfo(const char *node, // e.g. "www.example.com" or IP
 						const char *service, // e.g. "http" or port number
 						const struct addrinfo *hints, //bzero at start - points to a struct addrinfo with relevant information.
@@ -149,12 +151,14 @@ EXTERNAL FUNCS
 		If u just trying to connect to a remote machine and dont care about local port, just call connect, if the socket is unbound connect() will bind() to unused local port.
 	
 	##connect()
+		Used to connect to remote host
 		int connect(int sockfd, struct sockaddr *serv_addr, int addrlen);
 			serv_addr is a struct sockaddr containing the destination port and IP address, and addrlen is the length in bytes of the server address structure - gotten from getaddrinfo()
 		int c = connect(sockfd, res->ai_addr, res->ai_addrlen);
 		-1 on error
 
 	##listen()
+		Wait for incomming connect()ions.
 		int listen(int sockfd, int backlog);
 			backlog is nbr of connections allowed in the incoming queue.They wait in queue until you accept. Usually 20 - 10.
 		-1 on error
