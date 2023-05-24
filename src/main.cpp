@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 23:58:54 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/24 20:32:48 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/24 23:34:30 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,10 +106,11 @@ int main(int ac, char **av)
 		
 		//Working with telnet, but not with Hexchat
 		//Might have to do with IRC protocol message format
-		std::string str;
+		std::string str, msg = ":DESKTOP-LILBEN NOTICE Bean :" ;
 		std::cout << "Send message: ";
-		// std::getline(std::cin, str);
-		str = ":DESKTOP-LILBEN NOTICE Bean :Chupa a pixota\r\n";
+		std::getline(std::cin, str);
+		// str = ":DESKTOP-LILBEN NOTICE Bean :Chupa\r\n";
+		str = msg + str + "\r\n";
 		sent_size = send(new_fd, str.c_str(), str.size(), 0);
 		if (sent_size == -1)
 		{
@@ -118,13 +119,15 @@ int main(int ac, char **av)
 			continue;
 		}
 		std::cout << "Message Sent. Number of bytes: "<< sent_size << std::endl;
-		char *buf[MAXDATASIZE];
+		char buf[MAXDATASIZE];
+		ft_bzero(buf, MAXDATASIZE);
 		if (recv(new_fd, buf, MAXDATASIZE - 1, 0) == -1)
 		{
 			std::cerr << "Server error: send()" << std::endl;
 			close(new_fd);
 			continue;
 		}
+		std::cout << (char  *)buf << std::endl;
 	}
 }
 
