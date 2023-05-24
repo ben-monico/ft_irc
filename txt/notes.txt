@@ -195,7 +195,8 @@ EXTERNAL FUNCS
 		done with sending and receiving? close the socketfd.
 
 	#BLOCKING
-		When we socket() an fd, the kernel sets it to blocking. To unblock, we use fcntl(fd, F_SETFL, O_NONBLOCK). This allows you to poll the socket for info.
+		When we socket() an fd, the kernel sets it to blocking. To unblock, we use fcntl(fd, F_SETFL, O_NONBLOCK). 
+	This allows you to poll the socket for info.
 		Trying to read from a non-blocking socket with no data, its not allowed to block, so you get -1 error.
 		Putting a program in a busy-wait looking for data on a socket is a bad practice.
 
@@ -203,7 +204,8 @@ EXTERNAL FUNCS
 		We want to monitor a bunch of sockets and handle the ones which have data ready. 
 		Polling is very slow for big numbers. libevent might speed it up.
 		The idea is having the OS letting us know when data is ready so our process can sleep without costing resources.
-		Get an array of structs of poll fds with info on the socket fds we want to know and what events to monitor. The Os will block on poll() until one of those events occurs or  user defined timeout.
+		Get an array of structs of poll fds with info on the socket fds we want to know and what events to monitor. 
+	The Os will block on poll() until one of those events occurs or  user defined timeout.
 		A listen() socket should return ready to read when an incoming connection can be accepted().
 
 		int poll(struct pollfd fds[], nfds_t nfds, int timeout);

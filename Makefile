@@ -1,7 +1,6 @@
 NAME		=	ircserv
 
-SRCS		=	src/main.cpp \
-				src/utils.cpp
+SRCS		=	src/main.cpp	src/utils.cpp	src/Context.cpp	
 
 SRCS_DIR	=	src
 
@@ -11,7 +10,7 @@ OBJS_DIR	=	obj
 
 INC			=	-I.
 
-CC			=	c++ -std=c++98 -Wall -Wextra -Werror -g
+CC			=	c++ -std=c++98 -Wall -Wextra -Werror -g -I. -Isrc/
 
 
 all:		$(NAME)

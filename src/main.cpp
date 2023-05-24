@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 23:58:54 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/23 01:02:46 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/24 20:32:48 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,12 +91,12 @@ int main(int ac, char **av)
 	socklen_t sin_size;
 	struct sockaddr_storage user_addr;
 	char s[INET_ADDRSTRLEN];
-	int sent_size, accept_fd;
+	int sent_size, new_fd;
 	while (1)
 	{
 		sin_size = sizeof(user_addr);
-		accept_fd = accept(sockfd, (struct sockaddr *)&user_addr, &sin_size);
-		if (accept_fd == -1)
+		new_fd = accept(sockfd, (struct sockaddr *)&user_addr, &sin_size);
+		if (new_fd == -1)
 		{
 			std::cerr << "Server error: accept()." << std::endl;
 			continue;
@@ -108,15 +108,23 @@ int main(int ac, char **av)
 		//Might have to do with IRC protocol message format
 		std::string str;
 		std::cout << "Send message: ";
-		std::getline(std::cin, str);
-		sent_size = send(accept_fd, str.c_str(), str.size(), 0);
+		// std::getline(std::cin, str);
+		str = ":DESKTOP-LILBEN NOTICE Bean :Chupa a pixota\r\n";
+		sent_size = send(new_fd, str.c_str(), str.size(), 0);
 		if (sent_size == -1)
 		{
 			std::cerr << "Server error: send()" << std::endl;
-			close(accept_fd);
+			close(new_fd);
 			continue;
 		}
 		std::cout << "Message Sent. Number of bytes: "<< sent_size << std::endl;
+		char *buf[MAXDATASIZE];
+		if (recv(new_fd, buf, MAXDATASIZE - 1, 0) == -1)
+		{
+			std::cerr << "Server error: send()" << std::endl;
+			close(new_fd);
+			continue;
+		}
 	}
 }
 
