@@ -12,7 +12,7 @@ class Context
 {
 	public:
 	//Commands
-		static void cmd_join(Client &client, std::string channel);
+		static void cmd_join(Client &client, std::string const &channel);
 		static void cmd_setNick(Client &client, std::string nick);
 		static void cmd_setUserName(Client &client, std::string userName);
 

@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 00:00:24 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/25 17:46:01 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/25 18:49:00 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,10 @@
 # define BACKLOG 10
 # define MAXDATASIZE 300 
 
-
-void err_out(std::string str);
+//Utils
 void ft_bzero(void *s, size_t n);
+
+void parse_recv(std::string str);
+void err_out(std::string str);
 
 #endif

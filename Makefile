@@ -1,6 +1,6 @@
 NAME		=	ircserv
 
-SRCS		=	src/main.cpp	src/utils.cpp	src/Context.cpp	
+SRCS		=	src/main.cpp	src/utils.cpp	src/Context.cpp	src/parsing.cpp
 
 SRCS_DIR	=	src
 

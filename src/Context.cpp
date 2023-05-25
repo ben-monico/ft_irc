@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 19:09:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/25 16:55:49 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/25 18:58:48 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ std::vector<Channel>::iterator  Context::find_Channel(std::string name)
 	return it;	
 }
 
-void Context::cmd_join(Client &client, std::string channel)
+void Context::cmd_join(Client &client, std::string const &channel)
 {
 	std::vector<Channel>::iterator it = find_Channel(channel);
 	if (it == _channels.end())

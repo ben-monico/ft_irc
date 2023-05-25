@@ -6,11 +6,13 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 23:58:54 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/25 17:51:56 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/25 19:31:26 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_irc.h"
+#include <poll.h>
+#include <string.h>
 
 void err_out(std::string str)
 {
@@ -21,10 +23,8 @@ void err_out(std::string str)
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
 {
-	if (sa->sa_family == AF_INET) {
+	if (sa->sa_family == AF_INET) //IPv4
 		return &(((struct sockaddr_in*)sa)->sin_addr);
-	}
-
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
@@ -86,44 +86,115 @@ int main(int ac, char **av)
 		std::cout << "Server hostname: " << hostname << std::endl;
 	std::cout << "Waiting for connections..." << std::endl;
 	
+	int fd_size = 10;
+	struct pollfd *fds = new struct pollfd[fd_size]; 
+	for (int i = 0; i < fd_size; i++)
+		fds[i].fd = -1;
+	fds[0].fd = sockfd;
+	fds[0].events = POLLIN;
+	
 	socklen_t user_addr_size;
 	struct sockaddr_storage user_addr;
-	char user_ip[INET_ADDRSTRLEN];
+	char buf[MAXDATASIZE];
 	int new_fd;
-	while (1) // constantly accepting new users that are in accept() queue
+	while (1)
 	{
-		user_addr_size = sizeof(user_addr);
-		new_fd = accept(sockfd, (struct sockaddr *)&user_addr, &user_addr_size);
-		if (new_fd == -1)
+		int eve_count = poll(fds, fd_size, 10000);
+		if (eve_count < 0)
+			err_out("Server error: poll()");
+		for (int i = 0; i < fd_size; i++)
 		{
-			std::cerr << "Server error: accept()." << std::endl;
-			continue;
+			if (fds[i].revents & POLLIN) //Our sockfd is ready to read
+			{
+				if (fds[i].fd == sockfd) //sockfd ready to read
+				{
+					user_addr_size = sizeof(user_addr);
+					new_fd = accept(sockfd, (struct sockaddr *)&user_addr, &user_addr_size);
+					if (new_fd == -1)
+					{
+						std::cerr << "Server error: accept()." << std::endl;
+						continue;
+					}
+					std::cout << "accepted at index " << i << std::endl;
+					for (int j = 0 ; j < fd_size; j++)
+					{
+						if (fds[j].fd == -1)
+						{
+							fds[j].fd = new_fd;
+							fds[j].events = POLLIN;
+							break ;
+						}
+					}
+					std::string str, msg = "" ;
+					std::cout << "Send message: ";
+					std::getline(std::cin, str);
+					str = msg + str + "\r\n";
+					if (send(new_fd, str.c_str(), str.size(), 0) == -1)
+					{
+						std::cerr << "Server error: send()" << std::endl;
+						close(new_fd);
+						continue;
+					}
+				}
+				else // any other client is ready to read
+				{
+					int rec_bytes = recv(fds[i].fd, buf, sizeof(buf), 0);
+					if (rec_bytes <= 0) // error or closed connection
+					{
+						std::cerr << "Server error: recv()." << std::endl;
+						close(fds[i].fd);
+						fds[i].fd = -1;
+					}
+					else
+					{
+						// parse the sent msg, might be a cmd, if plain msg, broadcast to other clients in the channel
+						// parse_recv(buf);
+						std::cout << buf << std::endl;
+					}
+					ft_bzero(buf, MAXDATASIZE);
+				}
+			}
 		}
-		//cant use this below
-		inet_ntop(user_addr.ss_family, get_in_addr((struct sockaddr *)&user_addr), user_ip, sizeof(user_ip));
-		std::cout << "Server: Successful connection from " << user_ip << std::endl;
-
-		std::string str = "", msg = "" ;
-		std::cout << "Send message: ";
-		std::getline(std::cin, str);
-		// str = ":DESKTOP-LILBEN NOTICE Bean :Chupa\r\n";
-		str = msg + str + "\r\n";
-		if (send(new_fd, str.c_str(), str.size(), 0) == -1)
-		{
-			std::cerr << "Server error: send()" << std::endl;
-			close(new_fd);
-			continue;
-		}
-		//client sends back info on the connected user
-		char buf[MAXDATASIZE];
-		ft_bzero(buf, MAXDATASIZE);
-		if (recv(new_fd, buf, MAXDATASIZE - 1, 0) == -1)
-		{
-			std::cerr << "Server error: send()" << std::endl;
-			close(new_fd);
-			continue;
-		}
-		std::cout << (char  *)buf << std::endl;
 	}
+	
+	// socklen_t user_addr_size;
+	// struct sockaddr_storage user_addr;
+	// char user_ip[INET_ADDRSTRLEN];
+	// char buf[MAXDATASIZE];
+	// int new_fd;
+	// while (1) // constantly accepting new users that are in accept() queue
+	// {
+	// 	user_addr_size = sizeof(user_addr);
+	// 	new_fd = accept(sockfd, (struct sockaddr *)&user_addr, &user_addr_size);
+	// 	if (new_fd == -1)
+	// 	{
+	// 		std::cerr << "Server error: accept()." << std::endl;
+	// 		continue;
+	// 	}
+	// 	//cant use this below
+	// 	inet_ntop(user_addr.ss_family, get_in_addr((struct sockaddr *)&user_addr), user_ip, sizeof(user_ip));
+	// 	std::cout << "Server: Successful connection from " << user_ip << std::endl;
+
+	// 	std::string str, msg = "" ;
+	// 	std::cout << "Send message: ";
+	// 	std::getline(std::cin, str);
+	// 	str = msg + str + "\r\n";
+	// 	if (send(new_fd, str.c_str(), str.size(), 0) == -1)
+	// 	{
+	// 		std::cerr << "Server error: send()" << std::endl;
+	// 		close(new_fd);
+	// 		continue;
+	// 	}
+	// 	//client sends back info
+	// 	char buf[MAXDATASIZE];
+	// 	ft_bzero(buf, MAXDATASIZE);
+	// 	if (recv(new_fd, buf, MAXDATASIZE - 1, 0) == -1)
+	// 	{
+	// 		std::cerr << "Server error: send()" << std::endl;
+	// 		close(new_fd);
+	// 		continue;
+	// 	}
+	// 	std::cout << (char  *)buf << std::endl;
+	// }
 }
 
