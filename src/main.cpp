@@ -6,13 +6,13 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 23:58:54 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/25 19:31:26 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/25 22:48:53 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_irc.h"
 #include <poll.h>
-#include <string.h>
+
 
 void err_out(std::string str)
 {
@@ -96,27 +96,24 @@ int main(int ac, char **av)
 	socklen_t user_addr_size;
 	struct sockaddr_storage user_addr;
 	char buf[MAXDATASIZE];
-	int new_fd;
+	int new_fd, rec_bytes;
+	//TODO: client packets might be fragmented, store/append them until \r\n is found
 	while (1)
 	{
-		int eve_count = poll(fds, fd_size, 10000);
-		if (eve_count < 0)
+		int event_count = poll(fds, fd_size, 10000);
+		if (event_count < 0)
 			err_out("Server error: poll()");
 		for (int i = 0; i < fd_size; i++)
 		{
-			if (fds[i].revents & POLLIN) //Our sockfd is ready to read
+			if (fds[i].revents & POLLIN) //Our sockfd is ready to read aka our listener
 			{
 				if (fds[i].fd == sockfd) //sockfd ready to read
 				{
 					user_addr_size = sizeof(user_addr);
 					new_fd = accept(sockfd, (struct sockaddr *)&user_addr, &user_addr_size);
-					if (new_fd == -1)
-					{
-						std::cerr << "Server error: accept()." << std::endl;
+					if (new_fd == -1 && std::cerr << "Server error: accept().\n")
 						continue;
-					}
-					std::cout << "accepted at index " << i << std::endl;
-					for (int j = 0 ; j < fd_size; j++)
+					for (int j = 0 ; j < fd_size; j++) //find available pollfd slot
 					{
 						if (fds[j].fd == -1)
 						{
@@ -125,20 +122,12 @@ int main(int ac, char **av)
 							break ;
 						}
 					}
-					std::string str, msg = "" ;
-					std::cout << "Send message: ";
-					std::getline(std::cin, str);
-					str = msg + str + "\r\n";
-					if (send(new_fd, str.c_str(), str.size(), 0) == -1)
-					{
-						std::cerr << "Server error: send()" << std::endl;
-						close(new_fd);
-						continue;
-					}
+					if (!welcome_client(new_fd))
+						continue ;
 				}
 				else // any other client is ready to read
 				{
-					int rec_bytes = recv(fds[i].fd, buf, sizeof(buf), 0);
+					rec_bytes = recv(fds[i].fd, buf, sizeof(buf), 0);
 					if (rec_bytes <= 0) // error or closed connection
 					{
 						std::cerr << "Server error: recv()." << std::endl;
@@ -149,7 +138,7 @@ int main(int ac, char **av)
 					{
 						// parse the sent msg, might be a cmd, if plain msg, broadcast to other clients in the channel
 						// parse_recv(buf);
-						std::cout << buf << std::endl;
+						std::cout << buf << " in fd " << fds[i].fd << std::endl;
 					}
 					ft_bzero(buf, MAXDATASIZE);
 				}

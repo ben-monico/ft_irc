@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 00:00:24 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/25 18:49:00 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/25 23:13:25 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,10 @@
 # include <arpa/inet.h>
 # include <netinet/in.h>
 
-# include <sys/wait.h>
-# include <stdio.h>
-# include <errno.h>
+# include "Client.hpp"
+# include "Channel.hpp"
+# include "Context.hpp"
+
 
 # define PORT "3490"
 # define BACKLOG 10
@@ -35,7 +36,10 @@
 //Utils
 void ft_bzero(void *s, size_t n);
 
+void parse_new_client(std::string str);
 void parse_recv(std::string str);
+bool welcome_client(int sockfd);
+
 void err_out(std::string str);
 
 #endif

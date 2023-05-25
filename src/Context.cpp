@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 19:09:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/25 18:58:48 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/25 23:12:25 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 std::vector<Channel> Context::_channels;
 std::vector<Client> Context::_clients;
+std::string Context::welcome = "Welcome to ft_irc\r\n";
 
 std::vector<Channel>::iterator  Context::find_Channel(std::string name)
 {
@@ -75,4 +76,9 @@ void Context::cop_mode(Channel &channel, char c)
 {
 	if (c == 'i' || c == 't' || c == 'k' || c == 'o' || c == 'l')
 		channel.setMode(c);
+}
+
+void Context::add_client(Client client)
+{
+	_clients.push_back(client);
 }

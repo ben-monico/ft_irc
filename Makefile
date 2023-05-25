@@ -10,8 +10,7 @@ OBJS_DIR	=	obj
 
 INC			=	-I.
 
-CC			=	c++ -std=c++98 -Wall -Wextra -Werror -g -I. -Isrc/
-
+CC			=	c++ -std=c++98 -Wall -Wextra -Werror -g -Iinc/
 
 all:		$(NAME)
 
