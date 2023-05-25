@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 23:58:54 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/24 23:34:30 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/25 17:51:56 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,23 +28,18 @@ void *get_in_addr(struct sockaddr *sa)
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-int main(int ac, char **av)
+int server_setup()
 {
-	// if (ac != 3)
-	// 	err_out("Wrong number of arguments");
-	(void) ac;
-	(void) av;
-	struct addrinfo hints, *servinfo, *aux;
-	struct sigaction sa;
+	struct addrinfo initialinfo, *servinfo, *aux;
 	
-	ft_bzero(&hints, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE; //for my IP
+	ft_bzero(&initialinfo, sizeof(initialinfo));
+	initialinfo.ai_family = AF_INET; //IPV4
+	initialinfo.ai_socktype = SOCK_STREAM; //cause we need TCP/IP
+	initialinfo.ai_flags = AI_PASSIVE; //for my IP
 
 	int ret, sockfd, yes = 1;
 	std::string err = "Server error: getaddrinfo() - ";
-	if ((ret = getaddrinfo(NULL, PORT, &hints, &servinfo)))
+	if ((ret = getaddrinfo(NULL, PORT, &initialinfo, &servinfo)))
 	{
 		err += gai_strerror(ret);
 		err_out(err);
@@ -57,8 +52,11 @@ int main(int ac, char **av)
 			std::cerr << "Server error: socket()." << std::endl;
 			continue ;
 		}
+		//By using SOL_SOCKET, we are saying that we want to use the socket layer 
+		//By using SO_REUSEADDR, we can use the same port for different sockets without getting an error
 		if (setsockopt(sockfd, SOL_SOCKET,SO_REUSEADDR, &yes, sizeof(yes)) == -1)
 			err_out("Server error: setsockopt()");
+		//bind the aux->address to the socket
 		if (bind(sockfd, aux->ai_addr, aux->ai_addrlen) == -1)
 		{
 			close(sockfd);
@@ -69,56 +67,54 @@ int main(int ac, char **av)
 	}
 	freeaddrinfo(servinfo);
 	servinfo = NULL;
-	
-	//Couldn't find a valid address
-	if (!aux)
+	if (!aux) //means we couldnt bind to any address
 		err_out("Server error: unable to bind.");
-	//Unable to listen to socketfd
-	if (listen(sockfd, BACKLOG) == -1)
+	return sockfd;
+}
+
+int main(int ac, char **av)
+{
+	// if (ac != 3)
+	// 	err_out("Wrong number of arguments");
+	(void) ac;
+	(void) av;
+	int sockfd = server_setup();
+	if (listen(sockfd, BACKLOG) == -1) // check for incoming connections
 		err_out("Server error: listen()");
-	//Reap all dead processes
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;
-	if (sigaction(SIGCHLD, &sa, NULL) == -1)
-		err_out("Server error: sigaction()");
-	
-	// char hostname[256];
-    // if (gethostname(hostname, sizeof(hostname)) == 0)
-	// 	std::cout << "Server hostname: " << hostname << std::endl;
-	
+	char hostname[256];
+    if (gethostname(hostname, sizeof(hostname)) == 0)
+		std::cout << "Server hostname: " << hostname << std::endl;
 	std::cout << "Waiting for connections..." << std::endl;
 	
-	socklen_t sin_size;
+	socklen_t user_addr_size;
 	struct sockaddr_storage user_addr;
-	char s[INET_ADDRSTRLEN];
-	int sent_size, new_fd;
-	while (1)
+	char user_ip[INET_ADDRSTRLEN];
+	int new_fd;
+	while (1) // constantly accepting new users that are in accept() queue
 	{
-		sin_size = sizeof(user_addr);
-		new_fd = accept(sockfd, (struct sockaddr *)&user_addr, &sin_size);
+		user_addr_size = sizeof(user_addr);
+		new_fd = accept(sockfd, (struct sockaddr *)&user_addr, &user_addr_size);
 		if (new_fd == -1)
 		{
 			std::cerr << "Server error: accept()." << std::endl;
 			continue;
 		}
-		inet_ntop(user_addr.ss_family, get_in_addr((struct sockaddr *)&user_addr), s, sizeof(s));
-		std::cout << "Server: Successful connection from " << s << std::endl;
-		
-		//Working with telnet, but not with Hexchat
-		//Might have to do with IRC protocol message format
-		std::string str, msg = ":DESKTOP-LILBEN NOTICE Bean :" ;
+		//cant use this below
+		inet_ntop(user_addr.ss_family, get_in_addr((struct sockaddr *)&user_addr), user_ip, sizeof(user_ip));
+		std::cout << "Server: Successful connection from " << user_ip << std::endl;
+
+		std::string str = "", msg = "" ;
 		std::cout << "Send message: ";
 		std::getline(std::cin, str);
 		// str = ":DESKTOP-LILBEN NOTICE Bean :Chupa\r\n";
 		str = msg + str + "\r\n";
-		sent_size = send(new_fd, str.c_str(), str.size(), 0);
-		if (sent_size == -1)
+		if (send(new_fd, str.c_str(), str.size(), 0) == -1)
 		{
 			std::cerr << "Server error: send()" << std::endl;
 			close(new_fd);
 			continue;
 		}
-		std::cout << "Message Sent. Number of bytes: "<< sent_size << std::endl;
+		//client sends back info on the connected user
 		char buf[MAXDATASIZE];
 		ft_bzero(buf, MAXDATASIZE);
 		if (recv(new_fd, buf, MAXDATASIZE - 1, 0) == -1)

@@ -6,18 +6,18 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 19:09:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/24 20:23:09 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/25 16:55:49 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Context.hpp"
 
-std::list<Channel> Context::_channels;
-std::list<Client> Context::_clients;
+std::vector<Channel> Context::_channels;
+std::vector<Client> Context::_clients;
 
-std::list<Channel>::iterator  Context::find_Channel(std::string name)
+std::vector<Channel>::iterator  Context::find_Channel(std::string name)
 {
-	std::list<Channel>::iterator it = Context::_channels.begin();
+	std::vector<Channel>::iterator it = Context::_channels.begin();
 	for (; it != _channels.end(); ++it)
 		if (it->getName() == name)
 			break;
@@ -26,11 +26,12 @@ std::list<Channel>::iterator  Context::find_Channel(std::string name)
 
 void Context::cmd_join(Client &client, std::string channel)
 {
-	std::list<Channel>::iterator it = find_Channel(channel);
+	std::vector<Channel>::iterator it = find_Channel(channel);
 	if (it == _channels.end())
 	{
 		_channels.push_back(Channel(channel, 'o'));
 		it = (_channels.end())--;
+		
 	}
 	(*it).addClient(client);
 	client.setChannel(channel);
@@ -48,7 +49,7 @@ void Context::cmd_setUserName(Client &client, std::string userName)
 
 void Context::cop_kick(Client &client)
 {
-	std::list<Channel>::iterator it = find_Channel(client.getChannel());
+	std::vector<Channel>::iterator it = find_Channel(client.getChannel());
 	if (it != _channels.end())
 	{
 		(*it).removeClient(client);

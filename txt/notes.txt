@@ -192,8 +192,9 @@ EXTERNAL FUNCS
 		-1 on error.
 	
 	##close()
-		done with sending and receiving? close the socketfd.
-
+		done wit
+		
+		
 	#BLOCKING
 		When we socket() an fd, the kernel sets it to blocking. To unblock, we use fcntl(fd, F_SETFL, O_NONBLOCK). 
 	This allows you to poll the socket for info.

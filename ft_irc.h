@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 00:00:24 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/22 23:54:07 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/25 17:46:01 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 
 # define PORT "3490"
 # define BACKLOG 10
-# define MAXDATASIZE 100 
+# define MAXDATASIZE 300 
 
 
 void err_out(std::string str);

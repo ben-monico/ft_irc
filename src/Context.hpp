@@ -3,7 +3,7 @@
 
 # include <iostream>
 # include <string>
-# include <list>
+# include <vector>
 # include "Channel.hpp"
 # include "Client.hpp"
 
@@ -22,11 +22,11 @@ class Context
 		static void cop_topic(Client &client, std::string topic);
 		static void cop_mode(Channel &channel, char c);
 
-		static std::list<Channel>::iterator  find_Channel(std::string name);
+		static std::vector<Channel>::iterator  find_Channel(std::string name);
 
 	private:
-		static std::list<Channel>	_channels;
-		static std::list<Client>	_clients;
+		static std::vector<Channel>	_channels;
+		static std::vector<Client>	_clients;
 };
 
 #endif

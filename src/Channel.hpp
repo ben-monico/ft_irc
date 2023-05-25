@@ -3,7 +3,7 @@
 
 # include <iostream>
 # include <string>
-# include <list>
+# include <vector>
 # include "Client.hpp"
 
 class Client;
@@ -17,7 +17,7 @@ class Channel
 		void addClient(Client &client) { _clients.push_back(client); }
 		void removeClient(Client &client)
 		{
-			std::list<Client>::iterator it = _clients.begin();
+			std::vector<Client>::iterator it = _clients.begin();
 			for (; it != _clients.end(); ++it)
 				if (it->getNick() == client.getNick())
 					break;
@@ -31,10 +31,11 @@ class Channel
 		std::string getName() const { return _name; }
 			
 	private:
-		std::list<Client> _clients;
+		std::vector<Client> _clients;
 		std::string _name;
 		char _mode;
 		std::string _topic;
+		std::vector<Client> _operators;
 		
 };
 

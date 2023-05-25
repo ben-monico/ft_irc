@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 17:52:03 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/24 20:11:39 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/25 16:50:40 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,13 @@ class Client
 		void setUserName(std::string userName) { _userName = userName; }
 		void setChannel(std::string channel) { _channel = channel; }
 		std::string getChannel() const { return _channel; }
+		std::string getRole() const { return _role; }
 
 	private:
 		std::string _userName;
 		std::string _nick;
 		std::string _channel;
+		std::string _role;
 };
 
 #endif
