@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 23:58:54 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/25 22:48:53 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/26 14:55:40 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int server_setup()
 	}
 	freeaddrinfo(servinfo);
 	servinfo = NULL;
-	if (!aux) //means we couldnt bind to any address
+	if (!aux)
 		err_out("Server error: unable to bind.");
 	return sockfd;
 }
@@ -79,8 +79,10 @@ int main(int ac, char **av)
 	(void) ac;
 	(void) av;
 	int sockfd = server_setup();
-	if (listen(sockfd, BACKLOG) == -1) // check for incoming connections
+	// check for incoming connections
+	if (listen(sockfd, BACKLOG) == -1) 
 		err_out("Server error: listen()");
+	//get hostname
 	char hostname[256];
     if (gethostname(hostname, sizeof(hostname)) == 0)
 		std::cout << "Server hostname: " << hostname << std::endl;
@@ -97,17 +99,20 @@ int main(int ac, char **av)
 	struct sockaddr_storage user_addr;
 	char buf[MAXDATASIZE];
 	int new_fd, rec_bytes;
-	//TODO: client packets might be fragmented, store/append them until \r\n is found
 	while (1)
 	{
 		int event_count = poll(fds, fd_size, 10000);
 		if (event_count < 0)
 			err_out("Server error: poll()");
+		int cur = 0;
 		for (int i = 0; i < fd_size; i++)
 		{
-			if (fds[i].revents & POLLIN) //Our sockfd is ready to read aka our listener
+			if (cur == event_count)
+				break ;
+			if (fds[i].revents & POLLIN)
 			{
-				if (fds[i].fd == sockfd) //sockfd ready to read
+				cur++;
+				if (fds[i].fd == sockfd)  //Our sockfd is ready to read/accept a connection
 				{
 					user_addr_size = sizeof(user_addr);
 					new_fd = accept(sockfd, (struct sockaddr *)&user_addr, &user_addr_size);
@@ -127,6 +132,7 @@ int main(int ac, char **av)
 				}
 				else // any other client is ready to read
 				{
+					//TODO: client packets might be fragmented, store/append them until \r\n is found
 					rec_bytes = recv(fds[i].fd, buf, sizeof(buf), 0);
 					if (rec_bytes <= 0) // error or closed connection
 					{
@@ -136,7 +142,8 @@ int main(int ac, char **av)
 					}
 					else
 					{
-						// parse the sent msg, might be a cmd, if plain msg, broadcast to other clients in the channel
+						// TODO: parse the sent msg, might be a cmd, if plain msg, broadcast to other clients in the channel
+						//Each client is given a private buffer of 512
 						// parse_recv(buf);
 						std::cout << buf << " in fd " << fds[i].fd << std::endl;
 					}

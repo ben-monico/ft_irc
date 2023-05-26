@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 18:43:31 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/25 23:14:52 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/26 14:26:53 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 //we can limit usernames and nicknames to alphanumeric + _
 void parse_new_client(std::string str, int id)
 {
+	//USER | ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRE
 	std::string nick;
 	std::string userName;
 
@@ -40,7 +41,6 @@ void parse_new_client(std::string str, int id)
 			break;
 		}
 	}
-	//TODO: find user by username, if username in use throw err
 	Context::add_client(Client(nick, userName, id));
 }
 
@@ -65,7 +65,7 @@ bool welcome_client(int new_fd)
 	return true;
 }
 
-
+//TODO: pointer to member function for automated parsing (?)
 void parse_recv(std::string str)
 {
 	Client client("", "", 0);
