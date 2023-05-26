@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 19:09:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/26 14:53:30 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/26 14:59:00 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,7 @@ void Context::chanop_mode(Channel &channel, char c, std::string const & msg)
 	//check msg in case of additional params
 	if (c == 'i' || c == 't' || c == 'k' || c == 'o' || c == 'l')
 		channel.setMode(c);
+	(void) msg;
 }
 
 void Context::add_client(Client client)

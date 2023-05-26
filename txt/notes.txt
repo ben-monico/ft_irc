@@ -20,8 +20,8 @@ EXTERNAL FUNCS
 // ntohs 			converts a short integer from a network representation
 // ntohl 			converts a long integer from a network representation
 
-// inet_addr 		converts an Internet address to a network representation
-// inet_ntoa 		converts a network representation to an Internet addressq
+// inet_addr 		converts an  IPV4 dot-decimal notation to a network representation
+// inet_ntoa 		converts a network representation to an IPV4 dot-decimal notation
 
 // send				sends data on a socket
 // recv 			receives data from a socket

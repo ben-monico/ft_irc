@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 23:58:54 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/26 14:55:40 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/26 16:34:11 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,10 +82,12 @@ int main(int ac, char **av)
 	// check for incoming connections
 	if (listen(sockfd, BACKLOG) == -1) 
 		err_out("Server error: listen()");
+		
 	//get hostname
 	char hostname[256];
     if (gethostname(hostname, sizeof(hostname)) == 0)
 		std::cout << "Server hostname: " << hostname << std::endl;
+		
 	std::cout << "Waiting for connections..." << std::endl;
 	
 	int fd_size = 10;
@@ -101,7 +103,7 @@ int main(int ac, char **av)
 	int new_fd, rec_bytes;
 	while (1)
 	{
-		int event_count = poll(fds, fd_size, 10000);
+		int event_count = poll(fds, fd_size, -1);
 		if (event_count < 0)
 			err_out("Server error: poll()");
 		int cur = 0;
@@ -139,6 +141,7 @@ int main(int ac, char **av)
 						std::cerr << "Server error: recv()." << std::endl;
 						close(fds[i].fd);
 						fds[i].fd = -1;
+						//QUIT msg
 					}
 					else
 					{
