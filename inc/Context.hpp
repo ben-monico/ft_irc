@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/26 16:21:58 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/29 14:39:47 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # include "Channel.hpp"
 # include "Client.hpp"
 
-
+//Static management
 class Context
 {
 	public:
