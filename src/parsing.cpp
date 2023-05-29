@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 18:43:31 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/26 15:14:45 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/29 16:02:30 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,9 @@ bool welcome_client(int new_fd)
 //TODO: pointer to member function for automated parsing (?) \r\n
 void parse_recv(std::string str)
 {
+	//placeholdeer for join channel
 	Client client("", "", 0);
-	if (str.rfind("JOIN #", 0) != std::string::npos)
+	if (str.compare("JOIN #") < 0)
 	{
 		if (str[6])
 		{	

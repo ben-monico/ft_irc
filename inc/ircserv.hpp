@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 00:00:24 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/25 23:13:25 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/29 16:12:56 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # include "Client.hpp"
 # include "Channel.hpp"
 # include "Context.hpp"
+# include "Handler.hpp"
 
 
 # define PORT "3490"

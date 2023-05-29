@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/29 14:39:47 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/29 16:11:57 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,9 @@ class Context
 		static void chanop_mode(Channel &channel, char c, std::string const & msg);
 
 		static std::vector<Channel>::iterator  find_chan_by_name(std::string name);
+	
+	//Command Responses
+		static void RPL_TOPIC(Client &client, Channel &channel);
 
 	private:
 		static std::vector<Channel>	_channels;

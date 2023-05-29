@@ -6,11 +6,11 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 19:09:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/26 14:59:00 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/29 16:15:03 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Context.hpp"
+#include <Context.hpp>
 
 //ERRORS ON PAGE 43
 
@@ -40,6 +40,8 @@ void Context::cmd_join(Client &client, std::string const &channel)
 	}
 	(*it).addClient(client);
 	client.setChannel(channel);
+
+	
 	//display chan topic using RPL_TOPIC
 	// /ERR_NEEDMOREPARAMS              ERR_BANNEDFROMCHAN
 	// ERR_INVITEONLYCHAN              ERR_BADCHANNELKEY
@@ -118,4 +120,11 @@ void Context::chanop_mode(Channel &channel, char c, std::string const & msg)
 void Context::add_client(Client client)
 {
 	_clients.push_back(client);
+}
+
+//Command responses
+
+void Context::RPL_TOPIC(Client &client, Channel &channel)
+{
+	Handler::send_all()
 }
