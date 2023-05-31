@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Handler.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/29 14:36:26 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/31 17:30:08 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/05/31 19:17:26 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 # define HANDLER_HPP
 # define MYPORT "30035" // the port users will be connecting to
 # define BACKLOG 10 // how many pending connections queue will hold
-// #include <ircserv.hpp>
+# ifndef PASSWD
+#  define PASSWD "123"
+# endif
 # include <Context.hpp>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -29,20 +31,22 @@
 #include <poll.h>
 #include <cstring>
 #include <fcntl.h>
+
+
 //Static backend handler
 class Handler 
 {
 	private:
 		void	handleClientServerConnections();
 		void	handlePollResults(int &fdsSize, int &fdsCount);
-		void	handleClientConnection(int &fdsSize, int &fdsCount, int position);
+		std::string	handleClientConnection(int &fdsSize, int fdsCount, int position);
+		void	parseNewClientInfo(std::string const &str, int id);
 		void	acceptIncomingConnection(int &fdsSize, int &fdsCount);
 		void	delFromFDsArray(int &fdsCount, int &fdsSize, int position);
 		void	addToFDsArray(int &fdsCount, int &fdsSize, int newFD);
 		void	extendFDsArray(int &fdsSize);
 		void	listenBoundSocket();
 		void	printHostname();
-		size_t	ft_strlen(char *str);
 		addrinfo	*getServerInfo();
 		std::vector<int>	bindSocketFDs(struct addrinfo *servinfo);
 		std::vector<int>	_socketFDs;

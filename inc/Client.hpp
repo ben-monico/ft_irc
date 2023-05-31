@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 17:52:03 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/31 15:39:26 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/31 18:41:05 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ class Client
 	private:
 		std::string _nick;
 		std::string _userName;
-		int _id;
+		int _id; //is his index in pollfds
 		std::string _channel;
 		std::string _role;
 };

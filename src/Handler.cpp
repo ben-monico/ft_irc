@@ -1,4 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Handler.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/05/31 18:14:28 by bcarreir          #+#    #+#             */
+/*   Updated: 2023/05/31 19:24:25 by bcarreir         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <Handler.hpp>
+#include <ircserv.hpp>
 
 int	Handler::pError(std::string category, std::string error, int code)
 {
@@ -26,16 +39,6 @@ addrinfo *Handler::getServerInfo()
 	if ((status = getaddrinfo(NULL, MYPORT, &hints, &res)))
 		exit(pError("getaddrinfo error", gai_strerror(status), status));
 	return (res);
-}
-
-size_t Handler::ft_strlen(char *str)
-{
-	int i = -1;
-
-	if (!str || !*str)
-		return (0);
-	while (str[++i]) {}
-	return (i);
 }
 
 void	Handler::printHostname()
@@ -125,7 +128,7 @@ void	Handler::addToFDsArray(int &fdsCount, int &fdsSize, int newFD)
 		extendFDsArray(fdsSize);
 	_pollFDsArray[fdsCount].fd = newFD;
 	_pollFDsArray[fdsCount].events = POLLIN;
-	fdsCount += 1;
+	fdsCount++;
 }
 
 void	Handler::delFromFDsArray(int &fdsCount, int &fdsSize, int position)
@@ -140,13 +143,57 @@ void	Handler::acceptIncomingConnection(int &fdsSize, int &fdsCount)
 {
 	struct sockaddr_storage remoteaddr;
 	socklen_t	addrlen = sizeof(remoteaddr);
+	std::string msg;
 	int			newFD;
 
 	newFD = accept(_pollFDsArray[0].fd, (struct sockaddr *)&remoteaddr, &addrlen);
 	if (newFD < 0)
 		pError("accept error", "failed to accept request on fd", 1);
 	else
+	{
 		addToFDsArray(fdsCount, fdsSize, newFD);
+		msg = handleClientConnection(fdsSize, fdsCount - 1, fdsCount - 1);
+		parseNewClientInfo(msg, fdsCount - 1);
+	}
+}
+
+void Handler::parseNewClientInfo(std::string const &str, int id)
+{
+	std::string nick;
+	std::string userName;
+
+	int pos = str.find("PASS", 13);
+	if (pos != -1)
+	{
+		if (str.substr(pos + 5, str.size() - pos - 7) != PASSWD)
+		{
+			std::cout << "464 * :Password incorrect." << std::endl;
+			close(_pollFDsArray[id].fd);
+			delFromFDsArray(id, id, id);
+			return ;
+		}
+	} 
+		return ; // close connection instead 
+/* 	size_t i = 5;
+	for (; i < str.size(); i++)
+	{
+		if (str[i] == '\r' && str[i + 1] == '\n')
+		{
+			nick = str.substr(5, i - 5);
+			break;
+		}
+	}
+	//TODO: find user by nick, if nick in use throw err
+	size_t j = i + 7;
+	for (; j < str.size(); j++)
+	{
+		if (str[j] == '\r' && str[i + j] == '\n')
+		{
+			userName = str.substr(i + 7, j - i - 7);
+			break;
+		}
+	} */
+	Context::add_client(Client(nick, userName, id));
 }
 
 void	Handler::sendAllBytes(std::string msg, int clientId)
@@ -160,19 +207,20 @@ void	Handler::sendAllBytes(std::string msg, int clientId)
 	}
 }
 
-void	Handler::handleClientConnection(int &fdsSize, int &fdsCount, int position)
+//consider changing name to receive qqr coisa
+std::string	Handler::handleClientConnection(int &fdsSize, int fdsCount, int position)
 {
 	char	buf[384];
 	ft_bzero(buf, sizeof(buf));
 	int		bytesReceiveded = recv(_pollFDsArray[position].fd, buf, sizeof(buf), 0);
 
-	std::cout << "receiving msg" << std::endl;
+	// std::cout << "receiving msg" << std::endl;
 	if (bytesReceiveded <= 0)
 	{
 		std::cout << "Connection closed with " << _pollFDsArray[position].fd << std::endl;
 		close(_pollFDsArray[position].fd);
 		delFromFDsArray(fdsCount, fdsSize, position);
-		return ;
+		return "";
 	}
 	std::cout << "msg received:\n" << buf << std::endl;
 	for (int i = 0; i < fdsCount; ++i)
@@ -181,6 +229,7 @@ void	Handler::handleClientConnection(int &fdsSize, int &fdsCount, int position)
 			continue ;
 		sendAllBytes(buf, i);
 	}
+	return buf;
 }
 
 void	Handler::handlePollResults(int &fdsSize, int &fdsCount)

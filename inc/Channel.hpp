@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:40 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/31 16:00:47 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/31 18:46:02 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 # include <iostream>
 # include <string>
 # include <vector>
-#include <ircserv.hpp>
+# include <ircserv.hpp>
+# include <Client.hpp>
 
 
 class Client;
@@ -28,11 +29,12 @@ class Channel
 		~Channel() {}
 
 		void addClient(Client &client) { _clients.push_back(client); }
-		void removeClient(Client &client)
+		
+		void removeClientFromChannel(std::string const &nick)
 		{
 			std::vector<Client>::iterator it = _clients.begin();
 			for (; it != _clients.end(); ++it)
-				if (it->getNick() == client.getNick())
+				if (nick == it->getNick())
 					break;
 			if (it != _clients.end())
 				_clients.erase(it);

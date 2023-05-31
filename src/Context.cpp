@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Context.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 19:09:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/31 17:16:30 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/05/31 18:49:22 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void Context::chanop_kick(Client &client)
 	std::vector<Channel>::iterator it = find_chan_by_name(client.getChannel());
 	if (it != _channels.end())
 	{
-		(*it).removeClient(client);
+		(*it).removeClientFromChannel(client.getNick());
 		client.setChannel("");
 	}
 	//ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
