@@ -6,11 +6,11 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 23:58:54 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/26 16:34:11 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/31 15:37:22 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_irc.h"
+#include <ircserv.hpp>
 #include <poll.h>
 
 
@@ -132,7 +132,7 @@ int main(int ac, char **av)
 					if (!welcome_client(new_fd))
 						continue ;
 				}
-				else // any other client is ready to read
+				else // any other client is ready to read 
 				{
 					//TODO: client packets might be fragmented, store/append them until \r\n is found
 					rec_bytes = recv(fds[i].fd, buf, sizeof(buf), 0);
@@ -155,45 +155,5 @@ int main(int ac, char **av)
 			}
 		}
 	}
-	
-	// socklen_t user_addr_size;
-	// struct sockaddr_storage user_addr;
-	// char user_ip[INET_ADDRSTRLEN];
-	// char buf[MAXDATASIZE];
-	// int new_fd;
-	// while (1) // constantly accepting new users that are in accept() queue
-	// {
-	// 	user_addr_size = sizeof(user_addr);
-	// 	new_fd = accept(sockfd, (struct sockaddr *)&user_addr, &user_addr_size);
-	// 	if (new_fd == -1)
-	// 	{
-	// 		std::cerr << "Server error: accept()." << std::endl;
-	// 		continue;
-	// 	}
-	// 	//cant use this below
-	// 	inet_ntop(user_addr.ss_family, get_in_addr((struct sockaddr *)&user_addr), user_ip, sizeof(user_ip));
-	// 	std::cout << "Server: Successful connection from " << user_ip << std::endl;
-
-	// 	std::string str, msg = "" ;
-	// 	std::cout << "Send message: ";
-	// 	std::getline(std::cin, str);
-	// 	str = msg + str + "\r\n";
-	// 	if (send(new_fd, str.c_str(), str.size(), 0) == -1)
-	// 	{
-	// 		std::cerr << "Server error: send()" << std::endl;
-	// 		close(new_fd);
-	// 		continue;
-	// 	}
-	// 	//client sends back info
-	// 	char buf[MAXDATASIZE];
-	// 	ft_bzero(buf, MAXDATASIZE);
-	// 	if (recv(new_fd, buf, MAXDATASIZE - 1, 0) == -1)
-	// 	{
-	// 		std::cerr << "Server error: send()" << std::endl;
-	// 		close(new_fd);
-	// 		continue;
-	// 	}
-	// 	std::cout << (char  *)buf << std::endl;
-	// }
 }
 

@@ -6,14 +6,15 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 17:52:03 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/25 22:53:18 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/31 15:39:26 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-# include <ft_irc.h>
+#include <ircserv.hpp>
+
 
 class Channel;
 

@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:40 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/25 22:52:55 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/31 16:00:47 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 # include <iostream>
 # include <string>
 # include <vector>
-# include <ft_irc.h>
+#include <ircserv.hpp>
+
 
 class Client;
 
@@ -41,6 +42,7 @@ class Channel
 		void setTopic(std::string topic) { _topic = topic; }
 
 		std::string getName() const { return _name; }
+		std::string getTopic() const { return _topic; }
 			
 	private:
 		std::vector<Client> _clients;

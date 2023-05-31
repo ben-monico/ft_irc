@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 19:09:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/29 16:15:03 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/31 16:01:44 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,15 @@ std::vector<Channel>::iterator  Context::find_chan_by_name(std::string name)
 	return it;	
 }
 
+std::vector<Client>::iterator  Context::find_client_by_id(int id)
+{
+	std::vector<Client>::iterator it = Context::_clients.begin();
+	for (; it != _clients.end(); ++it)
+		if (it->getId() == id)
+			break;
+	return it;	
+}
+
 //Commands
 void Context::cmd_join(Client &client, std::string const &channel)
 {
@@ -40,7 +49,7 @@ void Context::cmd_join(Client &client, std::string const &channel)
 	}
 	(*it).addClient(client);
 	client.setChannel(channel);
-
+	RPL_TOPIC(client.getId(), *it);
 	
 	//display chan topic using RPL_TOPIC
 	// /ERR_NEEDMOREPARAMS              ERR_BANNEDFROMCHAN
@@ -124,7 +133,7 @@ void Context::add_client(Client client)
 
 //Command responses
 
-void Context::RPL_TOPIC(Client &client, Channel &channel)
+void Context::RPL_TOPIC(int client_id, Channel &channel)
 {
-	Handler::send_all()
+	Handler::send_all(client_id, channel.getName() + " : " + channel.getTopic() + "\r\n");
 }
