@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Context.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 19:09:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/31 16:01:44 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/05/31 17:16:30 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,5 +135,7 @@ void Context::add_client(Client client)
 
 void Context::RPL_TOPIC(int client_id, Channel &channel)
 {
-	Handler::send_all(client_id, channel.getName() + " : " + channel.getTopic() + "\r\n");
+	(void)channel;
+	(void)client_id;
+	// Handler::send_all(client_id, channel.getName() + " : " + channel.getTopic() + "\r\n");
 }
