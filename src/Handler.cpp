@@ -221,9 +221,9 @@ void	Handler::init( void )
 {
 	struct addrinfo		*servinfo;
 	servinfo = getServerInfo();
-	freeaddrinfo(servinfo);
 	_pollFDsArray = 0;
 	_socketFDs = bindSocketFDs(servinfo);
+	freeaddrinfo(servinfo);
 }
 
 void	Handler::start( void )
