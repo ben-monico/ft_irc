@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_irc.h                                           :+:      :+:    :+:   */
+/*   ircserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/16 00:00:24 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/29 16:12:56 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/01 16:46:57 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@
 
 //Utils
 void ft_bzero(void *s, size_t n);
+size_t ft_strlen(char *str);
 
 void parse_new_client(std::string str);
 void parse_recv(std::string str);

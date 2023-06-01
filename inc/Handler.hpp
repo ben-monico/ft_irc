@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Handler.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/29 14:36:26 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/31 17:30:08 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/01 16:47:13 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ class Handler
 		void	extendFDsArray(int &fdsSize);
 		void	listenBoundSocket();
 		void	printHostname();
-		size_t	ft_strlen(char *str);
 		addrinfo	*getServerInfo();
 		std::vector<int>	bindSocketFDs(struct addrinfo *servinfo);
 		std::vector<int>	_socketFDs;
