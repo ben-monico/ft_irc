@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/01 17:06:19 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/01 18:09:00 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,16 +37,17 @@ class Context
 		static void chanop_invite(Client &client, std::string channel);
 		static void chanop_topic(Client &client, std::string topic);
 		static void chanop_mode(Channel &channel, char c, std::string const & msg);
-
+	//Getters and checkers
 		static std::vector<Channel>::iterator  find_chan_by_name(std::string name);
 		static std::vector<Client>::iterator  find_client_by_id(int id);
+		static bool isUserInVector(std::vector<Client>::iterator userGot) { return (userGot != _clients.end()); }
 	
 	//Command Responses
 		static void RPL_TOPIC(int client_id, Channel &channel);
 
 	private:
-		static std::vector<Channel>	_channels;
 		static std::vector<Client>	_clients;
+		static std::vector<Channel>	_channels;
 };
 
 #endif

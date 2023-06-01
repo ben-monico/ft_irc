@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 19:09:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/01 17:07:10 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/01 18:08:51 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ std::vector<Channel> Context::_channels;
 std::vector<Client> Context::_clients;
 std::string Context::welcome = "Welcome to ft_irc\r\n";
 
-std::vector<Channel>::iterator  Context::find_chan_by_name(std::string name)
+std::vector<Channel>::iterator	Context::find_chan_by_name(std::string name)
 {
 	std::vector<Channel>::iterator it = Context::_channels.begin();
 	for (; it != _channels.end(); ++it)

@@ -2,9 +2,7 @@
 # define HANDLER_HPP
 # define MYPORT "30035" // the port users will be connecting to
 # define BACKLOG 10 // how many pending connections queue will hold
-# ifndef PASSWD
-#  define PASSWD "123"
-# endif
+
 # include <Context.hpp>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -20,7 +18,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <ircserv.hpp>
-
+#include <map>
 
 //Static backend handler
 class Handler 
@@ -36,6 +34,7 @@ class Handler
 		void	extendFDsArray(int &fdsSize);
 		void	listenBoundSocket();
 		void	printHostname();
+		void	parseResponse(std::string buf, int position);
 		addrinfo	*getServerInfo();
 		std::vector<int>	bindSocketFDs(struct addrinfo *servinfo);
 		std::vector<int>	_socketFDs;
@@ -46,6 +45,8 @@ class Handler
 		void	start( void );
 		void	sendAllBytes(std::string msg, int clientId);
 		void	init( void );
+		Handler() { }
+		~Handler() { }
 	
 };
 

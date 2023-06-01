@@ -24,8 +24,9 @@ class Client
 		int getId() const { return _id; }
 		int	getInit() { return (_init); }
 		void init(std::string nick, std::string userName) { _nick = nick; _userName = userName; _init = true; }
-
+		std::vector<std::string> &getCmds() { return (_cmds); }
 	private:
+		std::vector<std::string> _cmds;
 		int _id; //is his index in pollfds
 		bool _init;
 		std::string _nick;
