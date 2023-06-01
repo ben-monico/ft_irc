@@ -2,7 +2,9 @@
 # define HANDLER_HPP
 # define MYPORT "30035" // the port users will be connecting to
 # define BACKLOG 10 // how many pending connections queue will hold
-
+# ifndef PASSWD
+#  define PASSWD "123"
+# endif
 # include <Context.hpp>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -17,6 +19,7 @@
 #include <poll.h>
 #include <cstring>
 #include <fcntl.h>
+#include <ircserv.hpp>
 
 
 //Static backend handler
@@ -25,7 +28,7 @@ class Handler
 	private:
 		void	handleClientServerConnections();
 		void	handlePollResults(int &fdsSize, int &fdsCount);
-		std::string	handleClientConnection(int &fdsSize, int fdsCount, int position);
+		void	handleClientConnection(int &fdsSize, int &fdsCount, int position);
 		void	parseNewClientInfo(std::string const &str, int id);
 		void	acceptIncomingConnection(int &fdsSize, int &fdsCount);
 		void	delFromFDsArray(int &fdsCount, int &fdsSize, int position);

@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/31 15:47:12 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/01 17:06:19 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,9 @@
 # include <iostream>
 # include <string>
 # include <vector>
-# include "Channel.hpp"
-# include "Client.hpp"
+
+class Client;
+class Channel;
 
 //Static management
 class Context

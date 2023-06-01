@@ -1,19 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Client.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/24 17:52:03 by bcarreir          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2023/05/31 18:41:05 by bcarreir         ###   ########.fr       */
-=======
-/*   Updated: 2023/06/01 16:57:27 by bcarreir         ###   ########.fr       */
->>>>>>> bronadofix
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
@@ -42,11 +26,10 @@ class Client
 		void init(std::string nick, std::string userName) { _nick = nick; _userName = userName; _init = true; }
 
 	private:
-		int _fd;
+		int _id; //is his index in pollfds
 		bool _init;
 		std::string _nick;
 		std::string _userName;
-		int _id; //is his index in pollfds
 		std::string _channel;
 		std::string _role;
 };

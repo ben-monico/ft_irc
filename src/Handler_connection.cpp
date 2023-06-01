@@ -6,11 +6,15 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/01 16:54:41 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/01 17:07:26 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <Handler.hpp>
+#include <Context.hpp>
+#include <ircserv.hpp>
+#include <Client.hpp>
+#include <Client.hpp>
 
 void	Handler::sendAllBytes(std::string msg, int clientId)
 {
