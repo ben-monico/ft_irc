@@ -1,22 +1,8 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Handler.hpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/29 14:36:26 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/31 19:17:26 by bcarreir         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef HANDLER_HPP
 # define HANDLER_HPP
 # define MYPORT "30035" // the port users will be connecting to
 # define BACKLOG 10 // how many pending connections queue will hold
-# ifndef PASSWD
-#  define PASSWD "123"
-# endif
+
 # include <Context.hpp>
 #include <unistd.h>
 #include <sys/socket.h>

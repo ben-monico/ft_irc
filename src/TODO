@@ -1,0 +1,1 @@
+deleting from poll should fill fd with -1 for resource management
