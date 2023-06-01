@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Context.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/01 18:09:00 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/01 19:25:28 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,10 @@
 # include <iostream>
 # include <string>
 # include <vector>
+#include <Client.hpp>
 
-class Client;
 class Channel;
+class Handler;
 
 //Static management
 class Context
@@ -26,12 +27,13 @@ class Context
 	public:
 		static std::string	welcome;
 		static void add_client(Client client);
+		static void	remove_client(std::vector<Client>::iterator pos);
 	//Commands
 		static void cmd_join(Client &client, std::string const &channel);
 		static void cmd_setNick(Client &client, std::string nick);
 		static void cmd_setUserName(Client &client, std::string userName);
 		static void cmd_sendPM(Client &client, std::string const &msg);
-
+		static void	execClientCmds(Client &client);
 	//Channel operations
 		static void chanop_kick(Client &client);
 		static void chanop_invite(Client &client, std::string channel);
@@ -41,11 +43,12 @@ class Context
 		static std::vector<Channel>::iterator  find_chan_by_name(std::string name);
 		static std::vector<Client>::iterator  find_client_by_id(int id);
 		static bool isUserInVector(std::vector<Client>::iterator userGot) { return (userGot != _clients.end()); }
-	
+		static void	setServerPtr(Handler *serverPtr);
 	//Command Responses
 		static void RPL_TOPIC(int client_id, Channel &channel);
 
 	private:
+		static Handler				*server;
 		static std::vector<Client>	_clients;
 		static std::vector<Channel>	_channels;
 };

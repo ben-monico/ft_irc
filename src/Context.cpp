@@ -3,21 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   Context.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 19:09:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/01 18:08:51 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/01 19:31:14 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <Context.hpp>
-#include <Client.hpp>
 #include <Channel.hpp>
+#include <Handler.hpp>
 //ERRORS ON PAGE 43
 
 std::vector<Channel> Context::_channels;
 std::vector<Client> Context::_clients;
 std::string Context::welcome = "Welcome to ft_irc\r\n";
+Handler *Context::server = 0;
+
+void	Context::setServerPtr( Handler *serverPtr )
+{
+	server = serverPtr;
+}
 
 std::vector<Channel>::iterator	Context::find_chan_by_name(std::string name)
 {
@@ -127,12 +133,32 @@ void Context::chanop_mode(Channel &channel, char c, std::string const & msg)
 	(void) msg;
 }
 
-void Context::add_client(Client client)
+void	Context::add_client(Client client)
 {
 	_clients.push_back(client);
 }
 
+void	Context::remove_client(std::vector<Client>::iterator pos)
+{
+	_clients.erase(pos);
+}
 //Command responses
+void	Context::execClientCmds(Client &client)
+{
+	std::vector<std::string>			cmds = client.getCmds();
+	std::vector<std::string>::iterator	it = cmds.begin();
+	std::cout << "here bitchu" << std::endl;
+	for (; it != cmds.end(); ++it)
+	{
+		if (!it->find("QUIT"))
+		{
+			server->closeConection(client.getId());
+			break ;
+		}
+	}
+			
+			
+}
 
 void Context::RPL_TOPIC(int client_id, Channel &channel)
 {

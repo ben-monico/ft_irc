@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Handler_connection.cpp                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/01 18:09:50 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/01 19:29:59 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <Handler.hpp>
 #include <Context.hpp>
 #include <ircserv.hpp>
-#include <Client.hpp>
 #include <Client.hpp>
 #include <sstream>
 
@@ -28,7 +27,12 @@ void	Handler::sendAllBytes(std::string msg, int clientId)
 	}
 }
 
-void	Handler::acceptIncomingConnection(int &fdsSize, int &fdsCount)
+void	Handler::closeConection( int position )
+{
+	delFromFDsArray(position);
+}
+
+void	Handler::acceptIncomingConnection()
 {
 	struct sockaddr_storage remoteaddr;
 	socklen_t	addrlen = sizeof(remoteaddr);
@@ -39,12 +43,12 @@ void	Handler::acceptIncomingConnection(int &fdsSize, int &fdsCount)
 		pError("accept error", "failed to accept request on fd", 1);
 	else
 	{
-		Context::add_client(Client(fdsCount));
-		addToFDsArray(fdsCount, fdsSize, newFD);
+		Context::add_client(Client(_fdsCount));
+		addToFDsArray(newFD);
 	}
 }
 
-void Handler::parseResponse(std::string buf, int position)
+int	Handler::parseResponse(std::string buf, int position)
 {
 	std::vector<Client>::iterator	user = Context::find_client_by_id((position));
 	std::vector<std::string>		cmds;
@@ -63,43 +67,61 @@ void Handler::parseResponse(std::string buf, int position)
 	}
 	for (std::vector<std::string>::iterator it = cmds.begin(); it != cmds.end(); ++it)
 		std::cout << *it << std::endl;
+	return (cmds.back().find("\r") != std::string::npos);
 }
 
-void	Handler::handleClientConnection(int &fdsSize, int &fdsCount, int position)
+void	Handler::getLoginInfo(std::string buf, int position)
+{
+	std::vector<Client>::iterator	user = Context::find_client_by_id((position));
+	std::vector<std::string>		cmds;
+	std::string						cmd;
+	std::istringstream				ss(buf);
+
+	if (!Context::isUserInVector(user))
+		exit (pError("parseResponse", "user not found", position));
+	cmds = user->getCmds();
+	std::getline(ss, cmd, '\n');
+	if (cmds.size() == 4)
+		{ } //verifyLoginInfo()}
+
+	
+}
+
+void	Handler::handleClientConnection(int position)
 {
 	char	buf[384];
 	ft_bzero(buf, sizeof(buf));
 	int		bytesReceiveded = recv(_pollFDsArray[position].fd, buf, sizeof(buf), 0);
 
-	std::cout << "Receiving msg from " << _pollFDsArray[position].fd << std::endl;
+	std::cout << "Receiving msg from " << position << std::endl;
 	if (bytesReceiveded <= 0)
 	{
-		std::cout << "Connection closed with " << _pollFDsArray[position].fd << std::endl;
-		close(_pollFDsArray[position].fd);
-		delFromFDsArray(fdsCount, fdsSize, position);
+		delFromFDsArray(position);
 		return ;
 	}
 	// if (Context::find_client_by_id((position))->getInit())
-		parseResponse(buf, position);
-	// else {}
+		if (parseResponse(buf, position)) 
+			Context::execClientCmds(*Context::find_client_by_id((position)));
+	// else
+	// 	getLoginInfo(buf, position);
 }
 
 void	Handler::handleClientServerConnections()
 {
-	int	fdsCount = 0, fdsSize = 8, pollCount;
+	int	pollCount;
 	
 	for (std::vector<int>::iterator it = _socketFDs.begin(); it != _socketFDs.end(); ++it)
-		addToFDsArray(fdsCount, fdsSize, *it);
+		addToFDsArray(*it);
 	while (1)
 	{
-		pollCount = poll(_pollFDsArray, fdsCount, -1);
+		pollCount = poll(_pollFDsArray, _fdsCount, -1);
 		if (pollCount < 0)
 		{
 			delete [] _pollFDsArray;
 			exit(pError("pollcount", "failed to poll", 8));
 		}
 		else if (pollCount)
-			handlePollResults(fdsSize, fdsCount);
+			handlePollResults();
 	}
 	if (_pollFDsArray)
 		delete [] _pollFDsArray;

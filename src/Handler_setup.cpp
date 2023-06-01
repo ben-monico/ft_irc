@@ -1,4 +1,5 @@
 #include <Handler.hpp>
+#include <Context.hpp>
 
 int	Handler::pError(std::string category, std::string error, int code)
 {
@@ -93,6 +94,7 @@ void	Handler::init( void )
 	_pollFDsArray = 0;
 	_socketFDs = bindSocketFDs(servinfo);
 	freeaddrinfo(servinfo);
+	Context::setServerPtr(this);
 }
 
 void	Handler::start( void )

@@ -17,6 +17,7 @@ class Client
 		void setNick(std::string nick) { _nick = nick; }
 		void setUserName(std::string userName) { _userName = userName; }
 		void setChannel(std::string channel) { _channel = channel; }
+		void setID(int	id) { _id = id; }
 		//Getters
 		std::string getNick() const { return _nick; }
 		std::string getChannel() const { return _channel; }

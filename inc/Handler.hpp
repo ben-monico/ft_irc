@@ -3,7 +3,6 @@
 # define MYPORT "30035" // the port users will be connecting to
 # define BACKLOG 10 // how many pending connections queue will hold
 
-# include <Context.hpp>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -25,27 +24,30 @@ class Handler
 {
 	private:
 		void	handleClientServerConnections();
-		void	handlePollResults(int &fdsSize, int &fdsCount);
-		void	handleClientConnection(int &fdsSize, int &fdsCount, int position);
+		void	handlePollResults();
+		void	handleClientConnection(int position);
 		void	parseNewClientInfo(std::string const &str, int id);
-		void	acceptIncomingConnection(int &fdsSize, int &fdsCount);
-		void	delFromFDsArray(int &fdsCount, int &fdsSize, int position);
-		void	addToFDsArray(int &fdsCount, int &fdsSize, int newFD);
-		void	extendFDsArray(int &fdsSize);
+		void	acceptIncomingConnection();
+		void	delFromFDsArray(int position);
+		void	addToFDsArray(int newFD);
+		void	extendFDsArray();
 		void	listenBoundSocket();
 		void	printHostname();
-		void	parseResponse(std::string buf, int position);
+		void	getLoginInfo(std::string buf, int position);
+		int		parseResponse(std::string buf, int position);
 		addrinfo	*getServerInfo();
 		std::vector<int>	bindSocketFDs(struct addrinfo *servinfo);
 		std::vector<int>	_socketFDs;
 		struct pollfd		*_pollFDsArray;
-
+		int					_fdsCount;
+		int					_fdsSize;
 	public:
 		int		pError(std::string category, std::string error, int code);
 		void	start( void );
+		void	closeConection( int position );
 		void	sendAllBytes(std::string msg, int clientId);
 		void	init( void );
-		Handler() { }
+		Handler(): _fdsCount(0), _fdsSize(8) { }
 		~Handler() { }
 	
 };

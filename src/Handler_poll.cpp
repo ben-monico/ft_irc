@@ -3,65 +3,71 @@
 /*                                                        :::      ::::::::   */
 /*   Handler_poll.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:35 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/01 16:48:42 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/01 19:23:13 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <Handler.hpp>
+#include <Context.hpp>
 
-void	Handler::extendFDsArray(int &fdsSize)
+void	Handler::extendFDsArray()
 {
 
-	struct pollfd	*tmpArray = new struct pollfd[fdsSize * 2];
+	struct pollfd	*tmpArray = new struct pollfd[_fdsSize * 2];
 
-	for (int i = 0; i < fdsSize * 2; ++i)
+	for (int i = 0; i < _fdsSize * 2; ++i)
 	{
-		i < fdsSize ? tmpArray[i].fd = _pollFDsArray[i].fd : tmpArray[i].fd = -1;
-		i < fdsSize ? tmpArray[i].revents = _pollFDsArray[i].revents : 0;
+		i < _fdsSize ? tmpArray[i].fd = _pollFDsArray[i].fd : tmpArray[i].fd = -1;
+		i < _fdsSize ? tmpArray[i].revents = _pollFDsArray[i].revents : 0;
 		tmpArray[i].events = POLLIN;
 	}
 	delete [] _pollFDsArray;
 	_pollFDsArray = tmpArray;
-	fdsSize *= 2;
+	_fdsSize *= 2;
 }
 
-void	Handler::addToFDsArray(int &fdsCount, int &fdsSize, int newFD)
+void	Handler::addToFDsArray(int newFD)
 {
 
 	if (!_pollFDsArray)
 	{
-		_pollFDsArray = new struct pollfd[fdsSize];
-		for (int i = 0; i < fdsSize; ++i)
+		_pollFDsArray = new struct pollfd[_fdsSize];
+		for (int i = 0; i < _fdsSize; ++i)
 			_pollFDsArray[i].fd = -1;
 	}
-	if (fdsCount == fdsSize)
-		extendFDsArray(fdsSize);
-	_pollFDsArray[fdsCount].fd = newFD;
-	_pollFDsArray[fdsCount].events = POLLIN;
-	fdsCount += 1;
+	if (_fdsCount == _fdsSize)
+		extendFDsArray();
+	_pollFDsArray[_fdsCount].fd = newFD;
+	_pollFDsArray[_fdsCount].events = POLLIN;
+	_fdsCount += 1;
 }
 
-void	Handler::delFromFDsArray(int &fdsCount, int &fdsSize, int position)
+void	Handler::delFromFDsArray(int position)
 {
-	if (position > fdsSize)
+	if (position > _fdsSize)
 		return ;
-	_pollFDsArray[position] = _pollFDsArray[--fdsCount];
+	std::cout << "Connection closed with " << position << std::endl;
+	close(_pollFDsArray[position].fd);	
+	_pollFDsArray[position] = _pollFDsArray[--_fdsCount];
+	std::iter_swap(Context::find_client_by_id(position), Context::find_client_by_id(_fdsCount));
+	Context::remove_client(Context::find_client_by_id(position));
+	Context::find_client_by_id(_fdsCount)->setID(position);
 	//set client id to new position no spaguetti forgetti
 }
 
 
-void	Handler::handlePollResults(int &fdsSize, int &fdsCount)
+void	Handler::handlePollResults()
 {
-	for (int i = 0; i < fdsCount; ++i)
+	for (int i = 0; i < _fdsCount; ++i)
 	{
 		if (!_pollFDsArray[i].revents)
 			continue ;
 		if (!i) //is self aka listener fd
-			acceptIncomingConnection(fdsSize, fdsCount);
+			acceptIncomingConnection();
 		else
-			handleClientConnection(fdsSize, fdsCount, i);
+			handleClientConnection(i);
 	}
 }
