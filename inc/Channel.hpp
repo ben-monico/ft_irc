@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:40 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/05/31 18:46:02 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/02 00:33:58 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class Channel
 
 		std::string getName() const { return _name; }
 		std::string getTopic() const { return _topic; }
+		std::vector<Client> &getClients() { return _clients; }
 			
 	private:
 		std::vector<Client> _clients;

@@ -35,6 +35,7 @@ void	Handler::printHostname()
 
 	if (gethostname(host, 256) == -1)
 		exit (pError("hostname", "failed to get hostname", 5));
+	Context::setHostname(":" + host);
 	std::cout << White << "#======================================="
 		<< "=======================================#" << std::endl;
 	std::cout << "I" << LightBlue << " Server info:" << White << std::setw(69) << "I\nI "<< NC;

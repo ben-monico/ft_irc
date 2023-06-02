@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Context.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 19:09:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/01 19:31:14 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/02 02:20:50 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,13 @@ void Context::cmd_join(Client &client, std::string const &channel)
 		it = (_channels.end())--;
 		
 	}
+	//how to set client mode?
 	(*it).addClient(client);
-	client.setChannel(channel);
+	client.addChannel(channel);
 	RPL_TOPIC(client.getId(), *it);
-	
-	//display chan topic using RPL_TOPIC
+	RPL_NAMREPLY(client.getId(), *it);
+	RPL_ENDOFNAMES(client.getId(), *it);
+
 	// /ERR_NEEDMOREPARAMS              ERR_BANNEDFROMCHAN
 	// ERR_INVITEONLYCHAN              ERR_BADCHANNELKEY
 	// ERR_CHANNELISFULL               ERR_BADCHANMASK
@@ -90,18 +92,17 @@ void Context::cmd_sendPM(Client &client, std::string const & msg)
 }
 
 //Channel operations
-void Context::chanop_kick(Client &client)
+void Context::chanop_kick(std::string const & channel, Client &client)
 {
-	//only chanop can kick
-	std::vector<Channel>::iterator it = find_chan_by_name(client.getChannel());
+	//:kickerNick!~kickerUserName@hostname KICK #channel targetuser :You have been kicked by kickuser: Reason for kick.
+	std::vector<Channel>::iterator it = find_chan_by_name(channel);
 	if (it != _channels.end())
 	{
 		(*it).removeClientFromChannel(client.getNick());
-		client.setChannel("");
+		client.eraseChannel(channel);
 	}
-	//ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
-	//    ERR_BADCHANMASK                 ERR_CHANOPRIVSNEEDED
-	//    ERR_NOTONCHANNEL
+	server->sendAllBytes(client.getNick() + " KICK #" + channel + " " + client.getNick() + \
+	 " :You have been kicked by " + client.getNick() + "\r\n", client.getId());
 }
 
 void Context::chanop_invite(Client &client, std::string channel)
@@ -155,14 +156,5 @@ void	Context::execClientCmds(Client &client)
 			server->closeConection(client.getId());
 			break ;
 		}
-	}
-			
-			
-}
-
-void Context::RPL_TOPIC(int client_id, Channel &channel)
-{
-	(void)channel;
-	(void)client_id;
-	// Handler::send_all(client_id, channel.getName() + " : " + channel.getTopic() + "\r\n");
+	}		
 }
