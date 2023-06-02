@@ -2,38 +2,44 @@
 # define CLIENT_HPP
 
 #include <ircserv.hpp>
-
+#include <map>
 
 class Channel;
 
 class Client
 {
 	public:
-		Client(int id) \
-			:_id(id), _init(false), _channel(""), _role("default") { }
+		Client(int id) :_id(id), _init(false) { }
 		~Client() { }
+		void init(std::string nick, std::string userName);
 		
 		//Setters
-		void setNick(std::string nick) { _nick = nick; }
-		void setUserName(std::string userName) { _userName = userName; }
-		void setChannel(std::string channel) { _channel = channel; }
-		void setID(int	id) { _id = id; }
+		void setNick(std::string const &nick);
+		void setUserName(std::string const &userName);
+		void setID(int	id);
+		void setMode(std::string const &channel, std::string const &mode);
+
 		//Getters
-		std::string getNick() const { return _nick; }
-		std::string getChannel() const { return _channel; }
-		std::string getRole() const { return _role; }
-		int getId() const { return _id; }
-		int	getInit() { return (_init); }
-		void init(std::string nick, std::string userName) { _nick = nick; _userName = userName; _init = true; }
-		std::vector<std::string> &getCmds() { return (_cmds); }
+		std::string getNick() const;
+		std::string getUserName() const;
+		std::vector<std::string> getChannels() const;
+		std::string getChannelMode(std::string const & channel) const ;
+		int getId() const;
+		int	getInit();
+		std::vector<std::string> &getCmds();
+
+		void addChannel(std::string const &channel);
+		void eraseChannel(std::string const &channel);
+
 	private:
 		std::vector<std::string> _cmds;
+		std::vector<std::string> _channelInvites;
+		std::vector<std::string> _channels;
+		std::map<std::string, std::string> _channelModes; //@ or + or nothing
 		int _id; //is his index in pollfds
 		bool _init;
 		std::string _nick;
 		std::string _userName;
-		std::string _channel;
-		std::string _role;
 };
 
 #endif
