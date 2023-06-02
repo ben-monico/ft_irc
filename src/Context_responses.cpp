@@ -5,7 +5,7 @@
 //:ircserv 332 userNick #channel :Topic of the channel
 void Context::CHAN_RPL_TEMPLATE(std::string code, Channel &channel, std::string msg, int client_id)
 {
-	server->sendAllBytes(_hostname + " " + code + " " + \
+	server->sendAllBytes(_hostname + code + " " + \
 	find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :" \
 	+ msg + "\r\n", client_id);
 }

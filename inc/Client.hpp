@@ -28,13 +28,11 @@ class Client
 		int	getInit() const;
 		std::vector<std::string> &getCmds();
 
-		void addChannel(std::string const &channel);
 		void eraseChannel(std::string const &channel);
 
 	private:
 		std::vector<std::string> _cmds;
 		std::vector<std::string> _channelInvites;
-		std::vector<std::string> _channels;
 		std::map<std::string, std::string> _channelModes; //@ or + or nothing
 		int _id; //is his index in pollfds
 		bool _init;
