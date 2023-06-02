@@ -42,11 +42,11 @@ void Context::cmd_join(int client_id, std::string const &channel)
 	{
 		_channels.push_back(Channel(channel, 'o'));
 		it = (_channels.end())--;
-		
+		//missing setMode @
 	}
 	//how to set client mode?
 	it->addClient(*client);
-	client->addChannel(channel);
+	client->setMode(channel, "");
 	RPL_TOPIC(client->getId(), *it);
 	RPL_NAMREPLY(client->getId(), *it);
 	RPL_ENDOFNAMES(client->getId(), *it);
