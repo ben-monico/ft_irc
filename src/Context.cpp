@@ -7,6 +7,7 @@ std::vector<Channel> Context::_channels;
 std::vector<Client> Context::_clients;
 std::string Context::welcome = "Welcome to ft_irc\r\n";
 Handler *Context::server = 0;
+std::string Context::_hostname = "";
 
 void	Context::setServerPtr( Handler *serverPtr )
 {

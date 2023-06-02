@@ -28,7 +28,7 @@ int Client::getId() const { return _id; }
 
 int	Client::getInit() const { return (_init); }
 
-std::vector<std::string> &Client::getCmds() const { return (_cmds); }
+std::vector<std::string> &Client::getCmds() { return (_cmds); }
 
 void Client::init(std::string nick, std::string userName)
 { 
