@@ -1,6 +1,6 @@
 NAME		=	ircserv
 
-SRCS		=	src/main.cpp	src/utils.cpp	\
+SRCS		=	src/main.cpp	src/utils.cpp	src/Client.cpp\
 				src/Context.cpp	src/Context_responses.cpp	\
 				src/Handler_poll.cpp src/Handler_connection.cpp src/Handler_setup.cpp
 

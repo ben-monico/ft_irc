@@ -20,7 +20,7 @@ void Context::RPL_NAMREPLY(int client_id, Channel &channel)
 	std::string msg = "";
 	std::vector<Client>::iterator it = channel.getClients().begin();
 	for (; it != channel.getClients().end(); ++it)
-		msg += it->getRole() + it->getNick() + " ";
+		msg += it->getChannelMode(channel.getName()) + it->getNick() + " ";
 	RPL_TEMPLATE("353", channel, msg, client_id);
 }
 

@@ -3,7 +3,7 @@
 
 #include <ircserv.hpp>
 #include <map>
-
+#include <vector>
 class Channel;
 
 class Client
@@ -25,7 +25,7 @@ class Client
 		std::vector<std::string> getChannels() const;
 		std::string getChannelMode(std::string const & channel) const ;
 		int getId() const;
-		int	getInit();
+		int	getInit() const;
 		std::vector<std::string> &getCmds();
 
 		void addChannel(std::string const &channel);
