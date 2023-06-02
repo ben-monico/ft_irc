@@ -149,9 +149,11 @@ void Context::addClientToChannel(int client_id, std::string const & channelname,
 		it->setMode(channelname, mode);
 }
 
-void Context::removeClientFromChannel(int client_id, std::string)
+void Context::removeClientFromChannel(int client_id, std::string const & channelname)
 {
-	
+	std::vector<Client>::iterator it = find_client_by_id(client_id);
+	if (it  != _clients.end())
+		it->eraseChannel(channelname);
 }
 
 
