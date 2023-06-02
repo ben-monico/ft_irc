@@ -1,5 +1,6 @@
 #include <Handler.hpp>
 #include <Context.hpp>
+#include <ircserv.hpp>
 
 int	Handler::pError(std::string category, std::string error, int code)
 {
@@ -15,14 +16,10 @@ addrinfo *Handler::getServerInfo()
 {
 	int				status = 0;
 	struct addrinfo	*res, hints;
-	//make sure its zeroed
-	hints.ai_addr = 0;
-	hints.ai_addrlen = 0;
-	hints.ai_canonname = 0;
-	hints.ai_next = 0;
-	hints.ai_protocol = 0;
+
+	ft_bzero(&hints, sizeof(hints));
 	hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
-	hints.ai_family = AF_UNSPEC; // don't care IPv4 or IPv6
+	hints.ai_family = AF_INET; // don't care IPv4 or IPv6
 	hints.ai_flags = AI_PASSIVE; // fill in my IP for me
 	if ((status = getaddrinfo(NULL, MYPORT, &hints, &res)))
 		exit(pError("getaddrinfo error", gai_strerror(status), status));
@@ -35,7 +32,6 @@ void	Handler::printHostname()
 
 	if (gethostname(host, 256) == -1)
 		exit (pError("hostname", "failed to get hostname", 5));
-	// Context::setHostname(":" + host);
 	std::cout << White << "#======================================="
 		<< "=======================================#" << std::endl;
 	std::cout << "I" << LightBlue << " Server info:" << White << std::setw(69) << "I\nI "<< NC;

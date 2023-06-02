@@ -7,7 +7,7 @@ std::vector<Channel> Context::_channels;
 std::vector<Client> Context::_clients;
 std::string Context::welcome = "Welcome to ft_irc\r\n";
 Handler *Context::server = 0;
-std::string Context::_hostname = "";
+std::string Context::_hostname = ":localhost ";
 
 void	Context::setServerPtr( Handler *serverPtr )
 {
@@ -31,18 +31,11 @@ std::vector<Client>::iterator  Context::find_client_by_id(int id)
 			break;
 	return it;	
 }
-Client	&Context::get_client_by_id(int id)
-{
-	std::vector<Client>::iterator it = Context::_clients.begin();
-	for (; it != _clients.end(); ++it)
-		if (it->getId() == id)
-			break;
-	return *it;	
-}
 
 //Commands
-void Context::cmd_join(Client &client, std::string const &channel)
+void Context::cmd_join(int client_id, std::string const &channel)
 {
+	std::vector<Client>::iterator client = find_client_by_id(client_id);
 	//check if invite only, or for pwd
 	std::vector<Channel>::iterator it = find_chan_by_name(channel);
 	if (it == _channels.end())
@@ -52,11 +45,11 @@ void Context::cmd_join(Client &client, std::string const &channel)
 		
 	}
 	//how to set client mode?
-	(*it).addClient(client);
-	client.addChannel(channel);
-	RPL_TOPIC(client.getId(), *it);
-	RPL_NAMREPLY(client.getId(), *it);
-	RPL_ENDOFNAMES(client.getId(), *it);
+	it->addClient(*client);
+	client->addChannel(channel);
+	RPL_TOPIC(client->getId(), *it);
+	RPL_NAMREPLY(client->getId(), *it);
+	RPL_ENDOFNAMES(client->getId(), *it);
 
 	// /ERR_NEEDMOREPARAMS              ERR_BANNEDFROMCHAN
 	// ERR_INVITEONLYCHAN              ERR_BADCHANNELKEY
@@ -65,19 +58,22 @@ void Context::cmd_join(Client &client, std::string const &channel)
 	// RPL_TOPIC
 }
 
-void Context::cmd_setNick(Client &client, std::string nick)
+void Context::cmd_setNick(int client_id, std::string nick)
 {
+	std::vector<Client>::iterator client = find_client_by_id(client_id);
 	//NICK | ERR_NICKCOLLISION ERR_NONICKNAMEGIVEN ERR_NICKNAMEINUSE ERR_ERRONEUSNICKNAME
-	client.setNick(nick);
+	client->setNick(nick);
 }
 
-void Context::cmd_setUserName(Client &client, std::string userName)
+void Context::cmd_setUserName(int client_id, std::string userName)
 {
-	client.setUserName(userName);
+	std::vector<Client>::iterator client = find_client_by_id(client_id);
+	client->setUserName(userName);
 }
 
-void Context::cmd_sendPM(Client &client, std::string const & msg)
+void Context::cmd_sendPM(int client_id, std::string const & msg)
 {
+	std::vector<Client>::iterator client = find_client_by_id(client_id);
 	//get target in message, send() desired PM
 	(void)client;
 	(void)msg;
@@ -89,21 +85,23 @@ void Context::cmd_sendPM(Client &client, std::string const & msg)
 }
 
 //Channel operations
-void Context::chanop_kick(std::string const & channel, Client &client)
+void Context::chanop_kick(std::string const & channel, int client_id)
 {
+	std::vector<Client>::iterator client = find_client_by_id(client_id);
 	//:kickerNick!~kickerUserName@hostname KICK #channel targetuser :You have been kicked by kickuser: Reason for kick.
 	std::vector<Channel>::iterator it = find_chan_by_name(channel);
 	if (it != _channels.end())
 	{
-		(*it).removeClientFromChannel(client.getNick());
-		client.eraseChannel(channel);
+		(*it).removeClientFromChannel(client->getNick());
+		client->eraseChannel(channel);
 	}
-	server->sendAllBytes(client.getNick() + " KICK #" + channel + " " + client.getNick() + \
-	 " :You have been kicked by " + client.getNick() + "\r\n", client.getId());
+	server->sendAllBytes(client->getNick() + " KICK #" + channel + " " + client->getNick() + \
+	 " :You have been kicked by " + client->getNick() + "\r\n", client->getId());
 }
 
-void Context::chanop_invite(Client &client, std::string channel)
+void Context::chanop_invite(int client_id, std::string channel)
 {
+	std::vector<Client>::iterator client = find_client_by_id(client_id);
 	//if channel is invite only mode, invite must be chanop
 	//ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
 	//    ERR_NOTONCHANNEL                ERR_USERONCHANNEL
@@ -113,8 +111,9 @@ void Context::chanop_invite(Client &client, std::string channel)
 	(void)channel;
 }
 
-void Context::chanop_topic(Client &client, std::string topic)
+void Context::chanop_topic(int client_id, std::string topic)
 {
+	std::vector<Client>::iterator client = find_client_by_id(client_id);
 	(void)client;
 	(void)topic;
 	// ERR_NEEDMOREPARAMS              ERR_NOTONCHANNEL
@@ -131,15 +130,31 @@ void Context::chanop_mode(Channel &channel, char c, std::string const & msg)
 	(void) msg;
 }
 
-void	Context::add_client(Client client)
+void	Context::add_client(int client_id)
 {
-	_clients.push_back(client);
+	_clients.push_back(Client(client_id));
 }
 
-void	Context::remove_client(std::vector<Client>::iterator pos)
+void	Context::remove_client(int client_id)
 {
+	std::vector<Client>::iterator pos = find_client_by_id(client_id);
+	if (pos  != _clients.end())
 	_clients.erase(pos);
 }
+
+void Context::addClientToChannel(int client_id, std::string const & channelname, std::string const &mode)
+{
+	std::vector<Client>::iterator it = find_client_by_id(client_id);
+	if (it  != _clients.end())
+		it->setMode(channelname, mode);
+}
+
+void Context::removeClientFromChannel(int client_id, std::string)
+{
+	
+}
+
+
 //Command responses
 void	Context::execClientCmds(int id)
 {
