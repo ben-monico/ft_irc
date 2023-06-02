@@ -11,6 +11,11 @@ int	Handler::pError(std::string category, std::string error, int code)
 	return (code);
 }
 
+bool	Handler::isPasswordMatch(std::string pw) const
+{
+		return (_password.compare(pw) == 0);
+}
+
 addrinfo *Handler::getServerInfo()
 {
 	int				status = 0;

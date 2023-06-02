@@ -1,13 +1,14 @@
 #include <Context.hpp>
 #include <Channel.hpp>
 #include <Handler.hpp>
+#include <sstream>
 //ERRORS ON PAGE 43
 
 std::vector<Channel> Context::_channels;
 std::vector<Client> Context::_clients;
 std::string Context::welcome = "Welcome to ft_irc\r\n";
 Handler *Context::server = 0;
-std::string Context::_hostname = "";
+std::string Context::_hostname = ":localhost";
 
 void	Context::setServerPtr( Handler *serverPtr )
 {
@@ -31,6 +32,16 @@ std::vector<Client>::iterator  Context::find_client_by_id(int id)
 			break;
 	return it;	
 }
+
+std::vector<Client>::iterator  Context::find_client_by_nick(const std::string &nick)
+{
+	std::vector<Client>::iterator it = Context::_clients.begin();
+	for (; it != _clients.end(); ++it)
+		if (it->getNick() == nick)
+			break;
+	return it;	
+}
+
 Client	&Context::get_client_by_id(int id)
 {
 	std::vector<Client>::iterator it = Context::_clients.begin();
@@ -136,9 +147,11 @@ void	Context::add_client(Client client)
 	_clients.push_back(client);
 }
 
-void	Context::remove_client(std::vector<Client>::iterator pos)
+void	Context::remove_client(int id_erase, int id_replace)
 {
-	_clients.erase(pos);
+	std::iter_swap(Context::find_client_by_id(id_erase), Context::find_client_by_id(id_replace));
+	_clients.erase(Context::find_client_by_id(id_erase));
+	find_client_by_id(id_replace)->setID(id_erase);
 }
 //Command responses
 void	Context::execClientCmds(int id)
@@ -156,4 +169,37 @@ void	Context::execClientCmds(int id)
 			break ;
 		}
 	}		
+}
+
+void	Context::verifyLoginInfo(int id)
+{
+	std::vector<Client>::iterator		client = find_client_by_id(id); 
+	std::vector<std::string>			&cmds = client->getCmds();
+	std::vector<std::string>::iterator	it = cmds.begin();
+	std::string							pass = "", nick = "", user = "";
+
+	for ( ; it != cmds.end(); ++it)
+	{
+		if (!it->compare(0, 5, "PASS "))
+			pass = it->substr(5, it->length() - 6);
+		else if (!it->compare(0, 5, "NICK "))
+			nick = it->substr(5, it->length() - 6);
+		else if (!it->compare(0, 5, "USER "))
+			user = it->substr(5, it->length() - 5);
+	}
+	std::stringstream	username(user);
+	if (!username.eof())
+		std::getline(username, user, ' ');
+	if (pass.empty() || !server->isPasswordMatch(pass))
+	{
+		ERR_PASSWDMISMATCH(id);
+		server->closeConection(id);
+	}
+	else if (isUserInVector(find_client_by_nick(nick)))
+	{
+		USR_RPL_TEMPLATE("436", "Nickname is already in use.", nick, id);
+		// server->closeConection(id);
+	}
+	else
+		client->init(nick, user);
 }

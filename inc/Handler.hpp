@@ -41,13 +41,15 @@ class Handler
 		struct pollfd		*_pollFDsArray;
 		int					_fdsCount;
 		int					_fdsSize;
+		const std::string	_password;
 	public:
 		int		pError(std::string category, std::string error, int code);
 		void	start( void );
 		void	closeConection( int position );
 		void	sendAllBytes(std::string msg, int clientId);
 		void	init( void );
-		Handler(): _fdsCount(0), _fdsSize(8) { }
+		bool	isPasswordMatch(std::string pw) const;
+		Handler(std::string password): _fdsCount(0), _fdsSize(8), _password(password) { }
 		~Handler() { }
 	
 };

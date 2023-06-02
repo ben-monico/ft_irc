@@ -15,8 +15,9 @@ class Context
 	public:
 		static std::string	welcome;
 		static void add_client(Client client);
-		static void	remove_client(std::vector<Client>::iterator pos);
+		static void	remove_client(int position, int fdsCount);
 		static void setHostname(std::string hostname);
+		static void	verifyLoginInfo(int id);
 	//Commands
 		static void cmd_join(Client &client, std::string const &channel);
 		static void cmd_setNick(Client &client, std::string nick);
@@ -31,15 +32,19 @@ class Context
 	//Getters and checkers
 		static std::vector<Channel>::iterator	find_chan_by_name(std::string name);
 		static std::vector<Client>::iterator	find_client_by_id(int id);
+		static std::vector<Client>::iterator 	find_client_by_nick(const std::string &nick);
 		Client									&get_client_by_id(int id);
 
 		static bool isUserInVector(std::vector<Client>::iterator userGot) { return (userGot != _clients.end()); }
 		static void	setServerPtr(Handler *serverPtr);
 	//Command Responses
-		static void RPL_TEMPLATE(std::string code, Channel &channel, std::string msg, int client_id);
+		static void CHAN_RPL_TEMPLATE(std::string code, Channel &channel, std::string msg, int client_id);
+		static void USR_RPL_TEMPLATE(std::string code, std::string msg, std::string nick, int client_id);
 		static void RPL_TOPIC(int client_id, Channel &channel);
 		static void RPL_NAMREPLY(int client_id, Channel &channel);
 		static void RPL_ENDOFNAMES(int client_id, Channel &channel);
+		static void ERR_PASSWDMISMATCH(int client_id);
+
 
 	private:
 		static std::string 			_hostname;

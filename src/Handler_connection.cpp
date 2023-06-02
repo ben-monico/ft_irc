@@ -6,7 +6,7 @@
 /*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/02 01:50:46 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/02 19:27:03 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 void	Handler::sendAllBytes(std::string msg, int clientId)
 {
 	int bytesSent;
+
+	std::cout << "Sending: " << msg << " - to: " << clientId << std::endl;
 	while ((bytesSent = send(_pollFDsArray[clientId].fd, msg.c_str(), msg.size(), 0)) != (int)msg.size())
 	{
 		if (bytesSent == -1)
@@ -83,13 +85,11 @@ void	Handler::getLoginInfo(std::string buf, int position)
 	{
 		std::getline(ss, cmd, '\n');
 		cmds.push_back(cmd);
+		std::cout << cmd << std::endl;
 	}
 	cmds.pop_back();
 	if (cmds.size() == 4)
-	{
-		user->init("test", "test");
-		std::cout << "init" << std::endl;
-	} //verifyLoginInfo()}
+		Context::verifyLoginInfo(position);
 }
 
 void	Handler::handleClientConnection(int position)

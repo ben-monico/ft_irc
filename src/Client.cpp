@@ -35,6 +35,7 @@ void Client::init(std::string nick, std::string userName)
 	_nick = nick;
 	_userName = userName;
 	_init = true;
+	std::cout << "Client " << nick << " initialized " << std::endl;
 }
 
 void Client::addChannel(std::string const &channel) { _channels.push_back(channel); }

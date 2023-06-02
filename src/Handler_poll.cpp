@@ -6,7 +6,7 @@
 /*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:35 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/01 19:23:13 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/02 18:08:00 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,7 @@ void	Handler::delFromFDsArray(int position)
 	std::cout << "Connection closed with " << position << std::endl;
 	close(_pollFDsArray[position].fd);	
 	_pollFDsArray[position] = _pollFDsArray[--_fdsCount];
-	std::iter_swap(Context::find_client_by_id(position), Context::find_client_by_id(_fdsCount));
-	Context::remove_client(Context::find_client_by_id(position));
-	Context::find_client_by_id(_fdsCount)->setID(position);
-	//set client id to new position no spaguetti forgetti
+	Context::remove_client(position, _fdsCount);
 }
 
 
