@@ -6,7 +6,7 @@
 /*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/02 19:27:03 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/02 19:38:44 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	Handler::acceptIncomingConnection()
 		pError("accept error", "failed to accept request on fd", 1);
 	else
 	{
-		Context::add_client(Client(_fdsCount));
+		Context::add_client(_fdsCount);
 		addToFDsArray(newFD);
 	}
 }

@@ -16,7 +16,7 @@ class Context
 		static std::string	welcome;
 		static void	verifyLoginInfo(int id);
 		static void add_client(int client_id);
-		static void	remove_client(int client_id);
+		static void	remove_client(int id_erase, int id_replace);
 		static void addClientToChannel(int client_id, std::string const&, std::string const&);
 		static void removeClientFromChannel(int client_id, std::string const&);
 

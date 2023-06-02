@@ -40,7 +40,7 @@ void Client::init(std::string nick, std::string userName)
 
 void Client::eraseChannel(std::string const &channel)
 {
-	std::map<std::string, std::string>::const_iterator it = _channelModes.find(channel);
+	std::map<std::string, std::string>::iterator it = _channelModes.find(channel);
 	if (it != _channelModes.end())
 		_channelModes.erase(it);
 }
