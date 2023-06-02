@@ -6,7 +6,7 @@
 /*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/01 19:25:28 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/02 01:25:49 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,17 @@ class Context
 		static void cmd_setNick(Client &client, std::string nick);
 		static void cmd_setUserName(Client &client, std::string userName);
 		static void cmd_sendPM(Client &client, std::string const &msg);
-		static void	execClientCmds(Client &client);
+		static void	execClientCmds(int id);
 	//Channel operations
 		static void chanop_kick(Client &client);
 		static void chanop_invite(Client &client, std::string channel);
 		static void chanop_topic(Client &client, std::string topic);
 		static void chanop_mode(Channel &channel, char c, std::string const & msg);
 	//Getters and checkers
-		static std::vector<Channel>::iterator  find_chan_by_name(std::string name);
-		static std::vector<Client>::iterator  find_client_by_id(int id);
+		static std::vector<Channel>::iterator	find_chan_by_name(std::string name);
+		static std::vector<Client>::iterator	find_client_by_id(int id);
+		Client									&get_client_by_id(int id);
+
 		static bool isUserInVector(std::vector<Client>::iterator userGot) { return (userGot != _clients.end()); }
 		static void	setServerPtr(Handler *serverPtr);
 	//Command Responses

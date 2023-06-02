@@ -34,7 +34,7 @@ class Handler
 		void	listenBoundSocket();
 		void	printHostname();
 		void	getLoginInfo(std::string buf, int position);
-		int		parseResponse(std::string buf, int position);
+		int		buildResponse(std::string buf, int position);
 		addrinfo	*getServerInfo();
 		std::vector<int>	bindSocketFDs(struct addrinfo *servinfo);
 		std::vector<int>	_socketFDs;

@@ -6,7 +6,7 @@
 /*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 19:09:34 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/01 19:31:14 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/02 01:39:36 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,14 @@ std::vector<Client>::iterator  Context::find_client_by_id(int id)
 		if (it->getId() == id)
 			break;
 	return it;	
+}
+Client	&Context::get_client_by_id(int id)
+{
+	std::vector<Client>::iterator it = Context::_clients.begin();
+	for (; it != _clients.end(); ++it)
+		if (it->getId() == id)
+			break;
+	return *it;	
 }
 
 //Commands
@@ -143,16 +151,18 @@ void	Context::remove_client(std::vector<Client>::iterator pos)
 	_clients.erase(pos);
 }
 //Command responses
-void	Context::execClientCmds(Client &client)
+void	Context::execClientCmds(int id)
 {
-	std::vector<std::string>			cmds = client.getCmds();
+	std::vector<Client>::iterator		client = find_client_by_id(id); 
+	std::vector<std::string>			&cmds = client->getCmds();
 	std::vector<std::string>::iterator	it = cmds.begin();
-	std::cout << "here bitchu" << std::endl;
+
+	
 	for (; it != cmds.end(); ++it)
 	{
-		if (!it->find("QUIT"))
+		if (it->find("QUIT") != std::string::npos)
 		{
-			server->closeConection(client.getId());
+			server->closeConection(client->getId());
 			break ;
 		}
 	}

@@ -6,7 +6,7 @@
 /*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/01 19:29:59 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/02 01:50:46 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,23 +48,23 @@ void	Handler::acceptIncomingConnection()
 	}
 }
 
-int	Handler::parseResponse(std::string buf, int position)
+int	Handler::buildResponse(std::string buf, int position)
 {
 	std::vector<Client>::iterator	user = Context::find_client_by_id((position));
-	std::vector<std::string>		cmds;
 	std::string						cmd;	
 	std::istringstream				ss(buf);
 
 	if (!Context::isUserInVector(user))
 		exit (pError("parseResponse", "user not found", position));
-	cmds = user->getCmds();
+	std::vector<std::string>	&cmds = user->getCmds();
 	if (!cmds.empty() && cmds.back().find("\r") != std::string::npos)
 		cmds.erase(user->getCmds().begin(), user->getCmds().end());
-	while (!ss.eof() || cmd.find("\r") != std::string::npos)
+	while (!ss.eof())
 	{
 		std::getline(ss, cmd, '\n');
 		cmds.push_back(cmd);
 	}
+	cmds.pop_back();
 	for (std::vector<std::string>::iterator it = cmds.begin(); it != cmds.end(); ++it)
 		std::cout << *it << std::endl;
 	return (cmds.back().find("\r") != std::string::npos);
@@ -73,18 +73,23 @@ int	Handler::parseResponse(std::string buf, int position)
 void	Handler::getLoginInfo(std::string buf, int position)
 {
 	std::vector<Client>::iterator	user = Context::find_client_by_id((position));
-	std::vector<std::string>		cmds;
 	std::string						cmd;
 	std::istringstream				ss(buf);
 
 	if (!Context::isUserInVector(user))
 		exit (pError("parseResponse", "user not found", position));
-	cmds = user->getCmds();
-	std::getline(ss, cmd, '\n');
+	std::vector<std::string>		&cmds = user->getCmds();
+	while (!ss.eof())
+	{
+		std::getline(ss, cmd, '\n');
+		cmds.push_back(cmd);
+	}
+	cmds.pop_back();
 	if (cmds.size() == 4)
-		{ } //verifyLoginInfo()}
-
-	
+	{
+		user->init("test", "test");
+		std::cout << "init" << std::endl;
+	} //verifyLoginInfo()}
 }
 
 void	Handler::handleClientConnection(int position)
@@ -99,11 +104,10 @@ void	Handler::handleClientConnection(int position)
 		delFromFDsArray(position);
 		return ;
 	}
-	// if (Context::find_client_by_id((position))->getInit())
-		if (parseResponse(buf, position)) 
-			Context::execClientCmds(*Context::find_client_by_id((position)));
-	// else
-	// 	getLoginInfo(buf, position);
+	if (!Context::find_client_by_id((position))->getInit())
+		getLoginInfo(buf, position);
+	else if (buildResponse(buf, position))
+		Context::execClientCmds((position));
 }
 
 void	Handler::handleClientServerConnections()
