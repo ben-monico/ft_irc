@@ -215,14 +215,18 @@ void	Context::verifyLoginInfo(int id)
 		std::getline(username, user, ' ');
 	if (pass.empty() || !server->isPasswordMatch(pass))
 	{
-		ERR_PASSWDMISMATCH(id);
+		server->sendAllBytes(_hostname + " 464 " + nick + " :Password incorrect\r\n", id);
 		server->closeConection(id);
 	}
 	else if (isUserInVector(find_client_by_nick(nick)))
 	{
-		USR_RPL_TEMPLATE("436", "Nickname is already in use.", nick, id);
+		//:irc.server.com 433 YourNickname :Nickname is already in use.
+		server->sendAllBytes(_hostname + " 422 " + nick + " :Nickname is already in use.\r\n", id);
 		// server->closeConection(id);
 	}
 	else
+	{
+		server->sendAllBytes(_hostname + " 1 " + nick + " :Welcome to FT_IRC!\r\n", id);
 		client->init(nick, user);
+	}
 }
