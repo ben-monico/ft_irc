@@ -46,7 +46,7 @@ class Handler
 		int		pError(std::string category, std::string error, int code);
 		void	start( void );
 		void	closeConection( int position );
-		void	sendAllBytes(std::string msg, int clientId);
+		void	sendAllBytes(std::string const &msg, int clientId);
 		void	init( void );
 		bool	isPasswordMatch(std::string pw) const;
 		Handler(std::string password): _fdsCount(0), _fdsSize(8), _password(password) { }

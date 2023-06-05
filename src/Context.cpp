@@ -6,9 +6,8 @@
 
 std::vector<Channel> Context::_channels;
 std::vector<Client> Context::_clients;
-std::string Context::welcome = "Welcome to ft_irc\r\n";
 Handler *Context::server = 0;
-std::string Context::_hostname = ":localhost";
+std::string Context::_hostname = ":localhost ";
 
 void	Context::setServerPtr( Handler *serverPtr )
 {
@@ -24,7 +23,7 @@ std::vector<Channel>::iterator	Context::find_chan_by_name(std::string name)
 	return it;	
 }
 
-std::vector<Client>::iterator  Context::find_client_by_id(int id)
+std::vector<Client>::iterator Context::find_client_by_id(int id)
 {
 	std::vector<Client>::iterator it = Context::_clients.begin();
 	for (; it != _clients.end(); ++it)
@@ -60,12 +59,13 @@ void Context::cmd_join(int client_id, std::string const &channel)
 	if (it == _channels.end())
 	{
 		_channels.push_back(Channel(channel, 'o'));
-		it = (_channels.end())--;
-		//missing setMode @
+		it = find_chan_by_name(channel);
+		client->addChannelMode(channel, "@");
+		server->sendAllBytes(":" + client->getNick() + " JOIN " + channel + "\r\n", client->getId());
+		server->sendAllBytes(":" + client->getNick() + " MODE " + channel + " +on " + client->getNick() + "\r\n", client->getId());
 	}
-	//how to set client mode?
-	it->addClient(*client);
-	client->setMode(channel, "");
+	else 
+		client->addChannelMode(channel, "");
 	RPL_TOPIC(client->getId(), *it);
 	RPL_NAMREPLY(client->getId(), *it);
 	RPL_ENDOFNAMES(client->getId(), *it);
@@ -111,7 +111,6 @@ void Context::chanop_kick(std::string const & channel, int client_id)
 	std::vector<Channel>::iterator it = find_chan_by_name(channel);
 	if (it != _channels.end())
 	{
-		(*it).removeClientFromChannel(client->getNick());
 		client->eraseChannel(channel);
 	}
 	server->sendAllBytes(client->getNick() + " KICK #" + channel + " " + client->getNick() + \
@@ -165,7 +164,7 @@ void Context::addClientToChannel(int client_id, std::string const & channelname,
 {
 	std::vector<Client>::iterator it = find_client_by_id(client_id);
 	if (it  != _clients.end())
-		it->setMode(channelname, mode);
+		it->addChannelMode(channelname, mode);
 }
 
 void Context::removeClientFromChannel(int client_id, std::string const & channelname)
@@ -175,8 +174,6 @@ void Context::removeClientFromChannel(int client_id, std::string const & channel
 		it->eraseChannel(channelname);
 }
 
-
-//Command responses
 void	Context::execClientCmds(int id)
 {
 	std::vector<Client>::iterator		client = find_client_by_id(id); 
@@ -190,6 +187,11 @@ void	Context::execClientCmds(int id)
 		{
 			server->closeConection(client->getId());
 			break ;
+		}
+		else if (it->find("JOIN #", 0) != std::string::npos)
+		{
+			std::string channel = it->substr(6, it->length() - 7);
+			cmd_join(client->getId(), channel);
 		}
 	}		
 }
@@ -224,5 +226,8 @@ void	Context::verifyLoginInfo(int id)
 		// server->closeConection(id);
 	}
 	else
+	{
 		client->init(nick, user);
+		Context::RPL_WELCOME(client->getId());
+	}
 }

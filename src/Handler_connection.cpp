@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Handler_connection.cpp                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/02 19:38:44 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/05 18:17:50 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,16 @@
 #include <Client.hpp>
 #include <sstream>
 
-void	Handler::sendAllBytes(std::string msg, int clientId)
+void	Handler::sendAllBytes(std::string const &msg, int clientId)
 {
 	int bytesSent;
 
 	std::cout << "Sending: " << msg << " - to: " << clientId << std::endl;
-	while ((bytesSent = send(_pollFDsArray[clientId].fd, msg.c_str(), msg.size(), 0)) != (int)msg.size())
+	while ((bytesSent = send(_pollFDsArray[clientId].fd, msg.c_str(), strlen(msg.c_str()), 0)) != (int)msg.size())
 	{
 		if (bytesSent == -1)
 			return ((void)pError("send error", "error sending bytes to clients", 1));	
-		bytesSent += send(_pollFDsArray[clientId].fd, &msg[bytesSent], msg.size() - bytesSent, 0);
+		bytesSent += send(_pollFDsArray[clientId].fd, &msg[bytesSent], strlen(msg.c_str()) - bytesSent, 0);
 	}
 }
 

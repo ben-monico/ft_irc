@@ -13,7 +13,6 @@ class Handler;
 class Context
 {
 	public:
-		static std::string	welcome;
 		static void	verifyLoginInfo(int id);
 		static void add_client(int client_id);
 		static void	remove_client(int id_erase, int id_replace);
@@ -49,6 +48,7 @@ class Context
 		static void RPL_NAMREPLY(int client_id, Channel &channel);
 		static void RPL_ENDOFNAMES(int client_id, Channel &channel);
 		static void ERR_PASSWDMISMATCH(int client_id);
+		static void RPL_WELCOME(int client_id);
 
 
 	private:
