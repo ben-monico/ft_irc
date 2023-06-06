@@ -49,3 +49,21 @@ bool Client::isOnChannel(std::string const &channel) const
 		return false;
 	return true;
 }
+
+void Client::addChannelInvite(std::string const &channel)
+{
+	_channelInvites.push_back(channel);
+}
+
+void Client::removeChannelInvite(std::string const &channel)
+{
+	std::vector<std::string>::iterator it = _channelInvites.begin();
+	for (; it != _channelInvites.end(); it++)
+	{
+		if (*it == channel)
+		{
+			_channelInvites.erase(it);
+			return ;
+		}
+	}
+}

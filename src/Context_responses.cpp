@@ -33,6 +33,8 @@ void Context::RPL_NOTOPIC(int client_id, Channel &channel)
 
 void Context::RPL_TOPIC(int client_id, Channel &channel)
 {
+	if (channel.getTopic().empty())
+		return RPL_NOTOPIC(client_id, channel);
 	server->sendAllBytes(_hostname + "332 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :" \
 	+ channel.getTopic() + "\r\n", client_id);
 }

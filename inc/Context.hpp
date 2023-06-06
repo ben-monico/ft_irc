@@ -13,6 +13,7 @@ class Handler;
 class Context
 {
 	public:
+		static void	setServerPtr(Handler *);
 		static void	verifyLoginInfo(int );
 		static void add_client(int);
 		static void	remove_client(int, int);
@@ -27,10 +28,17 @@ class Context
 		static void	execClientCmds(int d);
 
 	//Channel operations
-		static void chanop_kick(std::string const& , int);
-		static void chanop_invite(int, std::string );
-		static void chanop_topic(int, std::string const& );
+		static void chanop_kick_user(int client_id, std::string const& channel, std::string const& target);
+		static void chanop_invite_user(int client_id, std::string const& channel, std::string const& target);
+		static void chanop_topic(int client_id, std::string const& channel, std::string const& newtopic);
+
+		static void chanop_toggle_inviteonly(int, std::string );
+		static void chanop_toggle_topic_restriction(int, std::string const& );
 		static void chanop_mode(int, std::string const& , std::string const& );
+		static void chanop_userlimit(int client_id, std::string const& channel, std::string const& userLimit);
+		static void chanop_key(int client_id, std::string const& channel, std::string const& key);
+		static void chanop_oppriv(int client_id, std::string const& channel, std::string const& targetNick);
+
 
 	//Getters and checkers
 		static std::vector<Channel>::iterator	find_chan_by_name(std::string );
@@ -38,7 +46,6 @@ class Context
 		static std::vector<Client>::iterator 	find_client_by_nick(std::string const&);
 
 		static bool isUserInVector(std::vector<Client>::iterator );
-		static void	setServerPtr(Handler *);
 
 	//Command Responses
 		static void CHAN_RPL_TEMPLATE(std::string , Channel&, std::string , int);

@@ -12,7 +12,7 @@ void Context::cmd_join(int client_id, std::string const &channel)
 	{
 		_channels.push_back(Channel(channel));
 		it = find_chan_by_name(channel);
-		client->addChannelMode(channel, "o");
+		client->addChannelMode(channel, "@");
 		//Maybe all should get this message
 		server->sendAllBytes(":" + client->getNick() + " JOIN " + channel + "\r\n", client->getId());
 	}

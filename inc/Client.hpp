@@ -26,11 +26,13 @@ class Client
 		std::string getChannelMode(std::string const & channel) const ;
 		int getId() const;
 		int	getInit() const;
-		std::vector<std::string> &getCmds();
+		bool isOnChannel(std::string const &channel) const;
 
+		std::vector<std::string> &getCmds();
 		void addChannelMode(std::string const &channel, std::string const &mode);
 		void eraseChannel(std::string const &channel);
-		bool isOnChannel(std::string const &channel) const;
+		void addChannelInvite(std::string const &channel);
+		void removeChannelInvite(std::string const &channel);
 
 	private:
 		std::vector<std::string> _cmds;
