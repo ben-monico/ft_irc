@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:40 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/06 16:36:49 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/06 21:49:05 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ class Channel
 		void setKey(std::string const& key);
 		void toggleRestrictTopic();
 		void toggleInviteOnly();
+		void decrementUserCount();
+		void incrementUserCount();
 
 		std::string getName() const;
 		std::string getTopic() const;
@@ -45,6 +47,7 @@ class Channel
 		std::string _name;
 		std::string _topic;
 		int _userLimit;
+		int _userCount;
 		bool _inviteOnly;
 		bool _topicOpOnly;
 		std::string _key;

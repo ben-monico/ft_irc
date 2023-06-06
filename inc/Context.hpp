@@ -46,6 +46,8 @@ class Context
 		static std::vector<Client>::iterator 	find_client_by_nick(std::string const&);
 
 		static bool isUserInVector(std::vector<Client>::iterator );
+		static bool isChannelInVector(std::vector<Channel>::iterator );
+
 
 	//Command Responses
 		static void CHAN_RPL_TEMPLATE(std::string , Channel&, std::string , int);

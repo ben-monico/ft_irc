@@ -33,6 +33,8 @@ class Client
 		void eraseChannel(std::string const &channel);
 		void addChannelInvite(std::string const &channel);
 		void removeChannelInvite(std::string const &channel);
+		void removeFromAllChannels();
+
 
 	private:
 		std::vector<std::string> _cmds;

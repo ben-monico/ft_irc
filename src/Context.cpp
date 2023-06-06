@@ -47,9 +47,16 @@ void	Context::add_client(int client_id)
 
 void	Context::remove_client(int id_erase, int id_replace)
 {
-	std::iter_swap(Context::find_client_by_id(id_erase), Context::find_client_by_id(id_replace));
-	_clients.erase(Context::find_client_by_id(id_erase));
-	find_client_by_id(id_replace)->setID(id_erase);
+	std::vector<Client>::iterator clientToErase = Context::find_client_by_id(id_erase);
+	std::vector<Client>::iterator clientToReplace = Context::find_client_by_id(id_replace);
+	if (isUserInVector(clientToErase))
+	{
+		clientToErase->removeFromAllChannels();
+		std::iter_swap(clientToErase,clientToReplace);
+		_clients.erase(clientToErase);
+		if (id_erase != id_replace)
+			clientToReplace->setID(id_erase);
+	}
 }
 
 void Context::addClientToChannel(int client_id, std::string const & channelname, std::string const &mode)
@@ -87,13 +94,14 @@ void	Context::verifyLoginInfo(int id)
 		std::getline(username, user, ' ');
 	if (pass.empty() || !server->isPasswordMatch(pass))
 	{
-		ERR_PASSWDMISMATCH(id);
+		server->sendAllBytes(_hostname + " 464 " + nick + " :Password incorrect\r\n", id);
 		server->closeConection(id);
 	}
 	else if (isUserInVector(find_client_by_nick(nick)))
 	{
-		USR_RPL_TEMPLATE("436", "Nickname is already in use.", nick, id);
-		// server->closeConection(id);
+		//:irc.server.com 433 YourNickname :Nickname is already in use.
+		server->sendAllBytes(_hostname + " 422 " + nick + " :Nickname is already in use.\r\n", id);
+		server->closeConection(id);
 	}
 	else
 	{
@@ -104,3 +112,6 @@ void	Context::verifyLoginInfo(int id)
 }
 
 bool Context::isUserInVector(std::vector<Client>::iterator userGot) { return (userGot != _clients.end()); }
+
+bool Context::isChannelInVector(std::vector<Channel>::iterator channelGot) { return (channelGot != _channels.end()); }
+

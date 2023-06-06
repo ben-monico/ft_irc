@@ -19,16 +19,15 @@ void Context::USR_RPL_TEMPLATE(std::string code, std::string msg, std::string ni
 void Context::RPL_WELCOME(int client_id)
 {
 	server->sendAllBytes(_hostname + "CAP " + find_client_by_id(client_id)->getNick() + "NAK :302\r\n", client_id);
-	server->sendAllBytes(_hostname + "442 " + find_client_by_id(client_id)->getNick() + " :Welcome to Hell, " + find_client_by_id(client_id)->getNick() + "\r\n", client_id);
+	server->sendAllBytes(_hostname + "001 " + find_client_by_id(client_id)->getNick() + " :Welcome to Hell, " + find_client_by_id(client_id)->getNick() + "\r\n", client_id);
 	server->sendAllBytes(_hostname + "005 " + find_client_by_id(client_id)->getNick() + " CHANTYPES=#\r\n", client_id);
 	server->sendAllBytes(_hostname + "005 " + find_client_by_id(client_id)->getNick() + " CHANMODES=i,t,k,o,l\r\n", client_id);
-
 }
 
 void Context::RPL_NOTOPIC(int client_id, Channel &channel)
 {
 	server->sendAllBytes(_hostname + "331 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :" \
-	+ "No topic is set." + "\r\n", client_id);
+	+ "No topic is set.\r\n", client_id);
 }
 
 void Context::RPL_TOPIC(int client_id, Channel &channel)

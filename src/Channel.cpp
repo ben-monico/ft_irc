@@ -5,6 +5,7 @@ Channel::Channel(std::string name)
 	_name = name;
 	_topic = "";
 	_userLimit = 0;
+	_userCount = 0;
 	_inviteOnly = false;
 	_topicOpOnly = false;
 	_key = "";
@@ -24,6 +25,8 @@ bool Channel::getTopicOpOnly() const { return _topicOpOnly; }
 
 std::string Channel::getKey() const { return _key; }
 
+int Channel::getUserCount() const { return _userCount; }
+
 
 void Channel::setTopic(std::string const & topic) { _topic = topic; }
 
@@ -34,3 +37,7 @@ void Channel::setKey(std::string const & key) { _key = key; }
 void Channel::toggleRestrictTopic() { _topicOpOnly = true ? false : true; }
 
 void Channel::toggleInviteOnly() { _inviteOnly = true ? false : true; }
+
+void Channel::decrementUserCount() { _userCount--; }
+
+void Channel::incrementUserCount() { _userCount++; }

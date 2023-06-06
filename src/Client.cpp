@@ -1,4 +1,6 @@
 #include <Client.hpp>
+#include <Context.hpp>
+#include <Channel.hpp>
 
 void Client::setNick(std::string const &nick) { _nick = nick; }
 
@@ -66,4 +68,11 @@ void Client::removeChannelInvite(std::string const &channel)
 			return ;
 		}
 	}
+}
+
+void Client::removeFromAllChannels()
+{
+	std::map<std::string, std::string>::iterator it = _channelModes.begin();
+	for (; it != _channelModes.end(); it++)
+		Context::find_chan_by_name(it->first)->decrementUserCount();
 }
