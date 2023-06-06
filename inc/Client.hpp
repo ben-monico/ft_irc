@@ -4,6 +4,7 @@
 #include <ircserv.hpp>
 #include <map>
 #include <vector>
+
 class Channel;
 
 class Client
