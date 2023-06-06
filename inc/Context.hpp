@@ -36,7 +36,6 @@ class Context
 		static std::vector<Channel>::iterator	find_chan_by_name(std::string name);
 		static std::vector<Client>::iterator	find_client_by_id(int id);
 		static std::vector<Client>::iterator 	find_client_by_nick(const std::string &nick);
-		Client									&get_client_by_id(int id);
 
 		static bool isUserInVector(std::vector<Client>::iterator userGot) { return (userGot != _clients.end()); }
 		static void	setServerPtr(Handler *serverPtr);

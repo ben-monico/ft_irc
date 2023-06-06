@@ -41,15 +41,6 @@ std::vector<Client>::iterator  Context::find_client_by_nick(const std::string &n
 	return it;	
 }
 
-Client	&Context::get_client_by_id(int id)
-{
-	std::vector<Client>::iterator it = Context::_clients.begin();
-	for (; it != _clients.end(); ++it)
-		if (it->getId() == id)
-			break;
-	return *it;	
-}
-
 void	Context::add_client(int client_id)
 {
 	_clients.push_back(Client(client_id));
