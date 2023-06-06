@@ -13,41 +13,42 @@ class Handler;
 class Context
 {
 	public:
-		static void	verifyLoginInfo(int id);
-		static void add_client(int client_id);
-		static void	remove_client(int id_erase, int id_replace);
-		static void addClientToChannel(int client_id, std::string const&, std::string const&);
-		static void removeClientFromChannel(int client_id, std::string const&);
+		static void	verifyLoginInfo(int );
+		static void add_client(int);
+		static void	remove_client(int, int);
+		static void addClientToChannel(int, std::string const&, std::string const&);
+		static void removeClientFromChannel(int, std::string const&);
 
 	//Commands
-		static void cmd_join(int client_id, std::string const &channel);
-		static void cmd_setNick(int client_id, std::string nick);
-		static void cmd_setUserName(int client_id, std::string userName);
-		static void cmd_sendPM(int client_id, std::string const &msg);
-		static void	execClientCmds(int id);
+		static void cmd_join(int, std::string const&);
+		static void cmd_setNick(int, std::string );
+		static void cmd_setUserName(int, std::string );
+		static void cmd_sendPM(int, std::string const&);
+		static void	execClientCmds(int d);
 
 	//Channel operations
-		static void chanop_kick(std::string const & channel, int client_id);
-		static void chanop_invite(int client_id, std::string channel);
-		static void chanop_topic(int client_id, std::string topic);
-		static void chanop_mode(Channel &channel, char c, std::string const & msg);
+		static void chanop_kick(std::string const& , int);
+		static void chanop_invite(int, std::string );
+		static void chanop_topic(int, std::string const& );
+		static void chanop_mode(int, std::string const& , std::string const& );
 
 	//Getters and checkers
-		static std::vector<Channel>::iterator	find_chan_by_name(std::string name);
-		static std::vector<Client>::iterator	find_client_by_id(int id);
-		static std::vector<Client>::iterator 	find_client_by_nick(const std::string &nick);
+		static std::vector<Channel>::iterator	find_chan_by_name(std::string );
+		static std::vector<Client>::iterator	find_client_by_id(int);
+		static std::vector<Client>::iterator 	find_client_by_nick(std::string const&);
 
-		static bool isUserInVector(std::vector<Client>::iterator userGot) { return (userGot != _clients.end()); }
-		static void	setServerPtr(Handler *serverPtr);
+		static bool isUserInVector(std::vector<Client>::iterator );
+		static void	setServerPtr(Handler *);
 
 	//Command Responses
-		static void CHAN_RPL_TEMPLATE(std::string code, Channel &channel, std::string msg, int client_id);
-		static void USR_RPL_TEMPLATE(std::string code, std::string msg, std::string nick, int client_id);
-		static void RPL_TOPIC(int client_id, Channel &channel);
-		static void RPL_NAMREPLY(int client_id, Channel &channel);
-		static void RPL_ENDOFNAMES(int client_id, Channel &channel);
-		static void ERR_PASSWDMISMATCH(int client_id);
-		static void RPL_WELCOME(int client_id);
+		static void CHAN_RPL_TEMPLATE(std::string , Channel&, std::string , int);
+		static void USR_RPL_TEMPLATE(std::string , std::string , std::string , int);
+		static void RPL_TOPIC(int, Channel&);
+		static void RPL_NOTOPIC(int, Channel&)
+;		static void RPL_NAMREPLY(int, Channel&);
+		static void RPL_ENDOFNAMES(int, Channel&);
+		static void ERR_PASSWDMISMATCH(int);
+		static void RPL_WELCOME(int);
 
 
 	private:

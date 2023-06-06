@@ -2,7 +2,6 @@
 #include <Channel.hpp>
 #include <Handler.hpp>
 #include <sstream>
-//ERRORS ON PAGE 43
 
 std::vector<Channel> Context::_channels;
 std::vector<Client> Context::_clients;
@@ -103,3 +102,5 @@ void	Context::verifyLoginInfo(int id)
 		Context::RPL_WELCOME(client->getId());
 	}
 }
+
+bool Context::isUserInVector(std::vector<Client>::iterator userGot) { return (userGot != _clients.end()); }

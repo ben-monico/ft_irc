@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:40 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/05 17:47:35 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/06 16:36:49 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <string>
 # include <vector>
 # include <ircserv.hpp>
-# include <Client.hpp>
+# include <map>
 
 
 class Client;
@@ -25,20 +25,29 @@ class Client;
 class Channel
 {
 	public:
-		Channel(std::string name, char mode) : _name(name), _mode(mode), _topic("NOTOPIC") { }
-		~Channel() {}
+		Channel(std::string name);
+		~Channel();
 
-		void setMode(char mode) { _mode = mode; }
-		void setTopic(std::string topic) { _topic = topic; }
+		void setTopic(std::string const& topic);
+		void setUserLimit(int limit);
+		void setKey(std::string const& key);
+		void toggleRestrictTopic();
+		void toggleInviteOnly();
 
-		std::string getName() const { return _name; }
-		std::string getTopic() const { return _topic; }
+		std::string getName() const;
+		std::string getTopic() const;
+		int getUserLimit() const;
+		bool getInviteOnly() const;
+		bool getTopicOpOnly() const;
+		std::string getKey() const;
 			
 	private:
 		std::string _name;
-		char _mode;
 		std::string _topic;
-		std::vector<Client> _operators;
+		int _userLimit;
+		bool _inviteOnly;
+		bool _topicOpOnly;
+		std::string _key;
 		
 };
 
