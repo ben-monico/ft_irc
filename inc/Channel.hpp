@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:40 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/06 21:49:05 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/06 22:18:48 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ class Channel
 		std::string getTopic() const;
 		int getUserLimit() const;
 		bool getInviteOnly() const;
+		int getUserCount() const;
 		bool getTopicOpOnly() const;
 		std::string getKey() const;
 			

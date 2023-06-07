@@ -75,5 +75,15 @@ void	Context::execClientCmds(int id)
 			std::string channel = it->substr(6, it->length() - 7);
 			cmd_join(client->getId(), channel);
 		}
+	//INVITE USER CHANNEL	- invite
+	//NICK <nick>			- set nick - all sharacters
+	//TOPIC <channel> :<topic>, if no topic but : - set topic to "" - if no topic and no : - show topic
+	//LIST - show channels
+	//KICK <channel> <tarjet> :<reason>
+	//JOIN #<CNAME1> #<CNAME2> #<CNAMEn>
+	//QUIT :<REASON>
+	//PRIVMSG <channel-pub/user-priv> :msg
+	//MODE +<FLAG><<PARAMS>> - can or not be space separated - will trim whitespaces - sep by + and if not flag in itkol, error out - if i or t have params error - else execute flag string
+	//	if k or l no params, toggle off pass or limit - if o no params call user retarded
 	}		
 }
