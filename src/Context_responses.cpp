@@ -56,7 +56,32 @@ void Context::RPL_ENDOFNAMES(int client_id, Channel &channel)
 	server->sendAllBytes(_hostname + "366 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :End of /NAMES list.\r\n", client_id);
 }
 
+void Context::ERR_NOSUCHNICK(int client_id, std::string const& nick)
+{
+	server->sendAllBytes(_hostname + "401 " + find_client_by_id(client_id)->getNick() + " " + nick + " :No such nick/channel\r\n", client_id);
+}
+
+void Context::ERR_NOSUCHCHANNEL(int client_id, std::string const& channel_name)
+{
+	server->sendAllBytes(_hostname + "403 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :No such channel\r\n", client_id);
+}
+
+void Context::ERR_NOTONCHANNEL(int client_id, std::string const& channel_name)
+{
+	server->sendAllBytes(_hostname + "442 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :User not on channel\r\n", client_id);
+}
+
+void Context::ERR_USERONCHANNEL(int client_id, std::string const& nick, std::string const& channel_name)
+{
+	server->sendAllBytes(_hostname + "443 " + find_client_by_id(client_id)->getNick() + " " + nick + " #" + channel_name + " :is already on channel\r\n", client_id);
+}
+
 void Context::ERR_PASSWDMISMATCH(int client_id)
 {
 	server->sendAllBytes(_hostname + "464 :Password Mismatched password. (Connection Refused)\r\n", client_id);
+}
+
+void Context::ERR_CHANOPRIVSNEEDED(int client_id, std::string const& channel_name)
+{
+	server->sendAllBytes(_hostname + "482 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :You're not channel operator\r\n", client_id);
 }

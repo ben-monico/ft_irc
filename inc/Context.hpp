@@ -56,8 +56,13 @@ class Context
 		static void RPL_NOTOPIC(int, Channel&)
 ;		static void RPL_NAMREPLY(int, Channel&);
 		static void RPL_ENDOFNAMES(int, Channel&);
-		static void ERR_PASSWDMISMATCH(int);
 		static void RPL_WELCOME(int);
+		static void ERR_NOTONCHANNEL(int, std::string const&);
+		static void ERR_USERONCHANNEL(int, std::string const&, std::string const&);
+		static void ERR_NOSUCHCHANNEL(int, std::string const&);
+		static void ERR_NOSUCHNICK(int, std::string const&);
+		static void ERR_PASSWDMISMATCH(int);
+		static void ERR_CHANOPRIVSNEEDED(int, std::string const&);
 
 
 	private:

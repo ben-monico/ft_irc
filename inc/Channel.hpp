@@ -6,7 +6,7 @@
 /*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 22:49:40 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/06 21:49:05 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/07 16:04:40 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ class Channel
 		std::string getName() const;
 		std::string getTopic() const;
 		int getUserLimit() const;
+		int getUserCount() const;
 		bool getInviteOnly() const;
 		bool getTopicOpOnly() const;
 		std::string getKey() const;

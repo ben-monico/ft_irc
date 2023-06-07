@@ -25,7 +25,7 @@ std::string Client::getChannelMode(std::string const & channel) const
 {
 	std::map<std::string, std::string>::const_iterator it = _channelModes.find(channel);
 	if (it == _channelModes.end())
-		return "";
+		return "-";
 	return it->second;
 }
 
@@ -75,4 +75,11 @@ void Client::removeFromAllChannels()
 	std::map<std::string, std::string>::iterator it = _channelModes.begin();
 	for (; it != _channelModes.end(); it++)
 		Context::find_chan_by_name(it->first)->decrementUserCount();
+}
+
+bool Client::isInChannel(std::string const &channel)
+{
+	if (_channelModes.find(channel) == _channelModes.end())
+		return false;
+	return true;
 }
