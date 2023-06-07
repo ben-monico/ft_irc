@@ -97,7 +97,7 @@ void	Context::verifyLoginInfo(int id)
 		server->sendAllBytes(_hostname + " 464 " + nick + " :Password incorrect\r\n", id);
 		server->closeConection(id);
 	}
-	else if (isUserInVector(find_client_by_nick(nick)))
+	else if (isUserInVector(find_client_by_nick(nick)) || isChannelInVector(find_chan_by_name(nick)))
 	{
 		//:irc.server.com 433 YourNickname :Nickname is already in use.
 		server->sendAllBytes(_hostname + " 422 " + nick + " :Nickname is already in use.\r\n", id);
@@ -106,7 +106,6 @@ void	Context::verifyLoginInfo(int id)
 	else
 	{
 		client->init(nick, user);
-		//need to go over CAP again
 		Context::RPL_WELCOME(client->getId());
 	}
 }
