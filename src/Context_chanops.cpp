@@ -19,7 +19,7 @@ void Context::chanop_kick_user(int client_id, std::string const& channel, std::s
 	{
 		target->removeChannelInvite(channel);
 		target->eraseChannel(channel);
-		find_chan_by_name(channel)->decrementUserCount();
+		find_chan_by_name(channel)->decrementUserCount(target->getId());
 		server->sendAllBytes(chanop->getNick() + " KICK #" + channel + " " + targetName + \
 		" :You have been kicked by " + chanop->getNick() + "\r\n", target->getId());
 	}
@@ -49,9 +49,12 @@ void Context::chanop_topic(int client_id, std::string const& channelName, std::s
 	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
 	if (client->getChannelMode(channelName) != "@")
-		ERR_CHANOPRIVSNEEDED(client_id, channelName);
+		return ERR_CHANOPRIVSNEEDED(client_id, channelName);
 	else if (!isChannelInVector(channel))
-		ERR_NOSUCHCHANNEL(client_id, channelName);
+		return ERR_NOSUCHCHANNEL(client_id, channelName);
+	else if (channel->isFull())
+		return ERR_CHANNELISFULL(client_id, channelName);
+	
 	else
 	{
 		newtopic.empty() ? RPL_TOPIC(client_id, *channel) : channel->setTopic(newtopic);

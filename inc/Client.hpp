@@ -35,6 +35,7 @@ class Client
 		void removeChannelInvite(std::string const &channel);
 		void removeFromAllChannels();
 		bool isInChannel(std::string const &channel);
+		bool isInvitedToChannel(std::string const &channel);
 
 
 	private:

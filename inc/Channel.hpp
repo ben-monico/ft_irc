@@ -7,9 +7,8 @@
 # include <ircserv.hpp>
 # include <map>
 
-
+class Handler;
 class Client;
-
 class Channel
 {
 	public:
@@ -21,18 +20,19 @@ class Channel
 		void setKey(std::string const& key);
 		void toggleRestrictTopic();
 		void toggleInviteOnly();
-		void decrementUserCount();
-		void incrementUserCount();
+		void decrementUserCount(int id);
+		void incrementUserCount(int id);
 
 		std::string getName() const;
 		std::string getTopic() const;
 		int getUserLimit() const;
 		int getUserCount() const;
 		bool getInviteOnly() const;
-		int getUserCount() const;
 		bool getTopicOpOnly() const;
+		bool isFull() const;
 		std::string getKey() const;
-			
+		void broadcastMsg(std::string const &msg, Handler *server);
+
 	private:
 		std::string _name;
 		std::string _topic;
@@ -41,7 +41,7 @@ class Channel
 		bool _inviteOnly;
 		bool _topicOpOnly;
 		std::string _key;
-		
+		std::vector<int> _usersID;
 };
 
 #endif

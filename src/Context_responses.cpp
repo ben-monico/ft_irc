@@ -81,6 +81,21 @@ void Context::ERR_PASSWDMISMATCH(int client_id)
 	server->sendAllBytes(_hostname + "464 :Password Mismatched password. (Connection Refused)\r\n", client_id);
 }
 
+void Context::ERR_CHANNELISFULL(int client_id, std::string const& channel_name)
+{
+	server->sendAllBytes(_hostname + "471 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :Cannot join channel (+l)\r\n", client_id);
+}
+
+void Context::ERR_INVITEONLYCHAN(int client_id, std::string const& channel_name)
+{
+	server->sendAllBytes(_hostname + "473 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :Cannot join channel (+i)\r\n", client_id);
+}
+
+void Context::ERR_BADCHANNELKEY(int client_id, std::string const& channel_name)
+{
+	server->sendAllBytes(_hostname + "475 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :Cannot join channel (+k)\r\n", client_id);
+}
+
 void Context::ERR_CHANOPRIVSNEEDED(int client_id, std::string const& channel_name)
 {
 	server->sendAllBytes(_hostname + "482 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :You're not channel operator\r\n", client_id);

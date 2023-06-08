@@ -1,5 +1,6 @@
 #include <Channel.hpp>
-
+#include <algorithm>
+#include <Handler.hpp>
 Channel::Channel(std::string name) 
 {
 	_name = name;
@@ -27,6 +28,8 @@ std::string Channel::getKey() const { return _key; }
 
 int Channel::getUserCount() const { return _userCount; }
 
+bool Channel::isFull() const { return (_userLimit != 0 && _userCount >= _userLimit); }
+
 
 void Channel::setTopic(std::string const & topic) { _topic = topic; }
 
@@ -38,6 +41,25 @@ void Channel::toggleRestrictTopic() { _topicOpOnly = true ? false : true; }
 
 void Channel::toggleInviteOnly() { _inviteOnly = true ? false : true; }
 
-void Channel::decrementUserCount() { _userCount--; }
+void Channel::decrementUserCount(int id) 
+{
+	std::vector<int>::iterator it = std::find(_usersID.begin(), _usersID.end(), id);
+	if (it != _usersID.end())
+	{
+		_usersID.erase(it);
+		_userCount--; 
+	}
+}
 
-void Channel::incrementUserCount() { _userCount++; }
+void Channel::incrementUserCount(int id)
+{
+	_userCount++;
+	_usersID.push_back(id);
+}
+
+void Channel::broadcastMsg(std::string const &msg, Handler *server)
+{
+	std::vector<int>::iterator it = _usersID.begin();
+	for (; it != _usersID.end(); it++)
+		server->sendAllBytes(msg, *it);
+}

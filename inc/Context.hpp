@@ -21,11 +21,11 @@ class Context
 		static void removeClientFromChannel(int, std::string const&);
 
 	//Commands
-		static void cmd_join(int, std::string const&);
-		static void cmd_setNick(int, std::string );
-		static void cmd_setUserName(int, std::string );
-		static void cmd_sendPM(int, std::string const&);
-		static void	execClientCmds(int d);
+		static void cmd_join(int client_id, std::string const &channelName, std::string const& key);
+		static void cmd_setNick(int client_id, std::string );
+		static void cmd_setUserName(int client_id, std::string );
+		static void cmd_sendPM(int client_id, std::string const& recipient, std::string const& msg);
+		static void	execClientCmds(int client_id);
 
 	//Channel operations
 		static void chanop_kick_user(int client_id, std::string const& channel, std::string const& target);
@@ -61,6 +61,9 @@ class Context
 		static void ERR_USERONCHANNEL(int, std::string const&, std::string const&);
 		static void ERR_NOSUCHCHANNEL(int, std::string const&);
 		static void ERR_NOSUCHNICK(int, std::string const&);
+		static void ERR_CHANNELISFULL(int client_id, std::string const& channel_name);
+		static void ERR_INVITEONLYCHAN(int client_id, std::string const& channel_name);
+		static void ERR_BADCHANNELKEY(int client_id, std::string const& channel_name);
 		static void ERR_PASSWDMISMATCH(int);
 		static void ERR_CHANOPRIVSNEEDED(int, std::string const&);
 

@@ -74,7 +74,7 @@ void Client::removeFromAllChannels()
 {
 	std::map<std::string, std::string>::iterator it = _channelModes.begin();
 	for (; it != _channelModes.end(); it++)
-		Context::find_chan_by_name(it->first)->decrementUserCount();
+		Context::find_chan_by_name(it->first)->decrementUserCount(_id);
 }
 
 bool Client::isInChannel(std::string const &channel)
@@ -82,4 +82,15 @@ bool Client::isInChannel(std::string const &channel)
 	if (_channelModes.find(channel) == _channelModes.end())
 		return false;
 	return true;
+}
+
+bool Client::isInvitedToChannel(std::string const &channel)
+{
+	std::vector<std::string>::iterator it = _channelInvites.begin();
+	for (; it != _channelInvites.end(); it++)
+	{
+		if (*it == channel)
+			return true;
+	}
+	return false;
 }
