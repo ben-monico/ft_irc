@@ -66,8 +66,8 @@ void Context::RPL_NAMREPLY(int client_id, Channel &channel)
 		if (it->isOnChannel(channel.getName()))
 			msg += it->getChannelMode(channel.getName()) + it->getNick() + " ";
 	}
-	server->sendAllBytes(_hostname + "353 " + find_client_by_id(client_id)->getNick() + " = #" + channel.getName() + " :" \
-	+ msg + "\r\n", client_id);
+	channel.broadcastMsg(_hostname + "353 " + find_client_by_id(client_id)->getNick() + " = #" + channel.getName() + " :" \
+	+ msg + "\r\n", server, -1);
 }
 
 void Context::RPL_ENDOFNAMES(int client_id, Channel &channel)
