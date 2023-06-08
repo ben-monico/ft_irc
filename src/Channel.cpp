@@ -1,6 +1,7 @@
 #include <Channel.hpp>
 #include <algorithm>
 #include <Handler.hpp>
+#include <Context.hpp>
 Channel::Channel(std::string name) 
 {
 	_name = name;
@@ -57,9 +58,12 @@ void Channel::incrementUserCount(int id)
 	_usersID.push_back(id);
 }
 
-void Channel::broadcastMsg(std::string const &msg, Handler *server)
+void Channel::broadcastMsg(std::string const &msg, Handler *server, int senderID)
 {
 	std::vector<int>::iterator it = _usersID.begin();
 	for (; it != _usersID.end(); it++)
-		server->sendAllBytes(msg, *it);
+	{
+		if (*it != senderID)
+			server->sendAllBytes(msg + "\r\n", *it);
+	}
 }

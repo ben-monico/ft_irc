@@ -24,6 +24,11 @@ void Context::RPL_WELCOME(int client_id)
 	server->sendAllBytes(_hostname + "005 " + find_client_by_id(client_id)->getNick() + " CHANMODES=i,t,k,o,l\r\n", client_id);
 }
 
+void Context::RPL_CHANNELMODEIS(int client_id, Channel &channel)
+{
+	server->sendAllBytes(_hostname + "324 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + "\r\n", client_id);
+}
+
 void Context::RPL_NOTOPIC(int client_id, Channel &channel)
 {
 	server->sendAllBytes(_hostname + "331 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :" \
@@ -36,6 +41,20 @@ void Context::RPL_TOPIC(int client_id, Channel &channel)
 		return RPL_NOTOPIC(client_id, channel);
 	server->sendAllBytes(_hostname + "332 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :" \
 	+ channel.getTopic() + "\r\n", client_id);
+}
+
+void Context::RPL_WHOREPLY(int client_id, Channel &channel)
+{
+	std::string msg = "";
+	std::vector<Client>::iterator it = _clients.begin();
+	for (; it != _clients.end(); ++it)
+	{
+		if (it->isOnChannel(channel.getName()))
+			server->sendAllBytes(_hostname + "352 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " " + \
+			it->getUserName() + " ircserv " + it->getNick() + " H :0 " + msg + "\r\n", client_id);
+	}
+	server->sendAllBytes(_hostname + "352 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " " + \
+	_hostname + " " + _hostname + " " + find_client_by_id(client_id)->getNick() + " H :0 " + msg + "\r\n", client_id);
 }
 
 void Context::RPL_NAMREPLY(int client_id, Channel &channel)

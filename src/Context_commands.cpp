@@ -21,7 +21,7 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 			else if (channel->isFull())
 				return ERR_CHANNELISFULL(client->getId(), channelName);
 		}
-		client->addChannelMode(channelName, "");
+		client->addChannelMode(channelName, "+");
 	}
 	else
 	{
@@ -30,7 +30,8 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 		client->addChannelMode(channelName, "@");
 	}
 	channel->incrementUserCount(client_id);
-	server->sendAllBytes(":" + client->getNick() + " JOIN " + channelName + "\r\n", client->getId());
+	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" + channelName, server, -1);
+	//these need to be broadcast
 	RPL_TOPIC(client->getId(), *channel);
 	RPL_NAMREPLY(client->getId(), *channel);
 	RPL_ENDOFNAMES(client->getId(), *channel);
@@ -39,7 +40,6 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 void Context::cmd_setNick(int client_id, std::string nick)
 {
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	//NICK | ERR_NICKCOLLISION ERR_NONICKNAMEGIVEN ERR_NICKNAMEINUSE ERR_ERRONEUSNICKNAME
 	client->setNick(nick);
 }
 
@@ -52,16 +52,10 @@ void Context::cmd_setUserName(int client_id, std::string userName)
 void Context::cmd_sendPM(int client_id, std::string const& recipient, std::string const & msg)
 {
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	std::vector<Client>::iterator recipientClient = find_client_by_nick(recipient);
+	// std::vector<Client>::iterator recipientClient = find_client_by_nick(recipient);
 	std::vector<Channel>::iterator recipientChannel = find_chan_by_name(recipient);
-	std::cout << "!" << msg << "!" <<std::endl;
-	std::cout << "!" << recipient << "!" <<std::endl;
-	if (isUserInVector(recipientClient))
-	{
-		server->sendAllBytes(":" + client->getNick() + " PRIVMSG " + recipient + " :" + msg + "\r\n", client->getId());
-	}
-	else if (isChannelInVector(recipientChannel))
-		recipientChannel->broadcastMsg("PRIVMSG #" + recipient + " :" + msg + "\r\n", server);
+	if (isChannelInVector(recipientChannel))
+		recipientChannel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost PRIVMSG #" + recipient + " :" + msg, server, client_id);
 
 	// ERR_NORECIPIENT                 ERR_NOTEXTTOSEND
 	//    ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
@@ -90,12 +84,28 @@ void	Context::execClientCmds(int id)
 			std::string channel = it->substr(6, it->length() - 7);
 			cmd_join(client->getId(), channel, "");
 		}
-		else if (it->find("PRIVMSG ", 0) != std::string::npos)
+		else if (it->find("PRIVMSG #", 0) != std::string::npos)
 		{
-			std::string recipient = it->substr(8, it->find(" ", 8) - 8);
-			std::string msg = it->substr(it->find(" :", 8) + 2, it->length() - it->find(" :", 8) - 3);
+	
+			std::string recipient = it->substr(9, it->find(" :", 9) - 9);
+			std::string msg = it->substr(it->find(" :", 9) + 2, it->length() - it->find(" :", 9) - 2);
 			cmd_sendPM(client->getId(), recipient, msg);
 		}
+		else if (it->find("MODE ", 0) != std::string::npos)
+		{
+			std::vector<Channel>::iterator channel = find_chan_by_name(it->substr(5, it->length() - 6));
+			if (isChannelInVector(channel))
+				RPL_CHANNELMODEIS(client->getId(), *channel);
+		}
+		// else if (it->find("WHO ", 0) != std::string::npos)
+		// {
+		// 	std::vector<Channel>::iterator channel = find_chan_by_name(it->substr(4, it->length() - 5));
+		// 	if (isChannelInVector(channel))
+		// 		RPL_WHOREPLY(client->getId(), *channel);
+		// 	else
+		// 		ERR_NOSUCHCHANNEL(client->getId(), it->substr(4, it->length() - 5));	
+		// }
+
 	//INVITE USER CHANNEL	- invite
 	//NICK <nick>			- set nick - all sharacters
 	//TOPIC <channel> :<topic>, if no topic but : - set topic to "" - if no topic and no : - show topic

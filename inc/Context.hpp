@@ -66,6 +66,9 @@ class Context
 		static void ERR_BADCHANNELKEY(int client_id, std::string const& channel_name);
 		static void ERR_PASSWDMISMATCH(int);
 		static void ERR_CHANOPRIVSNEEDED(int, std::string const&);
+		static void RPL_WHOREPLY(int client_id, Channel &channel);
+		static void RPL_CHANNELMODEIS(int client_id, Channel &channel);
+
 
 
 	private:

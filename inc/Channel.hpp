@@ -31,7 +31,7 @@ class Channel
 		bool getTopicOpOnly() const;
 		bool isFull() const;
 		std::string getKey() const;
-		void broadcastMsg(std::string const &msg, Handler *server);
+		void broadcastMsg(std::string const &msg, Handler *server, int senderID);
 
 	private:
 		std::string _name;
