@@ -68,7 +68,8 @@ class Context
 		static void ERR_CHANOPRIVSNEEDED(int, std::string const&);
 		static void RPL_WHOREPLY(int client_id, Channel &channel);
 		static void RPL_CHANNELMODEIS(int client_id, Channel &channel);
-
+		static void ERR_CANNOTSENDTOCHAN(int client_id, std::string const&* channel_name)
+		
 
 
 	private:

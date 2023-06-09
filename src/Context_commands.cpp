@@ -41,12 +41,14 @@ void Context::cmd_setNick(int client_id, std::string nick)
 {
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
 	client->setNick(nick);
+	//pass thru nick checker
 }
 
 void Context::cmd_setUserName(int client_id, std::string userName)
 {
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
 	client->setUserName(userName);
+	//pass thru usNa checker
 }
 
 void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const & msg)
@@ -56,11 +58,13 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 	{
 		recipient.erase(0, 1);
 		std::vector<Channel>::iterator recipientChannel = find_chan_by_name(recipient);
-		if (isChannelInVector(recipientChannel))
+		if (!isChannelInVector(recipientChannel))
+			return ERR_NOSUCHCHANNEL(sender->getId(), recipient);
+		else if (!sender->isOnChannel(recipient))
+			return ERR_CANNOTSENDTOCHAN(sender->getId(), recipient);
+		else
 			recipientChannel->broadcastMsg(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG #" + \
 				recipient + " :" + msg + "\r\n", server, sender_id);
-		else
-			return ERR_NOSUCHCHANNEL(sender->getId(), recipient);
 	}
 	else
 	{
@@ -70,12 +74,6 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 		else
 			return ERR_NOSUCHNICK(sender->getId(), recipient);
 	}
-
-	// ERR_NORECIPIENT                 ERR_NOTEXTTOSEND
-	//    ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
-	//    ERR_WILDTOPLEVEL                ERR_TOOMANYTARGETS
-	//    ERR_NOSUCHNICK
-	//    RPL_AWAY
 }
 
 

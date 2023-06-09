@@ -82,6 +82,11 @@ void Context::ERR_NOSUCHCHANNEL(int client_id, std::string const& channel_name)
 	server->sendAllBytes(_hostname + "403 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :No such channel\r\n", client_id);
 }
 
+void Context::ERR_CANNOTSENDTOCHAN(int client_id, std::string const&* channel_name)
+{
+	server->sendAllBytes(_hostname + "404 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :Cannot send to channel\r\n", client_id);
+}
+
 void Context::ERR_NOTONCHANNEL(int client_id, std::string const& channel_name)
 {
 	server->sendAllBytes(_hostname + "442 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :User not on channel\r\n", client_id);
