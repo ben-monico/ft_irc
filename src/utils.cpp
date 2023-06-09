@@ -17,17 +17,8 @@ size_t ft_strlen(char *str)
 	return (i);
 }
 
-size_t lenToIRCEOL(char *str)
+bool	isNumeric(const std::string &str)
 {
-	int i = -1;
-
-	if (!str || !*str)
-		return (0);
-	while (str[++i])
-	{
-		if (str[i] == '\r' && str[i + 1] == '\n')
-			return (i);
-	}
-	return (i);
-}	
+	return (str.find_first_not_of("0123456789") == std::string::npos);
+}
 

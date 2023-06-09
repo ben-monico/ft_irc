@@ -119,3 +119,8 @@ void Context::ERR_CHANOPRIVSNEEDED(int client_id, std::string const& channel_nam
 {
 	server->sendAllBytes(_hostname + "482 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :You're not channel operator\r\n", client_id);
 }
+
+void	Context::ERR_UNRECOGNIZEDCMD(const int &client_id, const std::string &cmd, const std::string reason)
+{
+	server->sendAllBytes(_hostname + "421 " + find_client_by_id(client_id)->getNick() + " " + cmd + " :" + reason + "\r\n",  client_id);
+}

@@ -79,57 +79,32 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 }
 
 
-void	Context::execClientCmds(int id)
+void	Context::execModeOptions(std::vector<std::string> vec, std::vector<Client>::iterator client, const std::string &chan)
 {
-	std::vector<Client>::iterator		client = find_client_by_id(id); 
-	std::vector<std::string>			&cmds = client->getCmds();
-	std::vector<std::string>::iterator	it = cmds.begin();
-
-	//pass through cmd_parser
-	for (; it != cmds.end(); ++it)
+	if (vec[2][0] == '+')
 	{
-		if (it->find("QUIT") != std::string::npos)
-		{
-			server->closeConection(client->getId());
-			break ;
-		}
-		else if (it->find("JOIN #", 0) != std::string::npos)
-		{
-			std::string channel = it->substr(6, it->length() - 7);
-			cmd_join(client->getId(), channel, "");
-		}
-		else if (it->find("PRIVMSG ", 0) != std::string::npos)
-		{
-			//must go with # if channel
-			std::string recipient = it->substr(8, it->find(" :", 8) - 8);
-			//msg body after :
-			std::string msg = it->substr(it->find(" :", 8) + 2, it->length() - it->find(" :", 8) - 3);
-			cmd_sendPM(client->getId(), recipient, msg);
-		}
-		else if (it->find("MODE ", 0) != std::string::npos)
-		{
-			std::vector<Channel>::iterator channel = find_chan_by_name(it->substr(5, it->length() - 6));
-			if (isChannelInVector(channel))
-				RPL_CHANNELMODEIS(client->getId(), *channel);
-		}
-		// else if (it->find("WHO ", 0) != std::string::npos)
-		// {
-		// 	std::vector<Channel>::iterator channel = find_chan_by_name(it->substr(5, it->length() - 6));
-		// 	if (isChannelInVector(channel))
-		// 		RPL_WHOREPLY(client->getId(), *channel);
-		// 	else
-		// 		ERR_NOSUCHCHANNEL(client->getId(), it->substr(5, it->length() - 6));	
-		// }
-
-	//INVITE USER CHANNEL	- invite
-	//NICK <nick>			- set nick - all sharacters
-	//TOPIC <channel> :<topic>, if no topic but : - set topic to "" - if no topic and no : - show topic
-	//LIST - show channels
-	//KICK <channel> <tarjet> :<reason>
-	//JOIN #<CNAME1> #<CNAME2> #<CNAMEn>
-	//QUIT :<REASON>
-	//PRIVMSG <channel-pub/user-priv> :msg
-	//MODE +<FLAG><<PARAMS>> - can or not be space separated - will trim whitespaces - sep by + and if not flag in itkol, error out - if i or t have params error - else execute flag string
-	//	if k or l no params, toggle off pass or limit - if o no params call user retarded
-	}		
+		if (vec[2][1] == 'o')
+			for (std::vector<std::string>::iterator i = vec.begin() + 3; i != vec.end(); ++i)
+				chanop_toggle_oppriv(client->getId(), chan, *i, "@");
+		if (vec[2][1] == 'l')
+			chanop_userlimit(client->getId(), chan, vec[3]);
+		if (vec[2][1] == 'k')
+			chanop_key(client->getId(), chan, vec[3]);
+		if (vec[2].find("i") != std::string::npos)
+			chanop_toggle_inviteonly(client->getId(), chan, true);
+		if (vec[2].find("t") != std::string::npos)
+			chanop_toggle_topic_restriction(client->getId(), chan, true);
+		return ;
+	}
+	if (vec[2][1] == 'o')
+		for (std::vector<std::string>::iterator i = vec.begin() + 3; i != vec.end(); ++i)
+			chanop_toggle_oppriv(client->getId(), chan, *i, "+");
+	if (vec[2].find("i") != std::string::npos)
+		chanop_toggle_inviteonly(client->getId(), chan, false);
+	if (vec[2].find("t") != std::string::npos)
+		chanop_toggle_topic_restriction(client->getId(), chan, false);
+	if (vec[2].find("k") != std::string::npos)
+		chanop_key(client->getId(), chan, "");
+	if (vec[2].find("l") != std::string::npos)
+		chanop_userlimit(client->getId(), chan, "0");
 }
