@@ -67,3 +67,10 @@ void Channel::broadcastMsg(std::string const &msg, Handler *server, int senderID
 			server->sendAllBytes(msg + "\r\n", *it);
 	}
 }
+
+void Channel::replaceClientID(int old_id, int new_id)
+{
+	std::vector<int>::iterator it = std::find(_usersID.begin(), _usersID.end(), old_id);
+	if (it != _usersID.end())
+		*it = new_id;
+}

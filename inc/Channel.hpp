@@ -32,6 +32,8 @@ class Channel
 		bool isFull() const;
 		std::string getKey() const;
 		void broadcastMsg(std::string const &msg, Handler *server, int senderID);
+		void replaceClientID(int old_id, int new_id);
+
 
 	private:
 		std::string _name;

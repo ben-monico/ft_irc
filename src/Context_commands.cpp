@@ -114,11 +114,11 @@ void	Context::execClientCmds(int id)
 		}
 		// else if (it->find("WHO ", 0) != std::string::npos)
 		// {
-		// 	std::vector<Channel>::iterator channel = find_chan_by_name(it->substr(4, it->length() - 5));
+		// 	std::vector<Channel>::iterator channel = find_chan_by_name(it->substr(5, it->length() - 6));
 		// 	if (isChannelInVector(channel))
 		// 		RPL_WHOREPLY(client->getId(), *channel);
 		// 	else
-		// 		ERR_NOSUCHCHANNEL(client->getId(), it->substr(4, it->length() - 5));	
+		// 		ERR_NOSUCHCHANNEL(client->getId(), it->substr(5, it->length() - 6));	
 		// }
 
 	//INVITE USER CHANNEL	- invite

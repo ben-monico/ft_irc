@@ -48,17 +48,15 @@ void	Context::add_client(int client_id)
 void	Context::remove_client(int id_erase, int id_replace)
 {
 	std::vector<Client>::iterator clientToErase = Context::find_client_by_id(id_erase);
-	std::vector<Client>::iterator clientToReplace = Context::find_client_by_id(id_replace);
 	if (isUserInVector(clientToErase))
 	{
 		clientToErase->removeFromAllChannels();
-		clientToReplace->removeFromAllChannels();
-		std::iter_swap(clientToErase,clientToReplace);
 		_clients.erase(clientToErase);
+		std::vector<Client>::iterator clientToReplace = Context::find_client_by_id(id_replace);
 		if (id_erase != id_replace)
 		{
 			clientToReplace->setID(id_erase);
-			clientToReplace->replaceIDInChannels(id_erase);
+			clientToReplace->replaceIDInChannels(id_replace, id_erase);
 		}
 	}
 }

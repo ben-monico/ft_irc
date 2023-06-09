@@ -95,9 +95,9 @@ bool Client::isInvitedToChannel(std::string const &channel)
 	return false;
 }
 
-void Client::replaceIDInChannels(int id)
+void Client::replaceIDInChannels(int old_id, int new_id)
 {
 	std::map<std::string, std::string>::iterator it = _channelModes.begin();
 	for (; it != _channelModes.end(); it++)
-		Context::find_chan_by_name(it->first)->incrementUserCount(id);
+		Context::find_chan_by_name(it->first)->replaceClientID(old_id, new_id);
 }

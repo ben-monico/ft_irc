@@ -51,10 +51,10 @@ void Context::RPL_WHOREPLY(int client_id, Channel &channel)
 	{
 		if (it->isOnChannel(channel.getName()))
 			server->sendAllBytes(_hostname + "352 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " " + \
-			it->getUserName() + " ircserv " + it->getNick() + " H :0 " + msg + "\r\n", client_id);
+			it->getUserName() + " localhost " + it->getNick() + " H :0 " + msg + "\r\n", client_id);
 	}
-	server->sendAllBytes(_hostname + "352 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " " + \
-	_hostname + " " + _hostname + " " + find_client_by_id(client_id)->getNick() + " H :0 " + msg + "\r\n", client_id);
+	// server->sendAllBytes(_hostname + "352 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " " + 
+	// _hostname + " " + _hostname + " " + find_client_by_id(client_id)->getNick() + " H :0 " + msg + "\r\n", client_id);
 }
 
 void Context::RPL_NAMREPLY(int client_id, Channel &channel)
@@ -72,7 +72,7 @@ void Context::RPL_NAMREPLY(int client_id, Channel &channel)
 
 void Context::RPL_ENDOFNAMES(int client_id, Channel &channel)
 {
-	server->sendAllBytes(_hostname + "366 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :End of /NAMES list.\r\n", client_id);
+	channel.broadcastMsg(_hostname + "366 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :End of /NAMES list.\r\n", server, -1);
 }
 
 void Context::ERR_NOSUCHNICK(int client_id, std::string const& nick)
