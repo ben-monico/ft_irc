@@ -63,9 +63,9 @@ void Channel::setUserLimit(int limit) { _userLimit = limit; }
 
 void Channel::setKey(std::string const & key) { _key = key; }
 
-void Channel::toggleRestrictTopic() { _topicOpOnly = true ? false : true; }
+void Channel::toggleRestrictTopic() { _topicOpOnly = _topicOpOnly ? false : true; }
 
-void Channel::toggleInviteOnly() { _inviteOnly = true ? false : true; }
+void Channel::toggleInviteOnly() { _inviteOnly = _inviteOnly ? false : true; }
 
 void Channel::decrementUserCount(int id) 
 {

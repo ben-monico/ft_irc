@@ -78,7 +78,7 @@ void Context::chanop_toggle_inviteonly(int client_id, std::string channelName)
 	}
 }
 
-void Context::chanop_toggle_topic_restriction(int client_id, std::string const& channelName)
+void Context::chanop_toggle_inviteonly(int client_id, std::string channelName, bool toggle)
 {
 	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
@@ -88,8 +88,29 @@ void Context::chanop_toggle_topic_restriction(int client_id, std::string const& 
 		ERR_NOSUCHCHANNEL(client_id, channelName);
 	else
 	{
-		channel->toggleRestrictTopic();
-		server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +t\r\n", client->getId());
+		channel->getInviteOnly() == toggle ? (void)0 : channel->toggleInviteOnly();
+		channel->getInviteOnly()
+		? server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +i\r\n", client->getId())
+		: server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " -i\r\n", client->getId());
+	}
+}
+
+void Context::chanop_toggle_topic_restriction(int client_id, std::string const& channelName, bool toggle)
+{
+	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
+	std::vector<Client>::iterator client = find_client_by_id(client_id);
+	if (client->getChannelMode(channelName) != "@")
+		ERR_CHANOPRIVSNEEDED(client_id, channelName);
+	else if (!isChannelInVector(channel))
+		ERR_NOSUCHCHANNEL(client_id, channelName);
+	else
+	{
+		std::cout << "topic only is at requested state = " << (channel->getTopicOpOnly() == toggle) << std::endl;
+		channel->getTopicOpOnly() == toggle ? (void)0 : channel->toggleRestrictTopic();
+		std::cout << "topic only is = " << channel->getTopicOpOnly() << std::endl;
+		channel->getTopicOpOnly()
+		? server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +t\r\n", client->getId())
+		: server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " -t\r\n", client->getId());	
 	}
 }
 
@@ -108,7 +129,7 @@ void Context::chanop_key(int client_id, std::string const& channelName, std::str
 	}
 }
 
-void Context::chanop_oppriv(int client_id, std::string const& channelName, std::string const& targetNick) 
+void Context::chanop_toggle_oppriv(int client_id, std::string const& channelName, std::string const& targetNick, std::string toggle) 
 {
 	std::vector<Client>::iterator target = find_client_by_nick(targetNick);
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
@@ -122,8 +143,10 @@ void Context::chanop_oppriv(int client_id, std::string const& channelName, std::
 		ERR_NOTONCHANNEL(client_id, channelName);
 	else
 	{
-		target->addChannelMode(channelName, "@");
-		server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +o " + targetNick + "\r\n", client_id);
+		target->getChannelMode(channelName) == toggle ? (void)0 : target->addChannelMode(channelName, toggle);
+		target->getChannelMode(channelName) == "@"
+		? server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +o " + targetNick + "\r\n", client_id)
+		: server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " -o " + targetNick + "\r\n", client_id);
 	}
 }
 
