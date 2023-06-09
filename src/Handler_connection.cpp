@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Handler_connection.cpp                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/06 21:55:44 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/10 00:49:40 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,11 +94,11 @@ void	Handler::getLoginInfo(std::string buf, int position)
 
 void	Handler::handleClientConnection(int position)
 {
-	char	buf[384];
+	char	buf[513];
 	ft_bzero(buf, sizeof(buf));
-	int		bytesReceiveded = recv(_pollFDsArray[position].fd, buf, sizeof(buf), 0);
+	int		bytesReceiveded = recv(_pollFDsArray[position].fd, buf, 512, 0);
 
-	std::cout << "Receiving msg from " << position << std::endl;
+	std::cout << "Receiving msg " << buf << "from " << position << std::endl;
 	if (bytesReceiveded <= 0)
 	{
 		delFromFDsArray(position);
@@ -130,3 +130,4 @@ void	Handler::handleClientServerConnections()
 	if (_pollFDsArray)
 		delete [] _pollFDsArray;
 }
+

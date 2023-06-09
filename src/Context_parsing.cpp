@@ -29,37 +29,6 @@ std::string joinVectorStrings(std::vector<std::string> &vec)
 	return (result);
 }
 
-// if (it->find("QUIT") != std::string::npos)
-// {
-// 	server->closeConection(client->getId());
-// 	break ;
-// }
-// else if (it->find("JOIN #", 0) != std::string::npos)
-// {
-
-// }
-// else if (it->find("PRIVMSG ", 0) != std::string::npos)
-// {
-// 	//must go with # if channel
-// 	std::string recipient = it->substr(8, it->find(" :", 8) - 8);
-// 	//msg body after :
-// 	std::string msg = it->substr(it->find(" :", 8) + 2, it->length() - it->find(" :", 8) - 3);
-// 	cmd_sendPM(client->getId(), recipient, msg);
-// }
-// else if (it->find("MODE ", 0) != std::string::npos)
-// {
-// 	std::vector<Channel>::iterator channel = find_chan_by_name(it->substr(5, it->length() - 6));
-// 	if (isChannelInVector(channel))
-// 		RPL_CHANNELMODEIS(client->getId(), *channel);
-// }
-// else if (it->find("WHO ", 0) != std::string::npos)
-// {
-// 	std::vector<Channel>::iterator channel = find_chan_by_name(it->substr(5, it->length() - 6));
-// 	if (isChannelInVector(channel))
-// 		RPL_WHOREPLY(client->getId(), *channel);
-// 	else
-// 		ERR_NOSUCHCHANNEL(client->getId(), it->substr(5, it->length() - 6));
-// }
 void Context::execClientCmds(int id)
 {
 	std::vector<Client>::iterator client = find_client_by_id(id);
