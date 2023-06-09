@@ -3,11 +3,11 @@
 #include <Client.hpp>
 #include <Handler.hpp>
 
-void Context::cmd_join(int client_id, std::string const &channelName, std::string const& key)
+void Context::cmd_join(int client_id, std::string const &channelName, std::string const &key)
 {
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
 	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
-	
+
 	if (isChannelInVector(channel))
 	{
 		if (client->isOnChannel(channelName))
@@ -30,8 +30,9 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 		client->addChannelMode(channelName, "@");
 	}
 	channel->incrementUserCount(client_id);
-	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" + \
-	channelName + "\r\n", server, -1);
+	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" +
+							  channelName + "\r\n",
+						  server, -1);
 	RPL_TOPIC(client->getId(), *channel);
 	RPL_NAMREPLY(client->getId(), *channel);
 	RPL_ENDOFNAMES(client->getId(), *channel);
@@ -41,17 +42,17 @@ void Context::cmd_setNick(int client_id, std::string nick)
 {
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
 	client->setNick(nick);
-	//pass thru nick checker
+	// pass thru nick checker
 }
 
 void Context::cmd_setUserName(int client_id, std::string userName)
 {
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
 	client->setUserName(userName);
-	//pass thru usNa checker
+	// pass thru usNa checker
 }
 
-void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const & msg)
+void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const &msg)
 {
 	std::vector<Client>::iterator sender = find_client_by_id(sender_id);
 	if (recipient[0] == '#')
@@ -63,8 +64,9 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 		else if (!sender->isOnChannel(recipient))
 			return ERR_CANNOTSENDTOCHAN(sender->getId(), recipient);
 		else
-			recipientChannel->broadcastMsg(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG #" + \
-				recipient + " :" + msg + "\r\n", server, sender_id);
+			recipientChannel->broadcastMsg(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG #" +
+											   recipient + " :" + msg + "\r\n",
+										   server, sender_id);
 	}
 	else
 	{
@@ -76,20 +78,19 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 	}
 }
 
-
-void	Context::execClientCmds(int id)
+void Context::execClientCmds(int id)
 {
-	std::vector<Client>::iterator		client = find_client_by_id(id); 
-	std::vector<std::string>			&cmds = client->getCmds();
-	std::vector<std::string>::iterator	it = cmds.begin();
+	std::vector<Client>::iterator client = find_client_by_id(id);
+	std::vector<std::string> &cmds = client->getCmds();
+	std::vector<std::string>::iterator it = cmds.begin();
 
-	//pass through cmd_parser
+	// pass through cmd_parser
 	for (; it != cmds.end(); ++it)
 	{
 		if (it->find("QUIT") != std::string::npos)
 		{
 			server->closeConection(client->getId());
-			break ;
+			break;
 		}
 		else if (it->find("JOIN #", 0) != std::string::npos)
 		{
@@ -98,9 +99,9 @@ void	Context::execClientCmds(int id)
 		}
 		else if (it->find("PRIVMSG ", 0) != std::string::npos)
 		{
-			//must go with # if channel
+			// must go with # if channel
 			std::string recipient = it->substr(8, it->find(" :", 8) - 8);
-			//msg body after :
+			// msg body after :
 			std::string msg = it->substr(it->find(" :", 8) + 2, it->length() - it->find(" :", 8) - 3);
 			cmd_sendPM(client->getId(), recipient, msg);
 		}
@@ -116,18 +117,18 @@ void	Context::execClientCmds(int id)
 			if (isChannelInVector(channel))
 				RPL_WHOREPLY(client->getId(), *channel);
 			else
-				ERR_NOSUCHCHANNEL(client->getId(), it->substr(5, it->length() - 6));	
+				ERR_NOSUCHCHANNEL(client->getId(), it->substr(5, it->length() - 6));
 		}
 
-	//INVITE USER CHANNEL	- invite
-	//NICK <nick>			- set nick - all sharacters
-	//TOPIC <channel> :<topic>, if no topic but : - set topic to "" - if no topic and no : - show topic
-	//LIST - show channels
-	//KICK <channel> <tarjet> :<reason>
-	//JOIN #<CNAME1> #<CNAME2> #<CNAMEn>
-	//QUIT :<REASON>
-	//PRIVMSG <channel-pub/user-priv> :msg
-	//MODE +<FLAG><<PARAMS>> - can or not be space separated - will trim whitespaces - sep by + and if not flag in itkol, error out - if i or t have params error - else execute flag string
-	//	if k or l no params, toggle off pass or limit - if o no params call user retarded
-	}		
+		// INVITE USER CHANNEL	- invite
+		// NICK <nick>			- set nick - all sharacters
+		// TOPIC <channel> :<topic>, if no topic but : - set topic to "" - if no topic and no : - show topic
+		// LIST - show channels
+		// KICK <channel> <tarjet> :<reason>
+		// JOIN #<CNAME1> #<CNAME2> #<CNAMEn>
+		// QUIT :<REASON>
+		// PRIVMSG <channel-pub/user-priv> :msg
+		// MODE +<FLAG><<PARAMS>> - can or not be space separated - will trim whitespaces - sep by + and if not flag in itkol, error out - if i or t have params error - else execute flag string
+		//	if k or l no params, toggle off pass or limit - if o no params call user retarded
+	}
 }

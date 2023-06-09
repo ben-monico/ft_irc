@@ -4,7 +4,7 @@
 #include <Context.hpp>
 #include <sstream>
 
-Channel::Channel(std::string name) 
+Channel::Channel(std::string name)
 {
 	_name = name;
 	_topic = "";
@@ -33,7 +33,7 @@ int Channel::getUserCount() const { return _userCount; }
 
 bool Channel::isFull() const { return (_userLimit != 0 && _userCount >= _userLimit); }
 
-void Channel::getModes(int client_id, Handler *server, std::string const & host) const
+void Channel::getModes(int client_id, Handler *server, std::string const &host) const
 {
 	std::stringstream ss;
 	ss << _userLimit;
@@ -51,29 +51,28 @@ void Channel::getModes(int client_id, Handler *server, std::string const & host)
 	if (_key.empty())
 		offMode += "k";
 	else
-		server->sendAllBytes(host + "265 " + Context::find_client_by_id(client_id)->getNick() + " #" + _name + " +k " + _key + "\r\n", client_id);	
+		server->sendAllBytes(host + "265 " + Context::find_client_by_id(client_id)->getNick() + " #" + _name + " +k " + _key + "\r\n", client_id);
 	if (offMode.size() > 1)
 		server->sendAllBytes(host + "324 " + Context::find_client_by_id(client_id)->getNick() + " #" + _name + " " + offMode + "\r\n", client_id);
 }
 
-
-void Channel::setTopic(std::string const & topic) { _topic = topic; }
+void Channel::setTopic(std::string const &topic) { _topic = topic; }
 
 void Channel::setUserLimit(int limit) { _userLimit = limit; }
 
-void Channel::setKey(std::string const & key) { _key = key; }
+void Channel::setKey(std::string const &key) { _key = key; }
 
 void Channel::toggleRestrictTopic() { _topicOpOnly = true ? false : true; }
 
 void Channel::toggleInviteOnly() { _inviteOnly = true ? false : true; }
 
-void Channel::decrementUserCount(int id) 
+void Channel::decrementUserCount(int id)
 {
 	std::vector<int>::iterator it = std::find(_usersID.begin(), _usersID.end(), id);
 	if (it != _usersID.end())
 	{
 		_usersID.erase(it);
-		_userCount--; 
+		_userCount--;
 	}
 }
 
@@ -99,4 +98,3 @@ void Channel::replaceClientID(int old_id, int new_id)
 	if (it != _usersID.end())
 		*it = new_id;
 }
-
