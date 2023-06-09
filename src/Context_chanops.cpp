@@ -64,20 +64,6 @@ void Context::chanop_topic(int client_id, std::string const &channelName, std::s
 }
 
 // MODES
-void Context::chanop_toggle_inviteonly(int client_id, std::string channelName)
-{
-	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
-	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	if (client->getChannelMode(channelName) != "@")
-		ERR_CHANOPRIVSNEEDED(client_id, channelName);
-	else if (!isChannelInVector(channel))
-		ERR_NOSUCHCHANNEL(client_id, channelName);
-	else
-	{
-		channel->toggleInviteOnly();
-		server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +i\r\n", client->getId());
-	}
-}
 
 void Context::chanop_toggle_inviteonly(int client_id, std::string channelName, bool toggle)
 {
@@ -125,8 +111,9 @@ void Context::chanop_key(int client_id, std::string const &channelName, std::str
 		ERR_NOSUCHCHANNEL(client_id, channelName);
 	else
 	{
+		!key.empty()	? server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +k " + key + "\r\n", client_id)
+						: server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " -k " + key + "\r\n", client_id);
 		channel->setKey(key);
-		server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +k " + key + "\r\n", client_id);
 	}
 }
 
@@ -162,6 +149,7 @@ void Context::chanop_userlimit(int client_id, std::string const &channelName, st
 	else
 	{
 		channel->setUserLimit(atoi(userLimit.c_str()));
-		server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +l " + userLimit + "\r\n", client_id);
+		channel->getUserLimit() ?	server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +l " + userLimit + "\r\n", client_id)
+								:	server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " -l " + userLimit + "\r\n", client_id);
 	}
 }

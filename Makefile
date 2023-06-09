@@ -13,7 +13,7 @@ OBJS_DIR	=	obj
 
 INC			=	-I.
 
-CC			=	c++ -std=c++98 -Wall -Wextra -Werror -g -Iinc/ -fsanitize=address
+CC			=	c++ -std=c++98 -Wall -Wextra -Werror -g -Iinc/ -Ofast
 
 all:		$(NAME)
 

@@ -47,7 +47,6 @@ class Context
 		static void chanop_invite_user(int client_id, std::string const& channel, std::string const& target);
 		static void chanop_topic(int client_id, std::string const& channel, std::string const& newtopic);
 
-		static void chanop_toggle_inviteonly(int, std::string );
 		static void chanop_toggle_inviteonly(int, std::string, bool);
 		static void chanop_toggle_topic_restriction(int, std::string const&, bool);
 		static void chanop_mode(int, std::string const& , std::string const& );

@@ -88,7 +88,7 @@ void	Context::execModeOptions(std::vector<std::string> vec, std::vector<Client>:
 		if (vec[2][1] == 'l')
 			chanop_userlimit(client->getId(), chan, vec[3]);
 		if (vec[2][1] == 'k')
-			chanop_key(client->getId(), chan, vec[3]);
+			vec.size() > 3 ? chanop_key(client->getId(), chan, vec[3]) : chanop_key(client->getId(), chan, "");
 		if (vec[2].find("i") != std::string::npos)
 			chanop_toggle_inviteonly(client->getId(), chan, true);
 		if (vec[2].find("t") != std::string::npos)
