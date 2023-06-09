@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <Handler.hpp>
 #include <Context.hpp>
+#include <sstream>
+
 Channel::Channel(std::string name) 
 {
 	_name = name;
@@ -30,6 +32,29 @@ std::string Channel::getKey() const { return _key; }
 int Channel::getUserCount() const { return _userCount; }
 
 bool Channel::isFull() const { return (_userLimit != 0 && _userCount >= _userLimit); }
+
+void Channel::getModes(int client_id, Handler *server, std::string const & host) const
+{
+	std::stringstream ss;
+	ss << _userLimit;
+	std::string offMode = "-", onMode = "+";
+
+	_inviteOnly ? onMode += "i" : offMode += "i";
+	_topicOpOnly ? onMode += "t" : offMode += "t";
+	if (onMode.size() > 1)
+		server->sendAllBytes(host + "324 " + Context::find_client_by_id(client_id)->getNick() + " #" + _name + " " + onMode + "\r\n", client_id);
+
+	if (_userLimit == 0)
+		offMode += "l";
+	else
+		server->sendAllBytes(host + "265 " + Context::find_client_by_id(client_id)->getNick() + " #" + _name + " +l " + ss.str() + "\r\n", client_id);
+	if (_key.empty())
+		offMode += "k";
+	else
+		server->sendAllBytes(host + "265 " + Context::find_client_by_id(client_id)->getNick() + " #" + _name + " +k " + _key + "\r\n", client_id);	
+	if (offMode.size() > 1)
+		server->sendAllBytes(host + "324 " + Context::find_client_by_id(client_id)->getNick() + " #" + _name + " " + offMode + "\r\n", client_id);
+}
 
 
 void Channel::setTopic(std::string const & topic) { _topic = topic; }
@@ -64,7 +89,7 @@ void Channel::broadcastMsg(std::string const &msg, Handler *server, int senderID
 	for (; it != _usersID.end(); it++)
 	{
 		if (*it != senderID)
-			server->sendAllBytes(msg + "\r\n", *it);
+			server->sendAllBytes(msg, *it);
 	}
 }
 
@@ -74,3 +99,4 @@ void Channel::replaceClientID(int old_id, int new_id)
 	if (it != _usersID.end())
 		*it = new_id;
 }
+

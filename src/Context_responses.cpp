@@ -18,7 +18,6 @@ void Context::USR_RPL_TEMPLATE(std::string code, std::string msg, std::string ni
 
 void Context::RPL_WELCOME(int client_id)
 {
-	server->sendAllBytes(_hostname + "CAP " + find_client_by_id(client_id)->getNick() + "NAK :302\r\n", client_id);
 	server->sendAllBytes(_hostname + "001 " + find_client_by_id(client_id)->getNick() + " :Welcome to Hell, " + find_client_by_id(client_id)->getNick() + "\r\n", client_id);
 	server->sendAllBytes(_hostname + "005 " + find_client_by_id(client_id)->getNick() + " CHANTYPES=#\r\n", client_id);
 	server->sendAllBytes(_hostname + "005 " + find_client_by_id(client_id)->getNick() + " CHANMODES=i,t,k,o,l\r\n", client_id);
@@ -26,35 +25,33 @@ void Context::RPL_WELCOME(int client_id)
 
 void Context::RPL_CHANNELMODEIS(int client_id, Channel &channel)
 {
-	server->sendAllBytes(_hostname + "324 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + "\r\n", client_id);
+	channel.getModes(client_id, server, _hostname);
 }
 
 void Context::RPL_NOTOPIC(int client_id, Channel &channel)
 {
-	server->sendAllBytes(_hostname + "331 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :" \
-	+ "No topic is set.\r\n", client_id);
+	channel.broadcastMsg(_hostname + "331 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :" \
+	+ "No topic is set.\r\n", server, -1);
 }
 
 void Context::RPL_TOPIC(int client_id, Channel &channel)
 {
 	if (channel.getTopic().empty())
 		return RPL_NOTOPIC(client_id, channel);
-	server->sendAllBytes(_hostname + "332 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :" \
-	+ channel.getTopic() + "\r\n", client_id);
+	channel.broadcastMsg(_hostname + "332 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :" \
+	+ channel.getTopic() + "\r\n", server, -1);
 }
 
 void Context::RPL_WHOREPLY(int client_id, Channel &channel)
 {
 	std::string msg = "";
-	std::vector<Client>::iterator it = _clients.begin();
-	for (; it != _clients.end(); ++it)
+	std::vector<int>::iterator it = channel._usersID.begin();
+	for (; it != channel._usersID.end(); ++it)
 	{
-		if (it->isOnChannel(channel.getName()))
-			server->sendAllBytes(_hostname + "352 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " " + \
-			it->getUserName() + " localhost " + it->getNick() + " H :0 " + msg + "\r\n", client_id);
+		std::vector<Client>::iterator user = find_client_by_id(*it);
+		server->sendAllBytes(_hostname + "352 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " " + \
+			user->getNick() + " " + user->getUserName() + " localhost ircserv " + user->getNick() + " " + user->getChannelMode(channel.getName()) + " :0 realname\r\n", client_id);
 	}
-	// server->sendAllBytes(_hostname + "352 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " " + 
-	// _hostname + " " + _hostname + " " + find_client_by_id(client_id)->getNick() + " H :0 " + msg + "\r\n", client_id);
 }
 
 void Context::RPL_NAMREPLY(int client_id, Channel &channel)

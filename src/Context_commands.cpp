@@ -30,8 +30,8 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 		client->addChannelMode(channelName, "@");
 	}
 	channel->incrementUserCount(client_id);
-	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" + channelName, server, -1);
-	//these need to be broadcast
+	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" + \
+	channelName + "\r\n", server, -1);
 	RPL_TOPIC(client->getId(), *channel);
 	RPL_NAMREPLY(client->getId(), *channel);
 	RPL_ENDOFNAMES(client->getId(), *channel);
@@ -58,7 +58,7 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 		std::vector<Channel>::iterator recipientChannel = find_chan_by_name(recipient);
 		if (isChannelInVector(recipientChannel))
 			recipientChannel->broadcastMsg(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG #" + \
-				recipient + " :" + msg, server, sender_id);
+				recipient + " :" + msg + "\r\n", server, sender_id);
 		else
 			return ERR_NOSUCHCHANNEL(sender->getId(), recipient);
 	}
@@ -106,20 +106,20 @@ void	Context::execClientCmds(int id)
 			std::string msg = it->substr(it->find(" :", 8) + 2, it->length() - it->find(" :", 8) - 3);
 			cmd_sendPM(client->getId(), recipient, msg);
 		}
-		else if (it->find("MODE ", 0) != std::string::npos)
+		else if (it->find("MODE #", 0) != std::string::npos)
+		{
+			std::vector<Channel>::iterator channel = find_chan_by_name(it->substr(6, it->length() - 7));
+			if (isChannelInVector(channel))
+				RPL_CHANNELMODEIS(id, *channel);
+		}
+		else if (it->find("WHO #", 0) != std::string::npos)
 		{
 			std::vector<Channel>::iterator channel = find_chan_by_name(it->substr(5, it->length() - 6));
 			if (isChannelInVector(channel))
-				RPL_CHANNELMODEIS(client->getId(), *channel);
+				RPL_WHOREPLY(client->getId(), *channel);
+			else
+				ERR_NOSUCHCHANNEL(client->getId(), it->substr(5, it->length() - 6));	
 		}
-		// else if (it->find("WHO ", 0) != std::string::npos)
-		// {
-		// 	std::vector<Channel>::iterator channel = find_chan_by_name(it->substr(5, it->length() - 6));
-		// 	if (isChannelInVector(channel))
-		// 		RPL_WHOREPLY(client->getId(), *channel);
-		// 	else
-		// 		ERR_NOSUCHCHANNEL(client->getId(), it->substr(5, it->length() - 6));	
-		// }
 
 	//INVITE USER CHANNEL	- invite
 	//NICK <nick>			- set nick - all sharacters

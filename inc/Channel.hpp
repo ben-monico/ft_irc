@@ -23,6 +23,7 @@ class Channel
 		void decrementUserCount(int id);
 		void incrementUserCount(int id);
 
+		void getModes(int client_id, Handler *server, std::string const& host) const;
 		std::string getName() const;
 		std::string getTopic() const;
 		int getUserLimit() const;
@@ -33,6 +34,7 @@ class Channel
 		std::string getKey() const;
 		void broadcastMsg(std::string const &msg, Handler *server, int senderID);
 		void replaceClientID(int old_id, int new_id);
+		std::vector<int> _usersID;
 
 
 	private:
@@ -43,7 +45,6 @@ class Channel
 		bool _inviteOnly;
 		bool _topicOpOnly;
 		std::string _key;
-		std::vector<int> _usersID;
 };
 
 #endif
