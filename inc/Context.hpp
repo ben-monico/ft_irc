@@ -24,7 +24,7 @@ class Context
 		static void cmd_join(int client_id, std::string const &channelName, std::string const& key);
 		static void cmd_setNick(int client_id, std::string );
 		static void cmd_setUserName(int client_id, std::string );
-		static void cmd_sendPM(int client_id, std::string const& recipient, std::string const& msg);
+		static void cmd_sendPM(int client_id, std::string recipient, std::string const& msg);
 		static void	execClientCmds(int client_id);
 
 	//Channel operations

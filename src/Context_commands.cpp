@@ -49,13 +49,27 @@ void Context::cmd_setUserName(int client_id, std::string userName)
 	client->setUserName(userName);
 }
 
-void Context::cmd_sendPM(int client_id, std::string const& recipient, std::string const & msg)
+void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const & msg)
 {
-	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	// std::vector<Client>::iterator recipientClient = find_client_by_nick(recipient);
-	std::vector<Channel>::iterator recipientChannel = find_chan_by_name(recipient);
-	if (isChannelInVector(recipientChannel))
-		recipientChannel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost PRIVMSG #" + recipient + " :" + msg, server, client_id);
+	std::vector<Client>::iterator sender = find_client_by_id(sender_id);
+	if (recipient[0] == '#')
+	{
+		recipient.erase(0, 1);
+		std::vector<Channel>::iterator recipientChannel = find_chan_by_name(recipient);
+		if (isChannelInVector(recipientChannel))
+			recipientChannel->broadcastMsg(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG #" + \
+				recipient + " :" + msg, server, sender_id);
+		else
+			return ERR_NOSUCHCHANNEL(sender->getId(), recipient);
+	}
+	else
+	{
+		std::vector<Client>::iterator recipientClient = find_client_by_nick(recipient);
+		if (isUserInVector(recipientClient))
+			server->sendAllBytes(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG " + recipient + " :" + msg + "\r\n", recipientClient->getId());
+		else
+			return ERR_NOSUCHNICK(sender->getId(), recipient);
+	}
 
 	// ERR_NORECIPIENT                 ERR_NOTEXTTOSEND
 	//    ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
@@ -84,11 +98,12 @@ void	Context::execClientCmds(int id)
 			std::string channel = it->substr(6, it->length() - 7);
 			cmd_join(client->getId(), channel, "");
 		}
-		else if (it->find("PRIVMSG #", 0) != std::string::npos)
+		else if (it->find("PRIVMSG ", 0) != std::string::npos)
 		{
-	
-			std::string recipient = it->substr(9, it->find(" :", 9) - 9);
-			std::string msg = it->substr(it->find(" :", 9) + 2, it->length() - it->find(" :", 9) - 2);
+			//must go with # if channel
+			std::string recipient = it->substr(8, it->find(" :", 8) - 8);
+			//msg body after :
+			std::string msg = it->substr(it->find(" :", 8) + 2, it->length() - it->find(" :", 8) - 3);
 			cmd_sendPM(client->getId(), recipient, msg);
 		}
 		else if (it->find("MODE ", 0) != std::string::npos)

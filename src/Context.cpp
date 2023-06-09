@@ -52,10 +52,14 @@ void	Context::remove_client(int id_erase, int id_replace)
 	if (isUserInVector(clientToErase))
 	{
 		clientToErase->removeFromAllChannels();
+		clientToReplace->removeFromAllChannels();
 		std::iter_swap(clientToErase,clientToReplace);
 		_clients.erase(clientToErase);
 		if (id_erase != id_replace)
+		{
 			clientToReplace->setID(id_erase);
+			clientToReplace->replaceIDInChannels(id_erase);
+		}
 	}
 }
 

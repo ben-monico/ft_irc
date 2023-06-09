@@ -77,7 +77,7 @@ void Context::RPL_ENDOFNAMES(int client_id, Channel &channel)
 
 void Context::ERR_NOSUCHNICK(int client_id, std::string const& nick)
 {
-	server->sendAllBytes(_hostname + "401 " + find_client_by_id(client_id)->getNick() + " " + nick + " :No such nick/channel\r\n", client_id);
+	server->sendAllBytes(_hostname + "401 " + find_client_by_id(client_id)->getNick() + " " + nick + " :No such nick\r\n", client_id);
 }
 
 void Context::ERR_NOSUCHCHANNEL(int client_id, std::string const& channel_name)
