@@ -97,9 +97,10 @@ void Context::ERR_USERONCHANNEL(int client_id, std::string const& nick, std::str
 	server->sendAllBytes(_hostname + "443 " + find_client_by_id(client_id)->getNick() + " " + nick + " #" + channel_name + " :is already on channel\r\n", client_id);
 }
 
-void Context::ERR_PASSWDMISMATCH(int client_id)
+void Context::ERR_PASSWDMISMATCH(int client_id, const std::string &nick)
 {
-	server->sendAllBytes(_hostname + "464 :Password Mismatched password. (Connection Refused)\r\n", client_id);
+	server->sendAllBytes(_hostname + " 464 " + nick + " :Password incorrect\r\n", client_id);
+	server->closeConection(client_id);
 }
 
 void Context::ERR_CHANNELISFULL(int client_id, std::string const& channel_name)
@@ -125,4 +126,19 @@ void Context::ERR_CHANOPRIVSNEEDED(int client_id, std::string const& channel_nam
 void	Context::ERR_UNRECOGNIZEDCMD(const int &client_id, const std::string &cmd, const std::string reason)
 {
 	server->sendAllBytes(_hostname + "421 " + find_client_by_id(client_id)->getNick() + " " + cmd + " :" + reason + "\r\n",  client_id);
+}
+
+void	Context::ERR_NICKNAMEINUSE( int client_id, const std::string &nick)
+{
+	server->sendAllBytes(_hostname + " 422 " + nick + " :Nickname is already in use.\r\n", client_id);
+}
+
+void	Context::ERR_ERRONEUSNICKNAME( int client_id, const std::string &nick)
+{
+	server->sendAllBytes(_hostname + " 432 " + nick + " :Nickname contains forbiden characters\r\n", client_id);
+}
+
+void	Context::ERR_NEEDMOREPARAMS( int client_id, const std::string cmd, const std::string reason)
+{
+	server->sendAllBytes(_hostname + " 461 " + cmd + " :" + reason + "\r\n", client_id);
 }

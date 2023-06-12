@@ -35,6 +35,8 @@ void Client::init(std::string nick, std::string userName)
 	_userName = userName;
 	_init = true;
 	std::cout << "Client " << nick << " initialized " << std::endl;
+	Context::RPL_WELCOME(_id);
+
 }
 
 void Client::eraseChannel(std::string const &channel)

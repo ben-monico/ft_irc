@@ -19,6 +19,7 @@ class Context
 		static void	remove_client(int, int);
 		static void addClientToChannel(int, std::string const&, std::string const&);
 		static void removeClientFromChannel(int, std::string const&);
+		static bool	loginInfoFound(std::vector<Client>::iterator &client);
 
 	//Command parsers
 		static void	execClientCmds(int client_id);
@@ -79,12 +80,15 @@ class Context
 		static void ERR_CHANNELISFULL(int client_id, std::string const& channel_name);
 		static void ERR_INVITEONLYCHAN(int client_id, std::string const& channel_name);
 		static void ERR_BADCHANNELKEY(int client_id, std::string const& channel_name);
-		static void ERR_PASSWDMISMATCH(int);
+		static void ERR_PASSWDMISMATCH(int client_id, const std::string &nick);
 		static void ERR_CHANOPRIVSNEEDED(int, std::string const&);
 		static void	ERR_UNRECOGNIZEDCMD(const int &client_id, const std::string &cmd, const std::string reason);
 		static void RPL_WHOREPLY(int client_id, Channel &channel);
 		static void RPL_CHANNELMODEIS(int client_id, Channel &channel);
 		static void ERR_CANNOTSENDTOCHAN(int client_id, std::string const& channel_name);
+		static void	ERR_NICKNAMEINUSE( int client_id, const std::string &nick);
+		static void	ERR_ERRONEUSNICKNAME( int client_id, const std::string &nick);
+		static void	ERR_NEEDMOREPARAMS( int client_id, const std::string cmd, const std::string reason);
 		
 
 
