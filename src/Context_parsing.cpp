@@ -188,8 +188,27 @@ void Context::parseList(std::vector<Client>::iterator client, std::string &cmd)
 
 void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 {
-	(void)client;
-	(void)cmd;
+	std::vector<std::string>				seggies = splitByChar(cmd, ' ');
+	std::vector<Channel>::iterator			channo;
+	std::vector<Client>::iterator			target;
+	std::string								cleanChan, reason;
+
+	if (seggies.size() < 4)
+		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel> :<reason>"));
+	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
+	channo = find_chan_by_name(cleanChan);
+	if (!isChannelInVector(channo))
+		return (ERR_NOSUCHCHANNEL(client->getId(), cleanChan));
+	target = find_client_by_nick(seggies[2]);
+	if (!isUserInVector(target))
+		return (ERR_NOSUCHNICK(client->getId(), seggies[2]));
+	if (!channo->isUserInChannel(target->getId()))
+		return (ERR_USERNOTINCHANNEL(client->getId(), cleanChan, seggies[2]));
+	seggies.erase(seggies.begin(), seggies.begin() + 3);
+	reason = joinVectorStrings(seggies);
+	if (reason[0] != ':')
+		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel> :<reason>"));
+	chanop_kickUser(client->getId(), cleanChan, target->getNick(), reason);
 }
 
 void Context::parsePrivmsg(std::vector<Client>::iterator client, std::string &cmd)

@@ -3,7 +3,7 @@
 #include <Channel.hpp>
 #include <cstdlib>
 
-void Context::chanop_kickUser(int client_id, std::string const &channelName, std::string const &targetName)
+void Context::chanop_kickUser(int client_id, std::string const &channelName, std::string const &targetName, const std::string &reason)
 {
 	std::vector<Client>::iterator chanop = find_client_by_id(client_id);
 	std::vector<Client>::iterator target = find_client_by_nick(targetName);
@@ -19,11 +19,11 @@ void Context::chanop_kickUser(int client_id, std::string const &channelName, std
 		ERR_NOTONCHANNEL(client_id, channelName);
 	else
 	{
+		channel->broadcastMsg(":" + chanop->getNick() + " KICK #" + channelName + " " + targetName +
+			 " :" + reason + "\r\n", server, -1);
 		target->removeChannelInvite(channelName);
 		target->eraseChannel(channelName);
 		channel->decrementUserCount(target->getId());
-		channel->broadcastMsg(":" + chanop->getNick() + " KICK #" + channelName + " " + targetName +
-			 " :You have been kicked by " + chanop->getNick() + "\r\n", server, -1);
 	}
 }
 
@@ -58,7 +58,7 @@ void Context::chanop_topic(int client_id, std::string const &channelName, std::s
 		return ERR_CHANNELISFULL(client_id, channelName);
 
 	else
-		server->sendAllBytes(":" + client->getNick() + " TOPIC #" + channelName + " :" + newtopic + "\r\n", client_id);
+		channel->broadcastMsg(":" + client->getNick() + " TOPIC #" + channelName + " :" + newtopic + "\r\n", server, -1);
 }
 
 // MODES
@@ -75,8 +75,8 @@ void Context::chanop_toggleInviteOnly(int client_id, std::string channelName, bo
 	{
 		channel->getInviteOnly() == toggle ? (void)0 : channel->toggleInviteOnly();
 		channel->getInviteOnly()	\
-		? server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +i\r\n", client->getId()) \
-		: server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " -i\r\n", client->getId());
+		? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " +i\r\n", server, -1)
+		: channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -i\r\n", server, -1);
 	}
 }
 
@@ -94,8 +94,8 @@ void Context::chanop_toggleTopicRestriction(int client_id, std::string const& ch
 		channel->getTopicOpOnly() == toggle ? (void)0 : channel->toggleRestrictTopic();
 		std::cout << "topic only is = " << channel->getTopicOpOnly() << std::endl;
 		channel->getTopicOpOnly()	\
-		? server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +t\r\n", client->getId()) \
-		: server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " -t\r\n", client->getId());	
+		? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " +t\r\n", server, -1)
+		: channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -t\r\n", server, -1);	
 	}
 }
 
@@ -109,21 +109,22 @@ void Context::chanop_key(int client_id, std::string const &channelName, std::str
 		ERR_NOSUCHCHANNEL(client_id, channelName);
 	else
 	{
-		!key.empty()	? server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +k " + key + "\r\n", client_id)
-			: server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " -k " + key + "\r\n", client_id);
+		key.empty()	? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -k " + key + "\r\n", server, -1)
+					: channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " +k " + key + "\r\n", server, -1);
 		channel->setKey(key);
 	}
 }
 
 void Context::chanop_toggleOpPriv(int client_id, std::string const& channelName, std::string const& targetNick, std::string toggle) 
 {
-	std::vector<Client>::iterator target = find_client_by_nick(targetNick);
-	std::vector<Client>::iterator client = find_client_by_id(client_id);
+	std::vector<Client>::iterator	target = find_client_by_nick(targetNick);
+	std::vector<Client>::iterator	client = find_client_by_id(client_id);
+	std::vector<Channel>::iterator	channel = find_chan_by_name(channelName);
 	if (client->getChannelMode(channelName) != "@")
 		ERR_CHANOPRIVSNEEDED(client_id, channelName);
 	else if (!isUserInVector(target))
 		ERR_NOSUCHNICK(client_id, targetNick);
-	else if (!isChannelInVector(find_chan_by_name(channelName)))
+	else if (!isChannelInVector(channel))
 		ERR_NOSUCHCHANNEL(client_id, channelName);
 	else if (!target->isInChannel(channelName))
 		ERR_NOTONCHANNEL(client_id, channelName);
@@ -131,8 +132,8 @@ void Context::chanop_toggleOpPriv(int client_id, std::string const& channelName,
 	{
 		target->getChannelMode(channelName) == toggle ? (void)0 : target->addChannelMode(channelName, toggle);
 		target->getChannelMode(channelName) == "@"
-		? server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +o " + targetNick + "\r\n", client_id)
-			: server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " -o " + targetNick + "\r\n", client_id);
+		? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " +o " + targetNick + "\r\n", server, -1)
+		: channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -o " + targetNick + "\r\n", server, -1);
 	}
 }
 
@@ -147,7 +148,7 @@ void Context::chanop_userLimit(int client_id, std::string const &channelName, st
 	else
 	{
 		channel->setUserLimit(atoi(userLimit.c_str()));
-		channel->getUserLimit() ?	server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " +l " + userLimit + "\r\n", client_id)
-			:	server->sendAllBytes(":" + client->getNick() + " MODE #" + channelName + " -l " + userLimit + "\r\n", client_id);
+		channel->getUserLimit()	? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " +l " + userLimit + "\r\n", server, -1)
+								: channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -l " + userLimit + "\r\n", server, -1);
 	}
 }

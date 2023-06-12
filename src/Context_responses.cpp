@@ -128,3 +128,8 @@ void	Context::ERR_NEEDMOREPARAMS( int client_id, const std::string cmd, const st
 {
 	server->sendAllBytes(_hostname + " 461 " + cmd + " :" + reason + "\r\n", client_id);
 }
+
+void	Context::ERR_USERNOTINCHANNEL( const int &client_id, const std::string &chan, const std::string &nick)
+{
+	server->sendAllBytes(_hostname + " 441 " + nick + " " + chan + " :Target not in channel\r\n", client_id);
+}

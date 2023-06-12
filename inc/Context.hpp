@@ -45,7 +45,7 @@ class Context
 		static void cmd_part(int client_id, std::string const & channelName, std::string const & reason);
 
 	//Channel operations
-		static void chanop_kickUser(int client_id, std::string const& channel, std::string const& target);
+		static void chanop_kickUser(int client_id, std::string const& channel, std::string const& target, const std::string &reason);
 		static void chanop_inviteUser(int client_id, std::string const& channel, std::string const& target);
 		static void chanop_topic(int client_id, std::string const& channel, std::string const& newtopic);
 
@@ -90,7 +90,7 @@ class Context
 		static void	ERR_NICKNAMEINUSE(int client_id, const std::string &nick);
 		static void	ERR_ERRONEUSNICKNAME( int client_id, const std::string &nick);
 		static void	ERR_NEEDMOREPARAMS( int client_id, const std::string cmd, const std::string reason);
-		
+		static void	ERR_USERNOTINCHANNEL( const int &client_id, const std::string &chan, const std::string &nick);
 
 
 	private:
