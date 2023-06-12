@@ -182,7 +182,8 @@ void Context::parseTopic(std::vector<Client>::iterator client, std::string &cmd)
 
 void Context::parseList(std::vector<Client>::iterator client, std::string &cmd)
 {
-	
+	(void) client;
+	(void) cmd;
 }
 
 void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
