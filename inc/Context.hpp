@@ -66,6 +66,8 @@ class Context
 		static bool isUserInVector(std::vector<Client>::iterator );
 		static bool isChannelInVector(std::vector<Channel>::iterator );
 
+		static void RPL_WELCOME(int);
+		
 	private:
 		static std::string 			_hostname;
 		static Handler				*server;
@@ -77,7 +79,6 @@ class Context
 		static void RPL_NOTOPIC(int, Channel&)
 ;		static void RPL_NAMREPLY(int, Channel&);
 		static void RPL_ENDOFNAMES(int, Channel&);
-		static void RPL_WELCOME(int);
 		static void ERR_NOTONCHANNEL(int, std::string const&);
 		static void ERR_USERONCHANNEL(int, std::string const&, std::string const&);
 		static void ERR_NOSUCHCHANNEL(int, std::string const&);
@@ -91,21 +92,10 @@ class Context
 		static void RPL_WHOREPLY(int client_id, Channel &channel);
 		static void RPL_CHANNELMODEIS(int client_id, Channel &channel);
 		static void ERR_CANNOTSENDTOCHAN(int client_id, std::string const& channel_name);
-<<<<<<< HEAD
-		static void	ERR_NICKNAMEINUSE(const int &client_id, const std::string &nick);
-=======
 		static void	ERR_NICKNAMEINUSE(int client_id, const std::string &nick);
 		static void	ERR_ERRONEUSNICKNAME( int client_id, const std::string &nick);
 		static void	ERR_NEEDMOREPARAMS( int client_id, const std::string cmd, const std::string reason);
 		static void	ERR_USERNOTINCHANNEL( const int &client_id, const std::string &chan, const std::string &nick);
-
-
-	private:
-		static std::string 			_hostname;
-		static Handler				*server;
-		static std::vector<Client>	_clients;
-		static std::vector<Channel>	_channels;
->>>>>>> 7fe8cdfed83eae413fb6fd61f7a5d134ffccbd32
 };
 
 #endif
