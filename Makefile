@@ -32,9 +32,14 @@ fclean:	clean
 
 re:	fclean all
 
-e:	re
+e:	all
 	@clear
 	./$(NAME) 1234
+
+h:	re
+	@clear
+	./$(NAME) 1234
+
 cl:
 	@clear
 	@c++ -std=c++98 -Wall -Wextra -Werror -g -I. src/client.cpp -o client
