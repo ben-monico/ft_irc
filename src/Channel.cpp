@@ -84,6 +84,15 @@ void Channel::broadcastMsg(std::string const &msg, Handler *server, int senderID
 	}
 }
 
+bool Channel::isUserInChannel(int userID) 
+{
+	std::vector<int>::iterator i = _usersID.begin();
+
+	for ( ; i != _usersID.end() && *i != userID; ++i) {}
+	return (i != _usersID.end());
+}
+
+
 void Channel::replaceClientID(int old_id, int new_id)
 {
 	std::vector<int>::iterator it = std::find(_usersID.begin(), _usersID.end(), old_id);

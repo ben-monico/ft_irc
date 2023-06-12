@@ -22,3 +22,7 @@ bool	isNumeric(const std::string &str)
 	return (str.find_first_not_of("0123456789") == std::string::npos);
 }
 
+bool	isNickValid(const std::string &nick)
+{
+	return (nick.find_first_not_of("0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM-_") == std::string::npos);
+}

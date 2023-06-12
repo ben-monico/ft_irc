@@ -92,9 +92,9 @@ void Context::cmd_part(int client_id, std::string const & channelName, std::stri
 	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
 	if (isChannelInVector(channel) && client->isInChannel(channelName))
 	{
+		channel->broadcastMsg(":" + client->getNick() + " PART #" + channelName + " :" + reason + "\r\n", server, -1);
 		client->eraseChannel(channelName);
 		channel->decrementUserCount(client_id);
-		channel->broadcastMsg(":" + client->getNick() + " PART #" + channelName + " :" + reason + "\r\n", server, client_id);
 	}
 }
 

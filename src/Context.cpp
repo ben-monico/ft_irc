@@ -13,6 +13,30 @@ void	Context::setServerPtr( Handler *serverPtr )
 	server = serverPtr;
 }
 
+bool	Context::loginInfoFound(std::vector<Client>::iterator &client)
+{
+	typedef std::vector<std::string>::iterator iter;
+	std::vector<std::string>	cmds = client->getCmds();
+	unsigned int				i = 0x00000000;
+
+	for (iter it = cmds.begin(); it != cmds.end(); ++it)
+	{
+		if (!it->compare(0, 5, "USER "))
+			i += 0xFF;
+		else if (!it->compare(0, 5, "NICK "))
+			i += 0xFF00;
+		else if (!it->compare(0, 5, "PASS "))
+			i += 0xFF0000;
+	}
+	if (cmds.size() >= 3 && i != 0xFFFFFF)
+	{
+		ERR_NEEDMOREPARAMS(client->getId(), "login", "need more params");
+		server->closeConection(client->getId());
+	}
+	return (i == 0xFFFFFF);
+}
+
+
 std::vector<Channel>::iterator	Context::find_chan_by_name(std::string name)
 {
 	std::vector<Channel>::iterator it = Context::_channels.begin();
@@ -104,22 +128,24 @@ void	Context::verifyLoginInfo(int id)
 	std::stringstream	username(user);
 	if (!username.eof())
 		std::getline(username, user, ' ');
-	if (pass.empty() || !server->isPasswordMatch(pass))
+	if (pass.empty() || nick.empty() || user.empty())
 	{
-		server->sendAllBytes(_hostname + " 464 " + nick + " :Password incorrect\r\n", id);
+		ERR_NEEDMOREPARAMS(id, "login", "missing password, nick, or user");
 		server->closeConection(id);
 	}
-	else if (isUserInVector(find_client_by_nick(nick)) || isChannelInVector(find_chan_by_name(nick)))
+	else if (!server->isPasswordMatch(pass))
+		ERR_PASSWDMISMATCH(id, nick);
+	else if (isUserInVector(find_client_by_nick(nick)) || isChannelInVector(find_chan_by_name(nick))
+		|| !isNickValid(nick) || user == nick)
 	{
-		//:irc.server.com 433 YourNickname :Nickname is already in use.
-		server->sendAllBytes(_hostname + " 422 " + nick + " :Nickname is already in use.\r\n", id);
+		if (!isNickValid(nick))
+			ERR_ERRONEUSNICKNAME(id, nick);
+		else
+			ERR_NICKNAMEINUSE(id, nick);
 		server->closeConection(id);
 	}
 	else
-	{
 		client->init(nick, user);
-		RPL_WELCOME(client->getId());
-	}
 }
 
 bool Context::isUserInVector(std::vector<Client>::iterator userGot) { return (userGot != _clients.end()); }

@@ -19,6 +19,7 @@ class Context
 		static void	remove_client(int, int);
 		static void addClientToChannel(int, std::string const&, std::string const&);
 		static void removeClientFromChannel(int, std::string const&);
+		static bool	loginInfoFound(std::vector<Client>::iterator &client);
 
 		//Command parsers
 		static void	execClientCmds(int client_id);
@@ -32,6 +33,7 @@ class Context
 		static void	parseKick(std::vector<Client>::iterator client, std::string &cmd);
 		static void	parsePrivmsg(std::vector<Client>::iterator client, std::string &cmd);
 		static void	parseQuit(std::vector<Client>::iterator client, std::string &cmd);
+		static void	parsePart(std::vector<Client>::iterator client, std::string &cmd);
 		static bool	verifyModeOptions(std::vector<std::string> &vec);
 
 		//Commands
@@ -42,8 +44,8 @@ class Context
 		static void cmd_sendPM(int client_id, std::string recipient, std::string const& msg);
 		static void cmd_part(int client_id, std::string const & channelName, std::string const & reason);
 
-		//Channel operations
-		static void chanop_kickUser(int client_id, std::string const& channel, std::string const& target);
+	//Channel operations
+		static void chanop_kickUser(int client_id, std::string const& channel, std::string const& target, const std::string &reason);
 		static void chanop_inviteUser(int client_id, std::string const& channel, std::string const& target);
 		static void chanop_topic(int client_id, std::string const& channel, std::string const& newtopic);
 		static void chanop_toggleInviteOnly(int, std::string, bool);
@@ -83,13 +85,27 @@ class Context
 		static void ERR_CHANNELISFULL(int client_id, std::string const& channel_name);
 		static void ERR_INVITEONLYCHAN(int client_id, std::string const& channel_name);
 		static void ERR_BADCHANNELKEY(int client_id, std::string const& channel_name);
-		static void ERR_PASSWDMISMATCH(int);
+		static void ERR_PASSWDMISMATCH(int client_id, const std::string &nick);
 		static void ERR_CHANOPRIVSNEEDED(int, std::string const&);
 		static void	ERR_UNRECOGNIZEDCMD(const int &client_id, const std::string &cmd, const std::string reason);
 		static void RPL_WHOREPLY(int client_id, Channel &channel);
 		static void RPL_CHANNELMODEIS(int client_id, Channel &channel);
 		static void ERR_CANNOTSENDTOCHAN(int client_id, std::string const& channel_name);
+<<<<<<< HEAD
 		static void	ERR_NICKNAMEINUSE(const int &client_id, const std::string &nick);
+=======
+		static void	ERR_NICKNAMEINUSE(int client_id, const std::string &nick);
+		static void	ERR_ERRONEUSNICKNAME( int client_id, const std::string &nick);
+		static void	ERR_NEEDMOREPARAMS( int client_id, const std::string cmd, const std::string reason);
+		static void	ERR_USERNOTINCHANNEL( const int &client_id, const std::string &chan, const std::string &nick);
+
+
+	private:
+		static std::string 			_hostname;
+		static Handler				*server;
+		static std::vector<Client>	_clients;
+		static std::vector<Channel>	_channels;
+>>>>>>> 7fe8cdfed83eae413fb6fd61f7a5d134ffccbd32
 };
 
 #endif

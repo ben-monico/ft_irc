@@ -34,6 +34,7 @@ class Channel
 		std::string getKey() const;
 		void broadcastMsg(std::string const &msg, Handler *server, int senderID);
 		void replaceClientID(int old_id, int new_id);
+		bool isUserInChannel(int userID);
 		std::vector<int> _usersID;
 
 
