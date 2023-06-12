@@ -20,7 +20,7 @@ class Context
 		static void addClientToChannel(int, std::string const&, std::string const&);
 		static void removeClientFromChannel(int, std::string const&);
 
-	//Command parsers
+		//Command parsers
 		static void	execClientCmds(int client_id);
 		static void	parseJoin(std::vector<Client>::iterator client, std::string &cmd);
 		static void	parseInvite(std::vector<Client>::iterator client, std::string &cmd);
@@ -34,8 +34,7 @@ class Context
 		static void	parseQuit(std::vector<Client>::iterator client, std::string &cmd);
 		static bool	verifyModeOptions(std::vector<std::string> &vec);
 
-		
-	//Commands
+		//Commands
 		static void	execModeOptions(std::vector<std::string> vec, std::vector<Client>::iterator client, const std::string &chan);
 		static void cmd_join(int client_id, std::string const &channelName, std::string const& key);
 		static void cmd_setNick(int client_id, std::string const & nick);
@@ -43,11 +42,10 @@ class Context
 		static void cmd_sendPM(int client_id, std::string recipient, std::string const& msg);
 		static void cmd_part(int client_id, std::string const & channelName, std::string const & reason);
 
-	//Channel operations
+		//Channel operations
 		static void chanop_kickUser(int client_id, std::string const& channel, std::string const& target);
 		static void chanop_inviteUser(int client_id, std::string const& channel, std::string const& target);
 		static void chanop_topic(int client_id, std::string const& channel, std::string const& newtopic);
-
 		static void chanop_toggleInviteOnly(int, std::string, bool);
 		static void chanop_toggleTopicRestriction(int, std::string const&, bool);
 		static void chanop_mode(int, std::string const& , std::string const& );
@@ -56,7 +54,7 @@ class Context
 		static void chanop_toggleOpPriv(int client_id, std::string const& channel, std::string const& targetNick, std::string toggle);
 
 
-	//Getters and checkers
+		//Getters and checkers
 		static std::vector<Channel>::iterator	find_chan_by_name(std::string );
 		static std::vector<Client>::iterator	find_client_by_id(int);
 		static std::vector<Client>::iterator 	find_client_by_nick(std::string const&);
@@ -66,8 +64,13 @@ class Context
 		static bool isUserInVector(std::vector<Client>::iterator );
 		static bool isChannelInVector(std::vector<Channel>::iterator );
 
+	private:
+		static std::string 			_hostname;
+		static Handler				*server;
+		static std::vector<Client>	_clients;
+		static std::vector<Channel>	_channels;
 
-	//Command Responses
+		//Command Responses
 		static void RPL_TOPIC(int, Channel&);
 		static void RPL_NOTOPIC(int, Channel&)
 ;		static void RPL_NAMREPLY(int, Channel&);
@@ -87,14 +90,6 @@ class Context
 		static void RPL_CHANNELMODEIS(int client_id, Channel &channel);
 		static void ERR_CANNOTSENDTOCHAN(int client_id, std::string const& channel_name);
 		static void	ERR_NICKNAMEINUSE(const int &client_id, const std::string &nick);
-		
-
-
-	private:
-		static std::string 			_hostname;
-		static Handler				*server;
-		static std::vector<Client>	_clients;
-		static std::vector<Channel>	_channels;
 };
 
 #endif
