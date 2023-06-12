@@ -38,35 +38,36 @@ class Context
 	//Commands
 		static void	execModeOptions(std::vector<std::string> vec, std::vector<Client>::iterator client, const std::string &chan);
 		static void cmd_join(int client_id, std::string const &channelName, std::string const& key);
-		static void cmd_setNick(int client_id, std::string );
-		static void cmd_setUserName(int client_id, std::string );
+		static void cmd_setNick(int client_id, std::string const & nick);
+		static void cmd_setUserName(int client_id, std::string const & username);
 		static void cmd_sendPM(int client_id, std::string recipient, std::string const& msg);
+		static void cmd_part(int client_id, std::string const & channelName, std::string const & reason);
 
 	//Channel operations
-		static void chanop_kick_user(int client_id, std::string const& channel, std::string const& target);
-		static void chanop_invite_user(int client_id, std::string const& channel, std::string const& target);
+		static void chanop_kickUser(int client_id, std::string const& channel, std::string const& target);
+		static void chanop_inviteUser(int client_id, std::string const& channel, std::string const& target);
 		static void chanop_topic(int client_id, std::string const& channel, std::string const& newtopic);
 
-		static void chanop_toggle_inviteonly(int, std::string, bool);
-		static void chanop_toggle_topic_restriction(int, std::string const&, bool);
+		static void chanop_toggleInviteOnly(int, std::string, bool);
+		static void chanop_toggleTopicRestriction(int, std::string const&, bool);
 		static void chanop_mode(int, std::string const& , std::string const& );
-		static void chanop_userlimit(int client_id, std::string const& channel, std::string const& userLimit);
+		static void chanop_userLimit(int client_id, std::string const& channel, std::string const& userLimit);
 		static void chanop_key(int client_id, std::string const& channel, std::string const& key);
-		static void chanop_toggle_oppriv(int client_id, std::string const& channel, std::string const& targetNick, std::string toggle);
+		static void chanop_toggleOpPriv(int client_id, std::string const& channel, std::string const& targetNick, std::string toggle);
 
 
 	//Getters and checkers
 		static std::vector<Channel>::iterator	find_chan_by_name(std::string );
 		static std::vector<Client>::iterator	find_client_by_id(int);
 		static std::vector<Client>::iterator 	find_client_by_nick(std::string const&);
+		static std::vector<Client>::iterator 	find_client_by_username(std::string const&);
+
 
 		static bool isUserInVector(std::vector<Client>::iterator );
 		static bool isChannelInVector(std::vector<Channel>::iterator );
 
 
 	//Command Responses
-		static void CHAN_RPL_TEMPLATE(std::string , Channel&, std::string , int);
-		static void USR_RPL_TEMPLATE(std::string , std::string , std::string , int);
 		static void RPL_TOPIC(int, Channel&);
 		static void RPL_NOTOPIC(int, Channel&)
 ;		static void RPL_NAMREPLY(int, Channel&);
@@ -85,6 +86,7 @@ class Context
 		static void RPL_WHOREPLY(int client_id, Channel &channel);
 		static void RPL_CHANNELMODEIS(int client_id, Channel &channel);
 		static void ERR_CANNOTSENDTOCHAN(int client_id, std::string const& channel_name);
+		static void	ERR_NICKNAMEINUSE(const int &client_id, const std::string &nick);
 		
 
 

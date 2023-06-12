@@ -2,20 +2,6 @@
 #include <Channel.hpp>
 #include <Handler.hpp>
 
-//:ircserv 332 userNick #channel :Topic of the channel
-void Context::CHAN_RPL_TEMPLATE(std::string code, Channel &channel, std::string msg, int client_id)
-{
-	server->sendAllBytes(_hostname + code + " * " + \
-	find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " :" \
-	+ msg + "\r\n", client_id);
-}
-
-void Context::USR_RPL_TEMPLATE(std::string code, std::string msg, std::string nick, int client_id)
-{
-	server->sendAllBytes(_hostname + code + " * " + nick + " :" \
-	+ msg + "\r\n", client_id);
-}
-
 void Context::RPL_WELCOME(int client_id)
 {
 	server->sendAllBytes(_hostname + "001 " + find_client_by_id(client_id)->getNick() + " :Welcome to Hell, " + find_client_by_id(client_id)->getNick() + "\r\n", client_id);
@@ -87,6 +73,16 @@ void Context::ERR_CANNOTSENDTOCHAN(int client_id, std::string const& channel_nam
 	server->sendAllBytes(_hostname + "404 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :Cannot send to channel\r\n", client_id);
 }
 
+void	Context::ERR_UNRECOGNIZEDCMD(const int &client_id, const std::string &cmd, const std::string reason)
+{
+	server->sendAllBytes(_hostname + "421 " + find_client_by_id(client_id)->getNick() + " " + cmd + " :" + reason + "\r\n",  client_id);
+}
+
+void	Context::ERR_NICKNAMEINUSE(const int &client_id, const std::string &nick)
+{
+	server->sendAllBytes(_hostname + "433 " + find_client_by_id(client_id)->getNick() + " " + nick + " :Nickname is already in use\r\n",  client_id);
+}
+
 void Context::ERR_NOTONCHANNEL(int client_id, std::string const& channel_name)
 {
 	server->sendAllBytes(_hostname + "442 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :User not on channel\r\n", client_id);
@@ -120,9 +116,4 @@ void Context::ERR_BADCHANNELKEY(int client_id, std::string const& channel_name)
 void Context::ERR_CHANOPRIVSNEEDED(int client_id, std::string const& channel_name)
 {
 	server->sendAllBytes(_hostname + "482 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :You're not channel operator\r\n", client_id);
-}
-
-void	Context::ERR_UNRECOGNIZEDCMD(const int &client_id, const std::string &cmd, const std::string reason)
-{
-	server->sendAllBytes(_hostname + "421 " + find_client_by_id(client_id)->getNick() + " " + cmd + " :" + reason + "\r\n",  client_id);
 }

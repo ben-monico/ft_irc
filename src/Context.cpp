@@ -40,6 +40,16 @@ std::vector<Client>::iterator  Context::find_client_by_nick(const std::string &n
 	return it;	
 }
 
+std::vector<Client>::iterator 	Context::find_client_by_username(std::string const& username)
+{
+	std::vector<Client>::iterator it = Context::_clients.begin();
+	for (; it != _clients.end(); ++it)
+		if (it->getUserName() == username)
+			break;
+	return it;	
+}
+
+
 void	Context::add_client(int client_id)
 {
 	_clients.push_back(Client(client_id));
@@ -108,7 +118,7 @@ void	Context::verifyLoginInfo(int id)
 	else
 	{
 		client->init(nick, user);
-		Context::RPL_WELCOME(client->getId());
+		RPL_WELCOME(client->getId());
 	}
 }
 

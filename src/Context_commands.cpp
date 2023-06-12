@@ -31,25 +31,33 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 	}
 	channel->incrementUserCount(client_id);
 	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" +
-							  channelName + "\r\n",
-						  server, -1);
+		channelName + "\r\n", server, -1);
 	RPL_TOPIC(client->getId(), *channel);
 	RPL_NAMREPLY(client->getId(), *channel);
 	RPL_ENDOFNAMES(client->getId(), *channel);
 }
 
-void Context::cmd_setNick(int client_id, std::string nick)
+void Context::cmd_setNick(int client_id, std::string const & nick)
 {
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	client->setNick(nick);
-	// pass thru nick checker
+	std::vector<Client>::iterator nickClient = find_client_by_nick(nick);
+	std::vector<Client>::iterator userClient = find_client_by_username(nick);
+
+	if (!isUserInVector(nickClient) && !isUserInVector(userClient))
+	{
+		client->setNick(nick);
+		server->sendAllBytes(_hostname + " " + client->getNick() + " " + nick + "\r\n", client->getId());
+	}
+	else
+		ERR_NICKNAMEINUSE(client->getId(), nick);
 }
 
-void Context::cmd_setUserName(int client_id, std::string userName)
+void Context::cmd_setUserName(int client_id, std::string const & userName)
 {
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	client->setUserName(userName);
-	// pass thru usNa checker
+	std::vector<Client>::iterator nickClient = find_client_by_nick(userName);
+	if (!isUserInVector(nickClient))
+		client->setUserName(userName);
 }
 
 void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const &msg)
@@ -64,17 +72,29 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 		else if (!sender->isOnChannel(recipient))
 			return ERR_CANNOTSENDTOCHAN(sender->getId(), recipient);
 		else
-			recipientChannel->broadcastMsg(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG #" +
-											   recipient + " :" + msg + "\r\n",
-										   server, sender_id);
+			recipientChannel->broadcastMsg(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG #" + \
+				recipient + " :" + msg + "\r\n", server, sender_id);
 	}
 	else
 	{
 		std::vector<Client>::iterator recipientClient = find_client_by_nick(recipient);
 		if (isUserInVector(recipientClient))
-			server->sendAllBytes(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG " + recipient + " :" + msg + "\r\n", recipientClient->getId());
+			server->sendAllBytes(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG " \
+			+ recipient + " :" + msg + "\r\n", recipientClient->getId());
 		else
 			return ERR_NOSUCHNICK(sender->getId(), recipient);
+	}
+}
+
+void Context::cmd_part(int client_id, std::string const & channelName, std::string const & reason)
+{
+	std::vector<Client>::iterator client = find_client_by_id(client_id);
+	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
+	if (isChannelInVector(channel) && client->isInChannel(channelName))
+	{
+		client->eraseChannel(channelName);
+		channel->decrementUserCount(client_id);
+		channel->broadcastMsg(":" + client->getNick() + " PART #" + channelName + " :" + reason + "\r\n", server, client_id);
 	}
 }
 
@@ -84,26 +104,26 @@ void	Context::execModeOptions(std::vector<std::string> vec, std::vector<Client>:
 	{
 		if (vec[2][1] == 'o')
 			for (std::vector<std::string>::iterator i = vec.begin() + 3; i != vec.end(); ++i)
-				chanop_toggle_oppriv(client->getId(), chan, *i, "@");
+				chanop_toggleOpPriv(client->getId(), chan, *i, "@");
 		if (vec[2][1] == 'l')
-			chanop_userlimit(client->getId(), chan, vec[3]);
+			chanop_userLimit(client->getId(), chan, vec[3]);
 		if (vec[2][1] == 'k')
 			vec.size() > 3 ? chanop_key(client->getId(), chan, vec[3]) : chanop_key(client->getId(), chan, "");
 		if (vec[2].find("i") != std::string::npos)
-			chanop_toggle_inviteonly(client->getId(), chan, true);
+			chanop_toggleInviteOnly(client->getId(), chan, true);
 		if (vec[2].find("t") != std::string::npos)
-			chanop_toggle_topic_restriction(client->getId(), chan, true);
+			chanop_toggleTopicRestriction(client->getId(), chan, true);
 		return ;
 	}
 	if (vec[2][1] == 'o')
 		for (std::vector<std::string>::iterator i = vec.begin() + 3; i != vec.end(); ++i)
-			chanop_toggle_oppriv(client->getId(), chan, *i, "+");
+			chanop_toggleOpPriv(client->getId(), chan, *i, "+");
 	if (vec[2].find("i") != std::string::npos)
-		chanop_toggle_inviteonly(client->getId(), chan, false);
+		chanop_toggleInviteOnly(client->getId(), chan, false);
 	if (vec[2].find("t") != std::string::npos)
-		chanop_toggle_topic_restriction(client->getId(), chan, false);
+		chanop_toggleTopicRestriction(client->getId(), chan, false);
 	if (vec[2].find("k") != std::string::npos)
 		chanop_key(client->getId(), chan, "");
 	if (vec[2].find("l") != std::string::npos)
-		chanop_userlimit(client->getId(), chan, "0");
+		chanop_userLimit(client->getId(), chan, "0");
 }
