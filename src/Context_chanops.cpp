@@ -90,9 +90,7 @@ void Context::chanop_toggleTopicRestriction(int client_id, std::string const& ch
 		ERR_NOSUCHCHANNEL(client_id, channelName);
 	else
 	{
-		std::cout << "topic only was = " << (channel->getTopicOpOnly() == toggle) << std::endl;
 		channel->getTopicOpOnly() == toggle ? (void)0 : channel->toggleRestrictTopic();
-		std::cout << "topic only is = " << channel->getTopicOpOnly() << std::endl;
 		channel->getTopicOpOnly()	\
 		? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " +t\r\n", server, -1)
 		: channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -t\r\n", server, -1);	
