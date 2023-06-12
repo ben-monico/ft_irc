@@ -33,6 +33,7 @@ class Context
 		static void	parseKick(std::vector<Client>::iterator client, std::string &cmd);
 		static void	parsePrivmsg(std::vector<Client>::iterator client, std::string &cmd);
 		static void	parseQuit(std::vector<Client>::iterator client, std::string &cmd);
+		static void	parsePart(std::vector<Client>::iterator client, std::string &cmd);
 		static bool	verifyModeOptions(std::vector<std::string> &vec);
 
 		

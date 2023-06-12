@@ -36,14 +36,14 @@ void Context::execClientCmds(int id)
 {
 	std::vector<Client>::iterator client = find_client_by_id(id);
 	std::vector<std::string> &cmds = client->getCmds();
-	std::string cmdStr = joinVectorStrings(cmds), buf, options[] = {"INVITE", "NICK", "TOPIC", "LIST", "KICK", "JOIN", "QUIT", "PRIVMSG", "MODE", "WHO"};
+	std::string cmdStr = joinVectorStrings(cmds), buf, options[] = {"INVITE", "NICK", "TOPIC", "LIST", "KICK", "JOIN", "QUIT", "PRIVMSG", "MODE", "WHO", "PART"};
 	int i;
 
 	std::istringstream cmd(cmdStr);
 	if (cmd.fail())
 		return (ERR_UNRECOGNIZEDCMD(client->getId(), cmdStr, "Failed to allocate string"));
 	std::getline(cmd, buf, ' ');
-	for (i = 0; i < 10; ++i)
+	for (i = 0; i < 11; ++i)
 		if (options[i] == buf)
 			break;
 	std::cout << "OPTION = " << i << std::endl;
@@ -79,6 +79,9 @@ void Context::execClientCmds(int id)
 	case 9:
 		parseWho(client, cmdStr);
 		break;
+	case 10:
+		parsePart(client, cmdStr);
+		break;
 	default:
 		return (ERR_UNRECOGNIZEDCMD(client->getId(), buf, "Unrecognized command"));
 	}
@@ -91,11 +94,12 @@ void Context::execClientCmds(int id)
 	// JOIN #<CNAME1> #<CNAME2> #<CNAMEn> ✅
 	// QUIT :<REASON> ✅
 	// WHO #channel ✅
+	// KICK <channel> <tarjet> :<reason> ✅
 	// LIST - show channels --- missing bronado --- 
 	// PART #channel :<reason> --- missing bronado --- 
-	// KICK <channel> <tarjet> :<reason> 
 	// PRIVMSG <channel-pub/user-priv> :msg
 }
+
 void Context::parseJoin(std::vector<Client>::iterator client, std::string &cmd)
 {
 	std::vector<std::string> seggies = splitByChar(cmd, ' ');
@@ -148,6 +152,8 @@ void Context::parseMode(std::vector<Client>::iterator client, std::string &cmd)
 			return (ERR_NOSUCHCHANNEL(client->getId(), cleanChan));
 		RPL_CHANNELMODEIS(client->getId(), *chan);
 	}
+	else 
+		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " +/-<options> <<params>>"));
 }
 
 void Context::parseNick(std::vector<Client>::iterator client, std::string &cmd)
@@ -221,6 +227,12 @@ void Context::parseQuit(std::vector<Client>::iterator client, std::string &cmd)
 	(void)cmd;
 	server->closeConection(client->getId());
 }
+
+void Context::parsePart(std::vector<Client>::iterator client, std::string &cmd)
+{
+	
+}
+
 
 bool Context::verifyModeOptions(std::vector<std::string> &vec)
 {
