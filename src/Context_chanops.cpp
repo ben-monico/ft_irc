@@ -58,10 +58,7 @@ void Context::chanop_topic(int client_id, std::string const &channelName, std::s
 		return ERR_CHANNELISFULL(client_id, channelName);
 
 	else
-	{
-		newtopic.empty() ? RPL_TOPIC(client_id, *channel) : channel->setTopic(newtopic);
-		channel->broadcastMsg(":" + client->getNick() + " TOPIC #" + channelName + " :" + newtopic + "\r\n", server, -1);
-	}
+		server->sendAllBytes(":" + client->getNick() + " TOPIC #" + channelName + " :" + newtopic + "\r\n", client_id);
 }
 
 // MODES
