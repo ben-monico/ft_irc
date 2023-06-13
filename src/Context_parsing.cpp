@@ -113,8 +113,12 @@ void Context::parseJoin(std::vector<Client>::iterator client, std::string &cmd)
 
 void Context::parseInvite(std::vector<Client>::iterator client, std::string &cmd)
 {
-	(void)client;
-	(void)cmd;
+	if (cmd.find("INVITE ") != std::string::npos)
+	{
+		std::string target = cmd.substr(7, cmd.find(' ', 7) - 7);
+		std::string channel = cmd.substr(cmd.find('#', 8) + 1, cmd.size() - cmd.find('#', 8) - 2);
+		chanop_inviteUser(client->getId(), channel, target);
+	}
 }
 
 void Context::parseWho(std::vector<Client>::iterator client, std::string &cmd)
@@ -219,8 +223,12 @@ void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 
 void Context::parsePrivmsg(std::vector<Client>::iterator client, std::string &cmd)
 {
-	(void)client;
-	(void)cmd;
+	if (cmd.find("PRIVMSG ") != std::string::npos)
+	{
+		std::string recipient = cmd.substr(8, cmd.find(' ', 8) - 8);
+		std::string msg = cmd.substr(cmd.find(':', 8) + 1);
+		cmd_sendPM(client->getId(), recipient, msg);
+	}
 }
 void Context::parseQuit(std::vector<Client>::iterator client, std::string &cmd)
 {

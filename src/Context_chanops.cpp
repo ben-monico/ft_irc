@@ -31,18 +31,22 @@ void Context::chanop_inviteUser(int client_id, std::string const &channel, std::
 {
 	std::vector<Client>::iterator chanop = find_client_by_id(client_id);
 	std::vector<Client>::iterator target = find_client_by_nick(targetName);
-	if (chanop->getChannelMode(channel) != "@")
+
+	if (!isChannelInVector(find_chan_by_name(channel)))
+		ERR_NOSUCHCHANNEL(client_id, channel);
+	else if (chanop->getChannelMode(channel) != "@")
 		ERR_CHANOPRIVSNEEDED(client_id, channel);
 	else if (!isUserInVector(target))
 		ERR_NOSUCHNICK(client_id, targetName);
-	else if (!isChannelInVector(find_chan_by_name(channel)))
-		ERR_NOSUCHCHANNEL(client_id, channel);
 	else if (target->isInChannel(channel))
 		ERR_USERONCHANNEL(client_id, targetName, channel);
 	else
 	{
 		target->addChannelInvite(channel);
-		server->sendAllBytes(chanop->getNick() + " INVITE " + targetName + " #" + channel + "\r\n", target->getId());
+		server->sendAllBytes(_hostname + "341 " + chanop->getNick() + " " + targetName + " #" + channel + " :Inviting " + \
+		targetName + " to join #" + channel + "\r\n", chanop->getId());
+		server->sendAllBytes(":" + chanop->getNick() + "!" + chanop->getUserName() + "@localhost NOTICE " + \
+		targetName + "You have been invited to join #" + channel + " by " + chanop->getNick() + "\r\n", target->getId());
 	}
 }
 
