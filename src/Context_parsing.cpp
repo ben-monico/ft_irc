@@ -116,7 +116,7 @@ void Context::execClientCmds(int id)
 	// PART #channel :<reason>  ✅
 	// KICK <channel> <tarjet> :<reason> ✅
 	// INVITE <user> #<channel> ✅
-	// PRIVMSG <channel-pub/user-priv> :msg
+	// PRIVMSG <channel-pub/user-priv> :msg ✅
 	// LIST - show channels --- missing bronado --- 
 }
 
@@ -141,7 +141,7 @@ void Context::parseInvite(std::vector<Client>::iterator client, std::string &cmd
 	std::string						cleanChan;
 	
 	if (seggies.size() != 3)
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " #<channel> <<key>>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " <target> #<channel>"));
 	target = find_client_by_nick(seggies[1]);
 	if (!isUserInVector(target))
 		return (ERR_NOSUCHNICK(client->getId(), seggies[1]));
@@ -151,7 +151,7 @@ void Context::parseInvite(std::vector<Client>::iterator client, std::string &cmd
 		return (ERR_NOSUCHCHANNEL(client->getId(), cleanChan));
 	if (channo->isUserInChannel(target->getId()))
 		return (ERR_USERONCHANNEL(client->getId(), seggies[1], cleanChan));
-	// cmdinvite
+	chanop_inviteUser(client->getId(), cleanChan, target->getNick());
 }
 
 void Context::parseWho(std::vector<Client>::iterator client, std::string &cmd)
@@ -261,8 +261,19 @@ void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 
 void Context::parsePrivmsg(std::vector<Client>::iterator client, std::string &cmd)
 {
-	(void)client;
-	(void)cmd;
+	std::vector<std::string>	seggies = splitByChar(cmd, ' ');
+	std::string					target, msg;
+
+	if(seggies.size() != 3)
+		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel>/<target> :<msg>"));
+	target = seggies[1];
+	seggies.erase(seggies.begin(), seggies.begin() + 2);
+	msg = joinVectorStrings(seggies);
+	if (msg[0] != ':')
+		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel>/<target> :<msg>"));
+	msg = msg.substr(1, msg.size() - 1);
+	cmd_sendPM(client->getId(), target, msg);
+
 }
 void Context::parseQuit(std::vector<Client>::iterator client, std::string &cmd)
 {
