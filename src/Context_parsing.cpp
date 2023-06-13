@@ -108,16 +108,16 @@ void Context::execClientCmds(int id)
 	//TODO:
 	// MODE +<FLAG><<PARAMS>> - can or not be space separated - will trim whitespaces
 		// - +it can be together rest alone +k neext <pass> +l needs<limit> +o needs<target> ✅
-	// INVITE USER CHANNEL	- invite ✅
 	// NICK <nick>			- set nick - all sharacters ✅
 	// TOPIC <channel> :<topic>, if no topic but : - set topic to "" - if no topic and no : - show topic ✅
 	// JOIN #<CNAME1> #<CNAME2> #<CNAMEn> ✅
 	// QUIT :<REASON> ✅
 	// WHO #channel ✅
+	// PART #channel :<reason>  ✅
 	// KICK <channel> <tarjet> :<reason> ✅
-	// LIST - show channels --- missing bronado --- 
-	// PART #channel :<reason> --- missing bronado --- 
+	// INVITE <user> #<channel>
 	// PRIVMSG <channel-pub/user-priv> :msg
+	// LIST - show channels --- missing bronado --- 
 }
 
 void Context::parseJoin(std::vector<Client>::iterator client, std::string &cmd)
@@ -133,8 +133,23 @@ void Context::parseJoin(std::vector<Client>::iterator client, std::string &cmd)
 
 void Context::parseInvite(std::vector<Client>::iterator client, std::string &cmd)
 {
-	(void)client;
-	(void)cmd;
+	std::vector<std::string>		seggies = splitByChar(cmd, ' ');
+	std::vector<Channel>::iterator	channo;
+	std::vector<Client>::iterator	target;
+	std::string						cleanChan;
+	
+	if (seggies.size() != 3)
+		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " #<channel> <<key>>"));
+	target = find_client_by_nick(seggies[1]);
+	if (!isUserInVector(target))
+		return (ERR_NOSUCHNICK(client->getId(), seggies[1]));
+	cleanChan = seggies[2].substr(1, seggies[2].size() - 1);
+	channo = find_chan_by_name(cleanChan);
+	if (!isChannelInVector(channo))
+		return (ERR_NOSUCHCHANNEL(client->getId(), cleanChan));
+	if (channo->isUserInChannel(target->getId()))
+		return (ERR_USERONCHANNEL(client->getId(), seggies[1], cleanChan));
+	// cmdinvite
 }
 
 void Context::parseWho(std::vector<Client>::iterator client, std::string &cmd)
