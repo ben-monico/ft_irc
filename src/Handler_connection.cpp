@@ -6,7 +6,7 @@
 /*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/13 22:10:02 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/13 22:30:49 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	Handler::sendAllBytes(std::string const &msg, int clientId)
 {
 	int bytesSent;
 
-	std::cout << "Sending: " << msg << " - to: " << clientId << std::endl;
+	std::cout << ">> Sending response to fd in position " << clientId << ":\n" << msg << "#====================#" << std::endl;
 	while ((bytesSent = send(_pollFDsArray[clientId].fd, msg.c_str(), strlen(msg.c_str()), 0)) != (int)msg.size())
 	{
 		if (bytesSent == -1)
@@ -67,8 +67,6 @@ int	Handler::buildResponse(std::string buf, int position)
 		cmds.push_back(cmd);
 	}
 	cmds.pop_back();
-	for (std::vector<std::string>::iterator it = cmds.begin(); it != cmds.end(); ++it)
-		std::cout << *it << std::endl;
 	return (cmds.back().find("\r") != std::string::npos);
 }
 
@@ -86,7 +84,6 @@ void	Handler::getLoginInfo(std::string buf, int position)
 		std::getline(ss, cmd, '\n');
 		if (cmd.length())
 			cmds.push_back(cmd);
-		std::cout << cmd << std::endl;
 	}
 
 	if (Context::loginInfoFound(user))
@@ -99,7 +96,7 @@ void	Handler::handleClientConnection(int position)
 	ft_bzero(buf, sizeof(buf));
 	int		bytesReceiveded = recv(_pollFDsArray[position].fd, buf, 512, 0);
 
-	std::cout << "Receiving msg from fd in position " << position << ":"  << buf << std::flush;
+	std::cout << ">> Receiving data from fd in position " << position << ":\n"  << buf << "#====================#" << std::endl;
 	if (bytesReceiveded <= 0)
 	{
 		delFromFDsArray(position);
