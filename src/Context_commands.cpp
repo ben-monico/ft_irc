@@ -43,11 +43,13 @@ void Context::cmd_setNick(int client_id, std::string const & nick)
 	std::vector<Client>::iterator nickClient = find_client_by_nick(nick);
 	std::vector<Client>::iterator userClient = find_client_by_username(nick);
 
-	if (!isUserInVector(nickClient) && !isUserInVector(userClient))
+	if (!isUserInVector(nickClient) && !isUserInVector(userClient) && nick != client->getUserName())
 	{
 		client->setNick(nick);
-		server->sendAllBytes(_hostname + " " + client->getNick() + " " + nick + "\r\n", client->getId());
+		server->sendAllBytes(_hostname + " NICK " + nick + "\r\n", client->getId());
 	}
+	else if (!isNickValid(nick))
+		ERR_ERRONEUSNICKNAME(client->getId(), nick);
 	else
 		ERR_NICKNAMEINUSE(client->getId(), nick);
 }

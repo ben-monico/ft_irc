@@ -112,6 +112,7 @@ void Context::removeClientFromChannel(int client_id, std::string const & channel
 void	Context::verifyLoginInfo(int id)
 {
 	std::vector<Client>::iterator		client = find_client_by_id(id); 
+	joinPartialCmdStrings(client);
 	std::vector<std::string>			&cmds = client->getCmds();
 	std::vector<std::string>::iterator	it = cmds.begin();
 	std::string							pass = "", nick = "", user = "";
@@ -124,6 +125,8 @@ void	Context::verifyLoginInfo(int id)
 			nick = it->substr(5, it->length() - 6);
 		else if (!it->compare(0, 5, "USER "))
 			user = it->substr(5, it->length() - 5);
+		else if (!it->compare(0, 5, "QUIT "))
+			server->closeConection(id);
 	}
 	std::stringstream	username(user);
 	if (!username.eof())
@@ -136,13 +139,16 @@ void	Context::verifyLoginInfo(int id)
 	else if (!server->isPasswordMatch(pass))
 		ERR_PASSWDMISMATCH(id, nick);
 	else if (isUserInVector(find_client_by_nick(nick)) || isChannelInVector(find_chan_by_name(nick))
-		|| !isNickValid(nick) || user == nick)
+		|| !isNickValid(nick) || !isNickValid(user) || user == nick)
 	{
-		if (!isNickValid(nick))
+		if (!isNickValid(nick) || !isNickValid(user))
 			ERR_ERRONEUSNICKNAME(id, nick);
 		else
 			ERR_NICKNAMEINUSE(id, nick);
-		server->closeConection(id);
+		it = cmds.begin();
+		for ( ; it != cmds.end() && it->compare(0, 5, "NICK "); ++it) {}
+		cmds.erase(it);
+		// server->closeConection(id);
 	}
 	else
 		client->init(nick, user);

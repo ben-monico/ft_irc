@@ -31,10 +31,30 @@ std::string joinVectorStrings(std::vector<std::string> &vec)
 		result += *i;
 	return (result);
 }
-
+void	Context::joinPartialCmdStrings(std::vector<Client>::iterator client)
+{
+	std::vector<std::string>	&cmds = client->getCmds();
+	std::vector<std::string>	joinedCmds;
+	std::string					cmd = "";
+	for (std::vector<std::string>::iterator i = cmds.begin(); i != cmds.end(); ++i)
+	{
+		if (cmd.find("\r") == std::string::npos || i->find("\r") == std::string::npos)
+			cmd += *i;
+		if (cmd.find("\r") != std::string::npos)
+		{
+			joinedCmds.push_back(cmd);
+			cmd = "";
+		}
+	}
+	cmds.erase(cmds.begin(), cmds.end());
+	cmds.reserve(joinedCmds.size());
+	cmds.insert(cmds.begin(), joinedCmds.begin(), joinedCmds.end());
+	
+}
 void Context::execClientCmds(int id)
 {
 	std::vector<Client>::iterator client = find_client_by_id(id);
+	joinPartialCmdStrings(client);
 	std::vector<std::string> &cmds = client->getCmds();
 	std::string cmdStr = joinVectorStrings(cmds), buf, options[] = {"INVITE", "NICK", "TOPIC", "LIST", "KICK", "JOIN", "QUIT", "PRIVMSG", "MODE", "WHO", "PART"};
 	int i;
