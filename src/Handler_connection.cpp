@@ -6,7 +6,7 @@
 /*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/13 21:26:23 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/13 21:27:15 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,7 @@ void	Handler::getLoginInfo(std::string buf, int position)
 			cmds.push_back(cmd);
 		std::cout << cmd << std::endl;
 	}
-	if (cmds.back()[0] == '\n')
-		cmds.pop_back();
+
 	if (Context::loginInfoFound(user))
 		Context::verifyLoginInfo(position);
 }
