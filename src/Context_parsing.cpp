@@ -253,6 +253,7 @@ void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 	{
 		seggies.erase(seggies.begin(), seggies.begin() + 3);
 		reason = joinVectorStrings(seggies);
+		reason = reason.substr(1, reason.size() - 1);
 		if (reason[0] != ':')
 			return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel> :<reason>"));
 	}
