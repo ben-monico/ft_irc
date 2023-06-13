@@ -128,10 +128,10 @@ void Context::parseJoin(std::vector<Client>::iterator client, std::string &cmd)
 
 	if (seggies.size() < 2 || seggies.size() > 3)
 		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " #<channel> <<key>>"));
-	if (seggies.size() == 2)
-		return (cmd_join(client->getId(), seggies[1], ""));
 	if (seggies[1][0] != '#' && !isNickValid(seggies[1].substr(1, seggies[1].size() - 1)))
 		return (ERR_NOSUCHCHANNEL(client->getId(), seggies[1]));
+	if (seggies.size() == 2)
+		return (cmd_join(client->getId(), seggies[1], ""));
 	cmd_join(client->getId(), seggies[1].substr(1, seggies[1].size() - 1), seggies[2]);
 }
 
