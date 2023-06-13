@@ -28,7 +28,9 @@ std::string joinVectorStrings(std::vector<std::string> &vec)
 	std::string result;
 
 	for (std::vector<std::string>::iterator i = vec.begin(); i != vec.end(); ++i)
-		result += *i;
+	{
+		result += *i + ' ';
+	}
 	return (result);
 }
 void	Context::joinPartialCmdStrings(std::vector<Client>::iterator client)
@@ -128,7 +130,7 @@ void Context::parseJoin(std::vector<Client>::iterator client, std::string &cmd)
 		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " #<channel> <<key>>"));
 	if (seggies.size() == 2)
 		return (cmd_join(client->getId(), seggies[1], ""));
-	if (seggies[1][0] != '#' || !isNickValid(seggies[1].substr(1, seggies[1].size() - 1)))
+	if (seggies[1][0] != '#' && !isNickValid(seggies[1].substr(1, seggies[1].size() - 1)))
 		return (ERR_NOSUCHCHANNEL(client->getId(), seggies[1]));
 	cmd_join(client->getId(), seggies[1].substr(1, seggies[1].size() - 1), seggies[2]);
 }
