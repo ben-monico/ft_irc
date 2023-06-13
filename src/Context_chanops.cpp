@@ -9,12 +9,12 @@ void Context::chanop_kickUser(int client_id, std::string const &channelName, std
 	std::vector<Client>::iterator target = find_client_by_nick(targetName);
 	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
 
-	if (chanop->getChannelMode(channelName) != "@")
+	if (!isChannelInVector(find_chan_by_name(channelName)))
+		ERR_NOSUCHCHANNEL(client_id, channelName);
+	else if (chanop->getChannelMode(channelName) != "@")
 		ERR_CHANOPRIVSNEEDED(client_id, channelName);
 	else if (!isUserInVector(target))
 		ERR_NOSUCHNICK(client_id, targetName);
-	else if (!isChannelInVector(find_chan_by_name(channelName)))
-		ERR_NOSUCHCHANNEL(client_id, channelName);
 	else if (!target->isInChannel(channelName))
 		ERR_NOTONCHANNEL(client_id, channelName);
 	else
@@ -54,12 +54,10 @@ void Context::chanop_topic(int client_id, std::string const &channelName, std::s
 {
 	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	if (client->getChannelMode(channelName) != "@")
-		return ERR_CHANOPRIVSNEEDED(client_id, channelName);
-	else if (!isChannelInVector(channel))
+	if (!isChannelInVector(channel))
 		return ERR_NOSUCHCHANNEL(client_id, channelName);
-	else if (channel->isFull())
-		return ERR_CHANNELISFULL(client_id, channelName);
+	else if (client->getChannelMode(channelName) != "@")
+		return ERR_CHANOPRIVSNEEDED(client_id, channelName);
 	else
 		channel->broadcastMsg(":" + client->getNick() + " TOPIC #" + channelName + " :" + newtopic + "\r\n", server, -1);
 }
@@ -70,10 +68,10 @@ void Context::chanop_toggleInviteOnly(int client_id, std::string channelName, bo
 {
 	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	if (client->getChannelMode(channelName) != "@")
-		ERR_CHANOPRIVSNEEDED(client_id, channelName);
-	else if (!isChannelInVector(channel))
+	if (!isChannelInVector(channel))
 		ERR_NOSUCHCHANNEL(client_id, channelName);
+	else if (client->getChannelMode(channelName) != "@")
+		ERR_CHANOPRIVSNEEDED(client_id, channelName);
 	else
 	{
 		channel->getInviteOnly() == toggle ? (void)0 : channel->toggleInviteOnly();
@@ -87,11 +85,11 @@ void Context::chanop_toggleTopicRestriction(int client_id, std::string const& ch
 {
 	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	if (client->getChannelMode(channelName) != "@")
-		ERR_CHANOPRIVSNEEDED(client_id, channelName);
-	else if (!isChannelInVector(channel))
+	if (!isChannelInVector(channel))
 		ERR_NOSUCHCHANNEL(client_id, channelName);
-	else
+	else if (client->getChannelMode(channelName) != "@")
+		ERR_CHANOPRIVSNEEDED(client_id, channelName);
+	else 
 	{
 		channel->getTopicOpOnly() == toggle ? (void)0 : channel->toggleRestrictTopic();
 		channel->getTopicOpOnly()	\
@@ -104,10 +102,10 @@ void Context::chanop_key(int client_id, std::string const &channelName, std::str
 {
 	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	if (client->getChannelMode(channelName) != "@")
-		ERR_CHANOPRIVSNEEDED(client_id, channelName);
-	else if (!isChannelInVector(channel))
+	if (!isChannelInVector(channel))
 		ERR_NOSUCHCHANNEL(client_id, channelName);
+	else if (client->getChannelMode(channelName) != "@")
+		ERR_CHANOPRIVSNEEDED(client_id, channelName);
 	else
 	{
 		key.empty()	? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -k " + key + "\r\n", server, -1)
@@ -121,12 +119,12 @@ void Context::chanop_toggleOpPriv(int client_id, std::string const& channelName,
 	std::vector<Client>::iterator	target = find_client_by_nick(targetNick);
 	std::vector<Client>::iterator	client = find_client_by_id(client_id);
 	std::vector<Channel>::iterator	channel = find_chan_by_name(channelName);
-	if (client->getChannelMode(channelName) != "@")
+	if (!isChannelInVector(channel))
+		ERR_NOSUCHCHANNEL(client_id, channelName);
+	else if (client->getChannelMode(channelName) != "@")
 		ERR_CHANOPRIVSNEEDED(client_id, channelName);
 	else if (!isUserInVector(target))
 		ERR_NOSUCHNICK(client_id, targetNick);
-	else if (!isChannelInVector(channel))
-		ERR_NOSUCHCHANNEL(client_id, channelName);
 	else if (!target->isInChannel(channelName))
 		ERR_NOTONCHANNEL(client_id, channelName);
 	else
@@ -142,10 +140,10 @@ void Context::chanop_userLimit(int client_id, std::string const &channelName, st
 {
 	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
 	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	if (client->getChannelMode(channelName) != "@")
-		ERR_CHANOPRIVSNEEDED(client_id, channelName);
-	else if (!isChannelInVector(channel))
+	if (!isChannelInVector(channel))
 		ERR_NOSUCHCHANNEL(client_id, channelName);
+	else if (client->getChannelMode(channelName) != "@")
+		ERR_CHANOPRIVSNEEDED(client_id, channelName);
 	else
 	{
 		channel->setUserLimit(atoi(userLimit.c_str()));
