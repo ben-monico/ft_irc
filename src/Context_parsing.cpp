@@ -16,9 +16,10 @@ std::vector<std::string> splitByChar(const std::string &string, char spliter)
 	while (!ss.eof())
 	{
 		std::getline(ss, seggie, spliter);
-		seggies.push_back(seggie);
+		if (seggie.size())
+			seggies.push_back(seggie);
 	}
-	if (seggies.back().find_first_of("\r\n") != std::string::npos)
+	if (seggies.back().find("\r") != std::string::npos)
 		seggies.back() = seggies.back().substr(0, seggies.back().size() - 1);
 	return (seggies);
 }
@@ -38,6 +39,7 @@ void	Context::joinPartialCmdStrings(std::vector<Client>::iterator client)
 	std::vector<std::string>	&cmds = client->getCmds();
 	std::vector<std::string>	joinedCmds;
 	std::string					cmd = "";
+
 	for (std::vector<std::string>::iterator i = cmds.begin(); i != cmds.end(); ++i)
 	{
 		if (cmd.find("\r") == std::string::npos || i->find("\r") == std::string::npos)
@@ -53,22 +55,35 @@ void	Context::joinPartialCmdStrings(std::vector<Client>::iterator client)
 	cmds.insert(cmds.begin(), joinedCmds.begin(), joinedCmds.end());
 	
 }
+
+
+//TODO:
+// MODE +<FLAG><<PARAMS>> - can or not be space separated - will trim whitespaces
+	// - +it can be together rest alone +k neext <pass> +l needs<limit> +o needs<target> ✅
+// NICK <nick>			- set nick - all sharacters ✅
+// TOPIC <channel> :<topic>, if no topic but : - set topic to "" - if no topic and no : - show topic ✅
+// JOIN #<CNAME1> #<CNAME2> #<CNAMEn> ✅
+// QUIT :<REASON> ✅
+// WHO #channel ✅
+// PART #channel :<reason>  ✅
+// KICK <channel> <tarjet> :<reason> ✅
+// INVITE <user> #<channel> ✅
+// PRIVMSG <channel-pub/user-priv> :msg ✅
 void Context::execClientCmds(int id)
 {
 	std::vector<Client>::iterator client = find_client_by_id(id);
 	joinPartialCmdStrings(client);
 	std::vector<std::string> &cmds = client->getCmds();
-	std::string cmdStr = joinVectorStrings(cmds), buf, options[] = {"INVITE", "NICK", "TOPIC", "LIST", "KICK", "JOIN", "QUIT", "PRIVMSG", "MODE", "WHO", "PART"};
+	std::string cmdStr = joinVectorStrings(cmds), buf, options[] = {"INVITE", "NICK", "TOPIC", "KICK", "JOIN", "QUIT", "PRIVMSG", "MODE", "WHO", "PART"};
 	int i;
 
 	std::istringstream cmd(cmdStr);
 	if (cmd.fail())
 		return (ERR_UNRECOGNIZEDCMD(client->getId(), cmdStr, "Failed to allocate string"));
 	std::getline(cmd, buf, ' ');
-	for (i = 0; i < 11; ++i)
+	for (i = 0; i < 10; ++i)
 		if (options[i] == buf)
 			break;
-	std::cout << "OPTION = " << i << std::endl;
 	switch (i)
 	{
 	case 0:
@@ -81,45 +96,29 @@ void Context::execClientCmds(int id)
 		parseTopic(client, cmdStr);
 		break;
 	case 3:
-		parseList(client, cmdStr);
-		break;
-	case 4:
 		parseKick(client, cmdStr);
 		break;
-	case 5:
+	case 4:
 		parseJoin(client, cmdStr);
 		break;
-	case 6:
+	case 5:
 		parseQuit(client, cmdStr);
 		break;
-	case 7:
+	case 6:
 		parsePrivmsg(client, cmdStr);
 		break;
-	case 8:
+	case 7:
 		parseMode(client, cmdStr);
 		break;
-	case 9:
+	case 8:
 		parseWho(client, cmdStr);
 		break;
-	case 10:
+	case 9:
 		parsePart(client, cmdStr);
 		break;
 	default:
 		return (ERR_UNRECOGNIZEDCMD(client->getId(), buf, "Unrecognized command"));
 	}
-	//TODO:
-	// MODE +<FLAG><<PARAMS>> - can or not be space separated - will trim whitespaces
-		// - +it can be together rest alone +k neext <pass> +l needs<limit> +o needs<target> ✅
-	// NICK <nick>			- set nick - all sharacters ✅
-	// TOPIC <channel> :<topic>, if no topic but : - set topic to "" - if no topic and no : - show topic ✅
-	// JOIN #<CNAME1> #<CNAME2> #<CNAMEn> ✅
-	// QUIT :<REASON> ✅
-	// WHO #channel ✅
-	// PART #channel :<reason>  ✅
-	// KICK <channel> <tarjet> :<reason> ✅
-	// INVITE <user> #<channel> ✅
-	// PRIVMSG <channel-pub/user-priv> :msg ✅
-	// LIST - show channels --- missing bronado --- 
 }
 
 void Context::parseJoin(std::vector<Client>::iterator client, std::string &cmd)
@@ -128,10 +127,10 @@ void Context::parseJoin(std::vector<Client>::iterator client, std::string &cmd)
 
 	if (seggies.size() < 2 || seggies.size() > 3)
 		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " #<channel> <<key>>"));
-	if (seggies[1][0] != '#' && !isNickValid(seggies[1].substr(1, seggies[1].size() - 1)))
+	if (seggies[1][0] != '#' || (seggies[1][0] == '#' && !isNickValid(seggies[1].substr(1, seggies[1].size() - 1))))
 		return (ERR_NOSUCHCHANNEL(client->getId(), seggies[1]));
 	if (seggies.size() == 2)
-		return (cmd_join(client->getId(), seggies[1], ""));
+		return (cmd_join(client->getId(), seggies[1].substr(1, seggies[1].size() - 1), ""));
 	cmd_join(client->getId(), seggies[1].substr(1, seggies[1].size() - 1), seggies[2]);
 }
 
