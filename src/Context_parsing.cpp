@@ -115,7 +115,7 @@ void Context::execClientCmds(int id)
 	// WHO #channel ✅
 	// PART #channel :<reason>  ✅
 	// KICK <channel> <tarjet> :<reason> ✅
-	// INVITE <user> #<channel>
+	// INVITE <user> #<channel> ✅
 	// PRIVMSG <channel-pub/user-priv> :msg
 	// LIST - show channels --- missing bronado --- 
 }
@@ -128,6 +128,8 @@ void Context::parseJoin(std::vector<Client>::iterator client, std::string &cmd)
 		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " #<channel> <<key>>"));
 	if (seggies.size() == 2)
 		return (cmd_join(client->getId(), seggies[1], ""));
+	if (seggies[1][0] != "#" || !isNickValid(seggies[1].substr(1, seggies[1].size() - 1)))
+		return (ERR_NOSUCHCHANNEL(client->getId(), seggies[1]));
 	cmd_join(client->getId(), seggies[1], seggies[2]);
 }
 
@@ -234,7 +236,7 @@ void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 	std::vector<Client>::iterator			target;
 	std::string								cleanChan, reason;
 
-	if (seggies.size() < 4)
+	if (seggies.size() < 3 || seggies.size() > 4)
 		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel> :<reason>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
 	channo = find_chan_by_name(cleanChan);
@@ -245,10 +247,15 @@ void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 		return (ERR_NOSUCHNICK(client->getId(), seggies[2]));
 	if (!channo->isUserInChannel(target->getId()))
 		return (ERR_USERNOTINCHANNEL(client->getId(), cleanChan, seggies[2]));
-	seggies.erase(seggies.begin(), seggies.begin() + 3);
-	reason = joinVectorStrings(seggies);
-	if (reason[0] != ':')
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel> :<reason>"));
+	if (seggies.size() == 4)
+	{
+		seggies.erase(seggies.begin(), seggies.begin() + 3);
+		reason = joinVectorStrings(seggies);
+		if (reason[0] != ':')
+			return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel> :<reason>"));
+	}
+	else
+		reason = "no reason specified.";
 	chanop_kickUser(client->getId(), cleanChan, target->getNick(), reason);
 }
 
