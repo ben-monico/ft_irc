@@ -22,14 +22,13 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 			else if (channel->isFull())
 				return ERR_CHANNELISFULL(client->getId(), channelName);
 		}
-		client->addChannelMode(channelName, "+");
 	}
 	else
 	{
 		_channels.push_back(Channel(channelName));
 		channel = find_chan_by_name(channelName);
-		client->addChannelMode(channelName, "@");
 	}
+	channel->getUserCount() == 0 ? client->addChannelMode(channelName, "@") : client->addChannelMode(channelName, "+");
 	channel->incrementUserCount(client_id);
 	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" +
 		channelName + "\r\n", server, -1);
@@ -108,7 +107,6 @@ void Context::cmd_part(int client_id, std::string const & channelName, std::stri
 	{
 		channel->broadcastMsg(":" + client->getNick() + " PART #" + channelName + " :" + reason + "\r\n", server, -1);
 		client->eraseChannel(channelName);
-		channel->decrementUserCount(client_id);
 	}
 }
 

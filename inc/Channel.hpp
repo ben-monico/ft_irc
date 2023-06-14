@@ -22,6 +22,9 @@ class Channel
 		void toggleInviteOnly();
 		void decrementUserCount(int id);
 		void incrementUserCount(int id);
+		void incrementChanOp();
+		void decrementChanOp();
+		void autoOp();
 
 		void getModes(int client_id, Handler *server, std::string const& host) const;
 		std::string getName() const;
@@ -43,6 +46,7 @@ class Channel
 		std::string _topic;
 		int _userLimit;
 		int _userCount;
+		int _chanOpCount;
 		bool _inviteOnly;
 		bool _topicOpOnly;
 		std::string _key;

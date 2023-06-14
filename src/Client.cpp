@@ -8,7 +8,14 @@ void Client::setUserName(std::string const &userName) { _userName = userName; }
 
 void Client::setID(int	id) { _id = id; }
 
-void Client::addChannelMode(std::string const &channel, std::string const &mode) { _channelModes[channel] = mode; }
+void Client::addChannelMode(std::string const &channel, std::string const &mode)
+{
+	if (getChannelMode(channel) == "@" && mode == "+")
+		Context::find_chan_by_name(channel)->decrementOpCount();
+	else if (getChannelMode(channel) == "+" && mode == "@")
+		Context::find_chan_by_name(channel)->incrementOpCount();
+	_channelModes[channel] = mode;
+}
 
 //Getters
 std::string Client::getNick() const { return _nick; }
@@ -41,6 +48,8 @@ void Client::init(std::string nick, std::string userName)
 
 void Client::eraseChannel(std::string const &channel)
 {
+	if (Context::isChannelInVector(channel))
+		Context::find_chan_by_name(channel)->decrementUserCount(_id);
 	std::map<std::string, std::string>::iterator it = _channelModes.find(channel);
 	if (it != _channelModes.end())
 		_channelModes.erase(it);
@@ -76,7 +85,10 @@ void Client::removeFromAllChannels()
 {
 	std::map<std::string, std::string>::iterator it = _channelModes.begin();
 	for (; it != _channelModes.end(); it++)
+	{
+		eraseChannel(it->first);
 		Context::find_chan_by_name(it->first)->decrementUserCount(_id);
+	}
 }
 
 bool Client::isInChannel(std::string const &channel)

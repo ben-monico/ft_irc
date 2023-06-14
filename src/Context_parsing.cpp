@@ -126,7 +126,7 @@ void Context::parseJoin(std::vector<Client>::iterator client, std::string &cmd)
 	std::vector<std::string> seggies = splitByChar(cmd, ' ');
 
 	if (seggies.size() < 2 || seggies.size() > 3)
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " #<channel> <<key>>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + " #<channel> <<key>>"));
 	if (seggies[1][0] != '#' || (seggies[1][0] == '#' && !isNickValid(seggies[1].substr(1, seggies[1].size() - 1))))
 		return (ERR_NOSUCHCHANNEL(client->getId(), seggies[1]));
 	if (seggies.size() == 2)
@@ -142,7 +142,7 @@ void Context::parseInvite(std::vector<Client>::iterator client, std::string &cmd
 	std::string						cleanChan;
 	
 	if (seggies.size() != 3)
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " <target> #<channel>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + " <target> #<channel>"));
 	target = find_client_by_nick(seggies[1]);
 	if (!isUserInVector(target))
 		return (ERR_NOSUCHNICK(client->getId(), seggies[1]));
@@ -162,7 +162,7 @@ void Context::parseWho(std::vector<Client>::iterator client, std::string &cmd)
 	std::string cleanChan;
 
 	if (seggies.size() != 2)
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " #<channel>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + " #<channel>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
 	chan = find_chan_by_name(cleanChan);
 	if (!isChannelInVector(chan))
@@ -179,7 +179,7 @@ void Context::parseMode(std::vector<Client>::iterator client, std::string &cmd)
 	if (seggies.back().empty())
 		seggies.pop_back();
 	if (seggies.size() < 2)
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " +/-<options> <<params>>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + " +/-<options> <<params>>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
 	if (seggies.size() > 2 && verifyModeOptions(seggies))
 		execModeOptions(seggies, client, cleanChan);
@@ -191,7 +191,7 @@ void Context::parseMode(std::vector<Client>::iterator client, std::string &cmd)
 		RPL_CHANNELMODEIS(client->getId(), *chan);
 	}
 	else 
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " +/-<options> <<params>>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + " +/-<options> <<params>>"));
 }
 
 void Context::parseNick(std::vector<Client>::iterator client, std::string &cmd)
@@ -199,7 +199,7 @@ void Context::parseNick(std::vector<Client>::iterator client, std::string &cmd)
 	std::vector<std::string> seggies = splitByChar(cmd, ' ');
 
 	if (seggies.size() != 2 || (seggies.size() == 2 && seggies[1].empty()))
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " <nick>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + " <nick>"));
 	Context::cmd_setNick(client->getId(), seggies[1]);
 }
 
@@ -210,7 +210,7 @@ void Context::parseTopic(std::vector<Client>::iterator client, std::string &cmd)
 	std::vector<Channel>::iterator	channo;
 
 	if (seggies.size() < 2)
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel> :<topic string>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + "#<channel> :<topic string>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
 	channo = find_chan_by_name(cleanChan);
 	if (!isChannelInVector(channo))
@@ -218,7 +218,7 @@ void Context::parseTopic(std::vector<Client>::iterator client, std::string &cmd)
 	if (seggies.size() == 2)
 		return (RPL_TOPIC(client->getId(), *channo));
 	if (seggies[2][0] != ':')
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel> :<topic string>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + "#<channel> :<topic string>"));
 	seggies.erase(seggies.begin(), seggies.begin() + 2);
 	topic = joinVectorStrings(seggies);
 	return (chanop_topic(client->getId(), cleanChan, topic[0] ? topic.substr(1, topic.size() - 1) : ""));
@@ -238,7 +238,7 @@ void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 	std::string								cleanChan, reason;
 
 	if (seggies.size() < 3 || seggies.size() > 4)
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel> :<reason>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + " #<channel> :<reason>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
 	channo = find_chan_by_name(cleanChan);
 	if (!isChannelInVector(channo))
@@ -254,7 +254,7 @@ void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 		reason = joinVectorStrings(seggies);
 		reason = reason.substr(1, reason.size() - 1);
 		if (reason[0] != ':')
-			return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel> :<reason>"));
+			return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + " #<channel> :<reason>"));
 	}
 	else
 		reason = "no reason specified.";
@@ -267,12 +267,12 @@ void Context::parsePrivmsg(std::vector<Client>::iterator client, std::string &cm
 	std::string					target, msg;
 
 	if(seggies.size() != 3)
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel>/<target> :<msg>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + " #<channel>/<target> :<msg>"));
 	target = seggies[1];
 	seggies.erase(seggies.begin(), seggies.begin() + 2);
 	msg = joinVectorStrings(seggies);
 	if (msg[0] != ':')
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel>/<target> :<msg>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + " #<channel>/<target> :<msg>"));
 	msg = msg.substr(1, msg.size() - 1);
 	cmd_sendPM(client->getId(), target, msg);
 
@@ -280,6 +280,7 @@ void Context::parsePrivmsg(std::vector<Client>::iterator client, std::string &cm
 void Context::parseQuit(std::vector<Client>::iterator client, std::string &cmd)
 {
 	(void)cmd;
+	client->removeFromAllChannels();
 	server->closeConection(client->getId());
 }
 
@@ -290,7 +291,7 @@ void Context::parsePart(std::vector<Client>::iterator client, std::string &cmd)
 	std::string						cleanChan, reason;
 
 	if (seggies.size() != 3)
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel> :<reason>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + " #<channel> :<reason>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
 	channo = find_chan_by_name(cleanChan);
 	if (!isChannelInVector(channo))
@@ -300,7 +301,7 @@ void Context::parsePart(std::vector<Client>::iterator client, std::string &cmd)
 	seggies.erase(seggies.begin(), seggies.begin() + 2);
 	reason = joinVectorStrings(seggies);
 	if (reason[0] != ':')
-		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + "#<channel> :<reason>"));
+		return (ERR_NEEDMOREPARAMS(client->getId(), "USAGE: " + seggies[0] + " #<channel> :<reason>"));
 	cmd_part(client->getId(), cleanChan, reason[0] ? reason.substr(1, reason.size() - 1) : "");
 }
 

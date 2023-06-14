@@ -10,6 +10,7 @@ Channel::Channel(std::string name)
 	_topic = "";
 	_userLimit = 0;
 	_userCount = 0;
+	_chanOpCount = 0;
 	_inviteOnly = false;
 	_topicOpOnly = false;
 	_key = "";
@@ -61,9 +62,12 @@ void Channel::toggleInviteOnly() { _inviteOnly = _inviteOnly ? false : true; }
 void Channel::decrementUserCount(int id)
 {
 	std::vector<int>::iterator it = std::find(_usersID.begin(), _usersID.end(), id);
+	int isOp = 0;
 	if (it != _usersID.end())
 	{
 		_usersID.erase(it);
+		if (Context::find_client_by_id(id)->getMode() == "@")
+			decrementChanOp();
 		_userCount--;
 	}
 }
@@ -72,6 +76,31 @@ void Channel::incrementUserCount(int id)
 {
 	_userCount++;
 	_usersID.push_back(id);
+}
+
+void Channel::incrementChanOp() { _chanOpCount++; }
+
+void Channel::decrementChanOp()
+{
+	_chanOpCount--;
+	if (_chanOpCount <= 0)
+	{
+		_chanOpCount = 0;
+		autoOp();
+	}
+}
+
+void Channel::autoOp()
+{
+	std::vector<int>::iterator it = _usersID.begin();
+	for (; it != _usersID.end(); it++)
+	{
+		if (Context::find_client_by_id(*it)->getMode() == "+")
+		{
+			Context::find_client_by_id(*it)->addChannelMode(_name, "@")
+			break;
+		}
+	}
 }
 
 void Channel::broadcastMsg(std::string const &msg, Handler *server, int senderID)

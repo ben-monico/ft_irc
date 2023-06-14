@@ -23,7 +23,6 @@ void Context::chanop_kickUser(int client_id, std::string const &channelName, std
 			 " :" + reason + "\r\n", server, -1);
 		target->removeChannelInvite(channelName);
 		target->eraseChannel(channelName);
-		channel->decrementUserCount(target->getId());
 	}
 }
 
@@ -129,6 +128,7 @@ void Context::chanop_toggleOpPriv(int client_id, std::string const& channelName,
 		ERR_NOTONCHANNEL(client_id, channelName);
 	else
 	{
+		//prohibi to self
 		target->getChannelMode(channelName) == toggle ? (void)0 : target->addChannelMode(channelName, toggle);
 		target->getChannelMode(channelName) == "@"
 		? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " +o " + targetNick + "\r\n", server, -1)
