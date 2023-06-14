@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Handler_poll.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:35 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/06 21:56:09 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/14 19:15:49 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
