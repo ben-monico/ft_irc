@@ -24,7 +24,7 @@ addrinfo *Handler::getServerInfo()
 
 	ft_bzero(&hints, sizeof(hints));
 	hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
-	hints.ai_family = AF_INET; // don't care IPv4 or IPv6
+	hints.ai_family = AF_INET6; // don't care IPv4 or IPv6
 	hints.ai_flags = AI_PASSIVE; // fill in my IP for me
 	if ((status = getaddrinfo(NULL, MYPORT, &hints, &res)))
 		exit(pError("getaddrinfo error", gai_strerror(status), status));
@@ -37,6 +37,7 @@ void	Handler::printHostname()
 
 	if (gethostname(host, 256) == -1)
 		exit (pError("hostname", "failed to get hostname", 5));
+	std::cout << std::endl;
 	std::cout << White << "#======================================="
 		<< "=======================================#" << std::endl;
 	std::cout << "I" << LightBlue << " Server info:" << White << std::setw(69) << "I\nI "<< NC;
@@ -46,7 +47,7 @@ void	Handler::printHostname()
 	
 	std::cout << White << "#======================================="
 		<< "=======================================#" << NC << std::endl;
-	std::cout << std::endl << std::endl;
+	std::cout << std::endl;
 }
 
 std::vector<int>	Handler::bindSocketFDs(struct addrinfo *servinfo)
@@ -56,7 +57,7 @@ std::vector<int>	Handler::bindSocketFDs(struct addrinfo *servinfo)
 
 	for (struct addrinfo *tmp = servinfo; tmp; tmp = tmp->ai_next)
 	{
-		int k = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol);
+		int k = socket(AF_INET6, tmp->ai_socktype, tmp->ai_protocol);
 		if (k < 0)
 			continue;
 		if (setsockopt(k, SOL_SOCKET,SO_REUSEADDR, &yes, sizeof(yes)) < 0)

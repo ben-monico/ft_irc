@@ -41,7 +41,7 @@ h:	re
 	./$(NAME) 1234
 
 cl:
-	@clear
+	# @clear
 	@c++ -std=c++98 -Wall -Wextra -Werror -g -I. src/client.cpp -o client
 	./client
 .PHONY: all clean fclean re e cl
