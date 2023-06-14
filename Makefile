@@ -14,7 +14,7 @@ OBJS_DIR	=	obj
 
 INC			=	-I.
 
-CC			=	c++ -std=c++98 -Wall -Wextra -Werror -g -Iinc/ -Ofast
+CC			=	c++ -std=c++98 -Wall -Wextra -Werror -g -Iinc/ -Ofast #-fsanitize=address
 
 all:		$(NAME)
 
@@ -34,11 +34,11 @@ fclean:	clean
 re:	fclean all
 
 e:	all
-	@clear
+	# @clear
 	./$(NAME) 1234
 
 h:	re
-	@clear
+	# @clear
 	./$(NAME) 1234
 
 cl:

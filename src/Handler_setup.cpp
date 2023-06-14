@@ -51,14 +51,13 @@ void	Handler::printHostname()
 	std::cout << std::endl;
 }
 
-std::vector<int>	Handler::bindSocketFDs(struct addrinfo *servinfo)
+int	Handler::bindSocketFD(struct addrinfo *servinfo)
 {
 	int	yes = 1;
-	std::vector<int> _socketFDs;
 
 	for (struct addrinfo *tmp = servinfo; tmp; tmp = tmp->ai_next)
 	{
-		int k = socket(AF_INET6, tmp->ai_socktype, tmp->ai_protocol);
+		int k = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol);
 		if (k < 0)
 			continue;
 		if (setsockopt(k, SOL_SOCKET,SO_REUSEADDR, &yes, sizeof(yes)) < 0)
@@ -66,27 +65,18 @@ std::vector<int>	Handler::bindSocketFDs(struct addrinfo *servinfo)
 		if (bind(k, tmp->ai_addr, tmp->ai_addrlen) < 0)
 			close(k);
 		else
-		{
-			_socketFDs.push_back(k);
-			break ;
-		}
+			return (k);
 	}
-	return (_socketFDs);
+	return (-1);
 }
 
 void	Handler::listenBoundSocket()
-{	
-	std::vector<int>::iterator	sockFD = _socketFDs.begin();
+{
 	int						status = -1;
 
-	if (_socketFDs.empty())
+	if (_socketFD == -1)
 		exit(pError("bind_socketFDs", "error binding socket to fd", 7));
-	for (; sockFD != _socketFDs.end() && status == -1; ++sockFD)
-	{
-		status = listen(*sockFD, BACKLOG);
-		if (status == -1)
-			_socketFDs.erase(sockFD);
-	}
+	status = listen(_socketFD, BACKLOG);
 	if (status == -1)
 		exit (pError("socketerr", "failed to listen on all bound sockets", 4));
 }
@@ -96,7 +86,7 @@ void	Handler::init( void )
 	struct addrinfo		*servinfo;
 	servinfo = getServerInfo();
 	_pollFDsArray = 0;
-	_socketFDs = bindSocketFDs(servinfo);
+	_socketFD = bindSocketFD(servinfo);
 	freeaddrinfo(servinfo);
 	Context::setServerPtr(this);
 	Bot::setServerPtr(this);
@@ -104,7 +94,7 @@ void	Handler::init( void )
 
 void	Handler::start( void )
 {
-	if (_socketFDs.empty())
+	if (_socketFD == -1)
 		exit(pError("_socketFDs", "no bound socket fds, please init", 9));
 	printHostname();
 	listenBoundSocket();
