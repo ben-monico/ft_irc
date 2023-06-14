@@ -6,7 +6,7 @@
 /*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/13 22:30:49 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/14 20:02:03 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	Handler::acceptIncomingConnection()
 	struct sockaddr_storage remoteaddr;
 	socklen_t	addrlen = sizeof(remoteaddr);
 	int			newFD;
-	// int			k = fdsCount;
+	
 	newFD = accept(_pollFDsArray[0].fd, (struct sockaddr *)&remoteaddr, &addrlen);
 	if (newFD < 0)
 		pError("accept error", "failed to accept request on fd", 1);
@@ -112,8 +112,7 @@ void	Handler::handleClientServerConnections()
 {
 	int	pollCount;
 	
-	for (std::vector<int>::iterator it = _socketFDs.begin(); it != _socketFDs.end(); ++it)
-		addToFDsArray(*it);
+	addToFDsArray(_socketFD);
 	while (1)
 	{
 		pollCount = poll(_pollFDsArray, _fdsCount, -1);

@@ -25,7 +25,7 @@ addrinfo *Handler::getServerInfo()
 
 	ft_bzero(&hints, sizeof(hints));
 	hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
-	hints.ai_family = AF_INET; // don't care IPv4 or IPv6
+	hints.ai_family = AF_INET6; // don't care IPv4 or IPv6
 	hints.ai_flags = AI_PASSIVE; // fill in my IP for me
 	if ((status = getaddrinfo(NULL, MYPORT, &hints, &res)))
 		exit(pError("getaddrinfo error", gai_strerror(status), status));
@@ -38,6 +38,7 @@ void	Handler::printHostname()
 
 	if (gethostname(host, 256) == -1)
 		exit (pError("hostname", "failed to get hostname", 5));
+	std::cout << std::endl;
 	std::cout << White << "#======================================="
 		<< "=======================================#" << std::endl;
 	std::cout << "I" << LightBlue << " Server info:" << White << std::setw(69) << "I\nI "<< NC;
@@ -47,13 +48,12 @@ void	Handler::printHostname()
 	
 	std::cout << White << "#======================================="
 		<< "=======================================#" << NC << std::endl;
-	std::cout << std::endl << std::endl;
+	std::cout << std::endl;
 }
 
-std::vector<int>	Handler::bindSocketFDs(struct addrinfo *servinfo)
+int	Handler::bindSocketFD(struct addrinfo *servinfo)
 {
 	int	yes = 1;
-	std::vector<int> _socketFDs;
 
 	for (struct addrinfo *tmp = servinfo; tmp; tmp = tmp->ai_next)
 	{
@@ -65,27 +65,18 @@ std::vector<int>	Handler::bindSocketFDs(struct addrinfo *servinfo)
 		if (bind(k, tmp->ai_addr, tmp->ai_addrlen) < 0)
 			close(k);
 		else
-		{
-			_socketFDs.push_back(k);
-			break ;
-		}
+			return (k);
 	}
-	return (_socketFDs);
+	return (-1);
 }
 
 void	Handler::listenBoundSocket()
-{	
-	std::vector<int>::iterator	sockFD = _socketFDs.begin();
+{
 	int						status = -1;
 
-	if (_socketFDs.empty())
+	if (_socketFD == -1)
 		exit(pError("bind_socketFDs", "error binding socket to fd", 7));
-	for (; sockFD != _socketFDs.end() && status == -1; ++sockFD)
-	{
-		status = listen(*sockFD, BACKLOG);
-		if (status == -1)
-			_socketFDs.erase(sockFD);
-	}
+	status = listen(_socketFD, BACKLOG);
 	if (status == -1)
 		exit (pError("socketerr", "failed to listen on all bound sockets", 4));
 }
@@ -95,7 +86,7 @@ void	Handler::init( void )
 	struct addrinfo		*servinfo;
 	servinfo = getServerInfo();
 	_pollFDsArray = 0;
-	_socketFDs = bindSocketFDs(servinfo);
+	_socketFD = bindSocketFD(servinfo);
 	freeaddrinfo(servinfo);
 	Context::setServerPtr(this);
 	Bot::setServerPtr(this);
@@ -103,7 +94,7 @@ void	Handler::init( void )
 
 void	Handler::start( void )
 {
-	if (_socketFDs.empty())
+	if (_socketFD == -1)
 		exit(pError("_socketFDs", "no bound socket fds, please init", 9));
 	printHostname();
 	listenBoundSocket();

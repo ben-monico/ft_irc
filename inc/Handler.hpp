@@ -35,13 +35,14 @@ class Handler
 		void	printHostname();
 		void	getLoginInfo(std::string buf, int position);
 		int		buildResponse(std::string buf, int position);
+		int		bindSocketFD(struct addrinfo *servinfo);
 		addrinfo	*getServerInfo();
-		std::vector<int>	bindSocketFDs(struct addrinfo *servinfo);
-		std::vector<int>	_socketFDs;
 		struct pollfd		*_pollFDsArray;
+		int					_socketFD;
 		int					_fdsCount;
 		int					_fdsSize;
 		const std::string	_password;
+
 	public:
 		int		pError(std::string category, std::string error, int code);
 		void	start( void );

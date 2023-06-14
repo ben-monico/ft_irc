@@ -5,8 +5,6 @@
 #include <ircserv.hpp>
 #include <sstream>
 
-//'alfanum' '-(/)_' ''
-
 std::vector<std::string> splitByChar(const std::string &string, char spliter)
 {
 	std::istringstream ss(string);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Handler_poll.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
+/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:35 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/06 21:56:09 by bcarreir         ###   ########.fr       */
+/*   Updated: 2023/06/14 19:51:56 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,12 @@ void	Handler::extendFDsArray()
 
 	struct pollfd	*tmpArray = new struct pollfd[_fdsSize * 2];
 
+	if (!tmpArray)
+		exit(pError("allocation error", "failed to allocate array of poll fds", 2));
 	for (int i = 0; i < _fdsSize * 2; ++i)
 	{
 		i < _fdsSize ? tmpArray[i].fd = _pollFDsArray[i].fd : tmpArray[i].fd = -1;
-		i < _fdsSize ? tmpArray[i].revents = _pollFDsArray[i].revents : 0;
+		tmpArray[i].revents = _pollFDsArray[i].revents;
 		tmpArray[i].events = POLLIN;
 	}
 	delete [] _pollFDsArray;
@@ -35,8 +37,13 @@ void	Handler::addToFDsArray(int newFD)
 	if (!_pollFDsArray)
 	{
 		_pollFDsArray = new struct pollfd[_fdsSize];
+		if (!_pollFDsArray)
+			exit(pError("allocation error", "failed to allocate array of poll fds", 2));
 		for (int i = 0; i < _fdsSize; ++i)
+		{
 			_pollFDsArray[i].fd = -1;
+			_pollFDsArray[i].revents = 0;
+		}
 	}
 	if (_fdsCount == _fdsSize)
 		extendFDsArray();
