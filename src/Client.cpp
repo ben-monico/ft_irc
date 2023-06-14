@@ -22,7 +22,7 @@ std::string Client::getNick() const { return _nick; }
 
 std::string Client::getUserName() const { return _userName; }
 
-int Client::getId() const { return _id; }
+int Client::getID() const { return _id; }
 
 int	Client::getInit() const { return (_init); }
 
@@ -46,7 +46,7 @@ void Client::init(std::string nick, std::string userName)
 
 }
 
-void Client::eraseChannel(std::string const &channel)
+void Client::removeChannel(std::string const &channel)
 {
 	if (Context::isChannelInVector(channel))
 		Context::find_chan_by_name(channel)->decrementUserCount(_id);
@@ -86,8 +86,7 @@ void Client::removeFromAllChannels()
 	std::map<std::string, std::string>::iterator it = _channelModes.begin();
 	for (; it != _channelModes.end(); it++)
 	{
-		eraseChannel(it->first);
-		Context::find_chan_by_name(it->first)->decrementUserCount(_id);
+		removeChannel(it->first);
 	}
 }
 

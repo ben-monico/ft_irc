@@ -62,13 +62,12 @@ void Channel::toggleInviteOnly() { _inviteOnly = _inviteOnly ? false : true; }
 void Channel::decrementUserCount(int id)
 {
 	std::vector<int>::iterator it = std::find(_usersID.begin(), _usersID.end(), id);
-	int isOp = 0;
 	if (it != _usersID.end())
 	{
 		_usersID.erase(it);
+		_userCount--;
 		if (Context::find_client_by_id(id)->getMode() == "@")
 			decrementChanOp();
-		_userCount--;
 	}
 }
 

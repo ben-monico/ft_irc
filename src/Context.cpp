@@ -30,8 +30,8 @@ bool	Context::loginInfoFound(std::vector<Client>::iterator &client)
 	}
 	if (cmds.size() >= 3 && i != 0xFFFFFF)
 	{
-		ERR_NEEDMOREPARAMS(client->getId(), "login", "need more params");
-		server->closeConection(client->getId());
+		ERR_NEEDMOREPARAMS(client->getID(), "login", "need more params");
+		server->closeConection(client->getID());
 	}
 	return (i == 0xFFFFFF);
 }
@@ -50,7 +50,7 @@ std::vector<Client>::iterator Context::find_client_by_id(int id)
 {
 	std::vector<Client>::iterator it = Context::_clients.begin();
 	for (; it != _clients.end(); ++it)
-		if (it->getId() == id)
+		if (it->getID() == id)
 			break;
 	return it;	
 }
@@ -106,7 +106,7 @@ void Context::removeClientFromChannel(int client_id, std::string const & channel
 {
 	std::vector<Client>::iterator it = find_client_by_id(client_id);
 	if (it  != _clients.end())
-		it->eraseChannel(channelname);
+		it->removeChannel(channelname);
 }
 
 void	Context::verifyLoginInfo(int id)

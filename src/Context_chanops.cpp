@@ -22,7 +22,8 @@ void Context::chanop_kickUser(int client_id, std::string const &channelName, std
 		channel->broadcastMsg(":" + chanop->getNick() + " KICK #" + channelName + " " + targetName +
 			 " :" + reason + "\r\n", server, -1);
 		target->removeChannelInvite(channelName);
-		target->eraseChannel(channelName);
+		target->removeChannel(channelName);
+		channel->decrementUserCount(target->getID());
 	}
 }
 
@@ -43,9 +44,9 @@ void Context::chanop_inviteUser(int client_id, std::string const &channel, std::
 	{
 		target->addChannelInvite(channel);
 		server->sendAllBytes(_hostname + "341 " + chanop->getNick() + " " + targetName + " #" + channel + " :Inviting " + \
-		targetName + " to join #" + channel + "\r\n", chanop->getId());
+		targetName + " to join #" + channel + "\r\n", chanop->getID());
 		server->sendAllBytes(":" + chanop->getNick() + "!" + chanop->getUserName() + "@localhost NOTICE " + \
-		targetName + "You have been invited to join #" + channel + " by " + chanop->getNick() + "\r\n", target->getId());
+		targetName + "You have been invited to join #" + channel + " by " + chanop->getNick() + "\r\n", target->getID());
 	}
 }
 
