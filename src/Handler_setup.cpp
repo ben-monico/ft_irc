@@ -1,6 +1,7 @@
 #include <Handler.hpp>
 #include <Context.hpp>
 #include <ircserv.hpp>
+#include <Bot.hpp>
 
 int	Handler::pError(std::string category, std::string error, int code)
 {
@@ -97,6 +98,7 @@ void	Handler::init( void )
 	_socketFDs = bindSocketFDs(servinfo);
 	freeaddrinfo(servinfo);
 	Context::setServerPtr(this);
+	Bot::setServerPtr(this);
 }
 
 void	Handler::start( void )

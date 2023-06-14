@@ -158,3 +158,6 @@ bool Context::isUserInVector(std::vector<Client>::iterator userGot) { return (us
 
 bool Context::isChannelInVector(std::vector<Channel>::iterator channelGot) { return (channelGot != _channels.end()); }
 
+std::vector<Client> &Context::getClients() { return _clients; }
+
+std::vector<Channel> &Context::getChannels() { return _channels; }

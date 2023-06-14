@@ -62,7 +62,8 @@ class Context
 		static std::vector<Client>::iterator	find_client_by_id(int);
 		static std::vector<Client>::iterator 	find_client_by_nick(std::string const&);
 		static std::vector<Client>::iterator 	find_client_by_username(std::string const&);
-
+		static std::vector<Client> &getClients();
+		static std::vector<Channel> &getChannels();
 
 		static bool isUserInVector(std::vector<Client>::iterator );
 		static bool isChannelInVector(std::vector<Channel>::iterator );

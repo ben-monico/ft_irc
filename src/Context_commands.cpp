@@ -2,6 +2,7 @@
 #include <Channel.hpp>
 #include <Client.hpp>
 #include <Handler.hpp>
+#include <Bot.hpp>
 
 void Context::cmd_join(int client_id, std::string const &channelName, std::string const &key)
 {
@@ -73,6 +74,17 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 			return ERR_NOSUCHCHANNEL(sender->getId(), recipient);
 		else if (!sender->isOnChannel(recipient))
 			return ERR_CANNOTSENDTOCHAN(sender->getId(), recipient);
+		else if (msg[0] == '/')
+		{
+			if (msg.find("/help", 0) != std::string::npos)
+				return Bot::help(sender->getId());
+			else if (msg.find("/users", 0) != std::string::npos)
+				return Bot::users(sender->getId());
+			else if (msg.find("/channels", 0) != std::string::npos)
+				return Bot::channels(sender->getId());
+			else
+				return ;
+		}
 		else
 			recipientChannel->broadcastMsg(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG #" + \
 				recipient + " :" + msg + "\r\n", server, sender_id);
