@@ -275,11 +275,12 @@ void Context::parsePrivmsg(std::vector<Client>::iterator client, std::string &cm
 	cmd_sendPM(client->getID(), target, msg);
 
 }
+
+//missing: leaving message with reason
 void Context::parseQuit(std::vector<Client>::iterator client, std::string &cmd)
 {
 	(void)cmd;
-	client->removeFromAllChannels();
-	server->closeConection(client->getID());
+	cmd_quit(client->getID(), "REASON");
 }
 
 void Context::parsePart(std::vector<Client>::iterator client, std::string &cmd)

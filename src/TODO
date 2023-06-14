@@ -1,3 +1,2 @@
-pass key param to cmd_join
 understand how commands work inside channel chat
-AUTO OP MISSING
+Error on privmsg when they have spaces

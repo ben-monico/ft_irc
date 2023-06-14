@@ -17,8 +17,7 @@ class Context
 		static void	verifyLoginInfo(int );
 		static void add_client(int);
 		static void	remove_client(int, int);
-		static void addClientToChannel(int, std::string const&, std::string const&);
-		static void removeClientFromChannel(int, std::string const&);
+
 		static bool	loginInfoFound(std::vector<Client>::iterator &client);
 
 		//Command parsers
@@ -44,6 +43,7 @@ class Context
 		static void cmd_setUserName(int client_id, std::string const & username);
 		static void cmd_sendPM(int client_id, std::string recipient, std::string const& msg);
 		static void cmd_part(int client_id, std::string const & channelName, std::string const & reason);
+		static void cmd_quit(int client_id, std::string const & reason);
 
 	//Channel operations
 		static void chanop_kickUser(int client_id, std::string const& channel, std::string const& target, const std::string &reason);
@@ -64,6 +64,7 @@ class Context
 		static std::vector<Client>::iterator 	find_client_by_username(std::string const&);
 		static std::vector<Client> &getClients();
 		static std::vector<Channel> &getChannels();
+		static Handler *getServerPtr();
 
 		static bool isUserInVector(std::vector<Client>::iterator );
 		static bool isChannelInVector(std::vector<Channel>::iterator );
@@ -96,7 +97,7 @@ class Context
 		static void ERR_CANNOTSENDTOCHAN(int client_id, std::string const& channel_name);
 		static void	ERR_NICKNAMEINUSE(int client_id, const std::string &nick);
 		static void	ERR_ERRONEUSNICKNAME( int client_id, const std::string &nick);
-		static void	ERR_NEEDMOREPARAMS( int client_id, const std::string cmd, const std::string reason);
+		static void	ERR_NEEDMOREPARAMS( int client_id, const std::string reason);
 		static void	ERR_USERNOTINCHANNEL( const int &client_id, const std::string &chan, const std::string &nick);
 };
 

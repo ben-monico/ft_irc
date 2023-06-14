@@ -28,10 +28,18 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 		_channels.push_back(Channel(channelName));
 		channel = find_chan_by_name(channelName);
 	}
-	channel->getUserCount() == 0 ? client->addChannelMode(channelName, "@") : client->addChannelMode(channelName, "+");
-	channel->incrementUserCount(client_id);
-	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" +
-		channelName + "\r\n", server, -1);
+	if (channel->getUserCount() == 0)
+	{
+		channel->addClient(client_id, "@");
+		client->addChannelMode(channelName, "@");
+	}
+	else
+	{
+		channel->addClient(client_id, "+");
+		client->addChannelMode(channelName, "+");
+	}
+	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" \
+		+ channelName + "\r\n", server, -1);
 	RPL_TOPIC(client->getID(), *channel);
 	RPL_NAMREPLY(client->getID(), *channel);
 	RPL_ENDOFNAMES(client->getID(), *channel);
@@ -107,8 +115,16 @@ void Context::cmd_part(int client_id, std::string const & channelName, std::stri
 	{
 		channel->broadcastMsg(":" + client->getNick() + " PART #" + channelName + " :" + reason + "\r\n", server, -1);
 		client->removeChannel(channelName);
-		channel->decrementUserCount(client_id);
 	}
+}
+//missing: leaving message with reason
+void Context::cmd_quit(int client_id, std::string const & reason)
+{
+	(void)reason;
+	std::vector<Client>::iterator client = find_client_by_id(client_id);
+
+	client->removeFromAllChannels();
+	server->closeConection(client_id);
 }
 
 void	Context::execModeOptions(std::vector<std::string> vec, std::vector<Client>::iterator client, const std::string &chan)

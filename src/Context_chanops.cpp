@@ -23,7 +23,6 @@ void Context::chanop_kickUser(int client_id, std::string const &channelName, std
 			 " :" + reason + "\r\n", server, -1);
 		target->removeChannelInvite(channelName);
 		target->removeChannel(channelName);
-		channel->decrementUserCount(target->getID());
 	}
 }
 
@@ -127,9 +126,10 @@ void Context::chanop_toggleOpPriv(int client_id, std::string const& channelName,
 		ERR_NOSUCHNICK(client_id, targetNick);
 	else if (!target->isInChannel(channelName))
 		ERR_NOTONCHANNEL(client_id, channelName);
+	else if (client->getNick() == targetNick)
+		return ;
 	else
 	{
-		//prohibi to self
 		target->getChannelMode(channelName) == toggle ? (void)0 : target->addChannelMode(channelName, toggle);
 		target->getChannelMode(channelName) == "@"
 		? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " +o " + targetNick + "\r\n", server, -1)
@@ -149,6 +149,6 @@ void Context::chanop_userLimit(int client_id, std::string const &channelName, st
 	{
 		channel->setUserLimit(atoi(userLimit.c_str()));
 		channel->getUserLimit()	? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " +l " + userLimit + "\r\n", server, -1)
-								: channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -l " + userLimit + "\r\n", server, -1);
+			: channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -l " + userLimit + "\r\n", server, -1);
 	}
 }

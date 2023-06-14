@@ -34,11 +34,11 @@ fclean:	clean
 re:	fclean all
 
 e:	all
-	# @clear
+	@clear
 	./$(NAME) 1234
 
 h:	re
-	# @clear
+	@clear
 	./$(NAME) 1234
 
 cl:
