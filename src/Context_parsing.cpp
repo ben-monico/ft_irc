@@ -275,7 +275,7 @@ void Context::parsePrivmsg(std::vector<Client>::iterator client, std::string &cm
 	//print every seggie
 	for (std::vector<std::string>::iterator it = seggies.begin(); it != seggies.end(); it++)
 		std::cout << "seggie = " << *it << std::endl;
-	if(seggies.size() != 3)
+	if(seggies.size() < 3)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: " + seggies[0] + " #<channel>/<target> :<msg>"));
 	target = seggies[1];
 	seggies.erase(seggies.begin(), seggies.begin() + 2);
