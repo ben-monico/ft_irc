@@ -1,2 +1,5 @@
-understand how commands work inside channel chat
-Error on privmsg when they have spaces
+[ ] understand how commands work inside channel chat 
+[ ] PRIVMSG is splitting msg and erroring on param num 
+[ ] Partial Sends might be leaving a \r behind
+[ ] MODE/WHO #channel whe njoining a channel error sometimes
+[ ] kick with reason not working

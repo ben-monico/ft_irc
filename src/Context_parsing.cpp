@@ -159,6 +159,9 @@ void Context::parseWho(std::vector<Client>::iterator client, std::string &cmd)
 	std::vector<std::string> seggies = splitByChar(cmd, ' ');
 	std::string cleanChan;
 
+	std::cout << "seggis size who = " << seggies.size() << " & cmd is " << cmd << std::endl;
+	for (std::vector<std::string>::iterator it = seggies.begin(); it != seggies.end(); it++)
+		std::cout << "seggie = " << *it << std::endl;
 	if (seggies.size() != 2)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: " + seggies[0] + " #<channel>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
@@ -174,6 +177,9 @@ void Context::parseMode(std::vector<Client>::iterator client, std::string &cmd)
 	std::vector<Channel>::iterator	chan;
 	std::string						cleanChan;
 
+	std::cout << "seggis size mode = " << seggies.size() << " & cmd is " << cmd << std::endl;
+for (std::vector<std::string>::iterator it = seggies.begin(); it != seggies.end(); it++)
+		std::cout << "seggie = " << *it << std::endl;
 	if (seggies.back().empty())
 		seggies.pop_back();
 	if (seggies.size() < 2)
@@ -264,6 +270,10 @@ void Context::parsePrivmsg(std::vector<Client>::iterator client, std::string &cm
 	std::vector<std::string>	seggies = splitByChar(cmd, ' ');
 	std::string					target, msg;
 
+	std::cout << "seggis size privmsg = " << seggies.size() << " & cmd is " << cmd << std::endl;
+	//print every seggie
+	for (std::vector<std::string>::iterator it = seggies.begin(); it != seggies.end(); it++)
+		std::cout << "seggie = " << *it << std::endl;
 	if(seggies.size() != 3)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: " + seggies[0] + " #<channel>/<target> :<msg>"));
 	target = seggies[1];

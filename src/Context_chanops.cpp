@@ -134,6 +134,7 @@ void Context::chanop_toggleOpPriv(int client_id, std::string const& channelName,
 		target->getChannelMode(channelName) == "@"
 		? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " +o " + targetNick + "\r\n", server, -1)
 		: channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -o " + targetNick + "\r\n", server, -1);
+		target->getChannelMode(channelName) == "@" ? channel->changeClientMode(target->getID(), "@") : channel->changeClientMode(target->getID(), "+");
 	}
 }
 

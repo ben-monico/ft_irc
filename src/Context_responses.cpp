@@ -30,15 +30,19 @@ void Context::RPL_TOPIC(int client_id, Channel &channel)
 
 void Context::RPL_WHOREPLY(int client_id, Channel &channel)
 {
-	std::map<int, std::string>::iterator it = channel.getUsersIn().begin();
+	std::map<int, std::string> map = channel.getUsersIn();
+	std::map<int, std::string>::iterator it = map.begin();
 
-	for (; it != channel.getUsersIn().end(); ++it)
+	if (map.empty())
+		std::cout << "Empty map" << std::endl;
+	for (; it != map.end(); ++it)
 	{
 		std::vector<Client>::iterator user = find_client_by_id(it->first);
-		server->sendAllBytes(_hostname + "352 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " " \
-			+ user->getNick() + " " + user->getUserName() + " localhost ircserv " + user->getNick() + " " \
-			+ user->getChannelMode(channel.getName()) + " :0 realname\r\n", client_id);
+			server->sendAllBytes(_hostname + "352 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " " \
+				+ user->getNick() + " " + user->getUserName() + " localhost ircserv " + user->getNick() + " " \
+				+ user->getChannelMode(channel.getName()) + " :0 realname\r\n", client_id);
 	}
+	
 }
 
 void Context::RPL_NAMREPLY(int client_id, Channel &channel)

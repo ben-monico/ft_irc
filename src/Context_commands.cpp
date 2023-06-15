@@ -28,16 +28,9 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 		_channels.push_back(Channel(channelName));
 		channel = find_chan_by_name(channelName);
 	}
-	if (channel->getUserCount() == 0)
-	{
-		channel->addClient(client_id, "@");
-		client->addChannelMode(channelName, "@");
-	}
-	else
-	{
-		channel->addClient(client_id, "+");
-		client->addChannelMode(channelName, "+");
-	}
+	std::string mode = (channel->getUserCount() == 0) ?  "@" : "+";
+	channel->addClient(client_id, mode);
+	client->addChannelMode(channelName, mode);
 	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" \
 		+ channelName + "\r\n", server, -1);
 	RPL_TOPIC(client->getID(), *channel);

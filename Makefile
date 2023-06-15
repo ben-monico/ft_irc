@@ -39,7 +39,7 @@ e:	all
 
 h:	re
 	@clear
-	./$(NAME) 1234
+	valgrind ./$(NAME) 1234
 
 cl:
 	# @clear
