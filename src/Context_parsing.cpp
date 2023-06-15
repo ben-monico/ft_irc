@@ -51,7 +51,6 @@ void	Context::joinPartialCmdStrings(std::vector<Client>::iterator client)
 	cmds.erase(cmds.begin(), cmds.end());
 	cmds.reserve(joinedCmds.size());
 	cmds.insert(cmds.begin(), joinedCmds.begin(), joinedCmds.end());
-	
 }
 
 
@@ -159,9 +158,8 @@ void Context::parseWho(std::vector<Client>::iterator client, std::string &cmd)
 	std::vector<std::string> seggies = splitByChar(cmd, ' ');
 	std::string cleanChan;
 
-	std::cout << "seggis size who = " << seggies.size() << " & cmd is " << cmd << std::endl;
 	for (std::vector<std::string>::iterator it = seggies.begin(); it != seggies.end(); it++)
-		std::cout << "seggie = " << *it << std::endl;
+		std::cout << "seggie " << seggies.size() - (seggies.end() - it) << " = " << *it << std::endl;
 	if (seggies.size() != 2)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: " + seggies[0] + " #<channel>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
@@ -177,13 +175,10 @@ void Context::parseMode(std::vector<Client>::iterator client, std::string &cmd)
 	std::vector<Channel>::iterator	chan;
 	std::string						cleanChan;
 
-	std::cout << "seggis size mode = " << seggies.size() << " & cmd is " << cmd << std::endl;
-for (std::vector<std::string>::iterator it = seggies.begin(); it != seggies.end(); it++)
-		std::cout << "seggie = " << *it << std::endl;
 	if (seggies.back().empty())
 		seggies.pop_back();
-	for (std::vector<std::string>::iterator i = seggies.begin(); i != seggies.end(); ++i)
-		std::cout << "seggies " << seggies.end() - i << " = " << *i << std::endl;
+	for (std::vector<std::string>::iterator it = seggies.begin(); it != seggies.end(); it++)
+		std::cout << "seggie " << seggies.size() - (seggies.end() - it) << " = " << *it << std::endl;
 	if (seggies.size() < 2)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: " + seggies[0] + " +/-<options> <<params>>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
