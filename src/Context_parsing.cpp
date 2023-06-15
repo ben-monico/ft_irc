@@ -32,9 +32,8 @@ std::string joinVectorStrings(std::vector<std::string> &vec)
 	}
 	return (result);
 }
-void	Context::joinPartialCmdStrings(std::vector<Client>::iterator client)
+void	Context::joinPartialCmdStrings(std::vector<std::string>	&cmds)
 {
-	std::vector<std::string>	&cmds = client->getCmds();
 	std::vector<std::string>	joinedCmds;
 	std::string					cmd = "";
 
@@ -53,7 +52,6 @@ void	Context::joinPartialCmdStrings(std::vector<Client>::iterator client)
 	cmds.insert(cmds.begin(), joinedCmds.begin(), joinedCmds.end());
 }
 
-
 //TODO:
 // MODE +<FLAG><<PARAMS>> - can or not be space separated - will trim whitespaces
 	// - +it can be together rest alone +k neext <pass> +l needs<limit> +o needs<target> ✅
@@ -69,15 +67,15 @@ void	Context::joinPartialCmdStrings(std::vector<Client>::iterator client)
 void Context::execClientCmds(int id)
 {
 	std::vector<Client>::iterator client = find_client_by_id(id);
-	for (std::vector<std::string>::iterator i = client->getCmds().begin(); i !=  client->getCmds().end(); ++i)
-		std::cout << "client cmds " << client->getCmds().size() - (client->getCmds().end() - i) << " = " << *i << std::endl;
-	joinPartialCmdStrings(client);
-	for (std::vector<std::string>::iterator i = client->getCmds().begin(); i !=  client->getCmds().end(); ++i)
-		std::cout << "client cmds after join " << client->getCmds().size() - (client->getCmds().end() - i) << " = " << *i << std::endl;
-	std::vector<std::string> &cmds = client->getCmds();
-	std::string cmdStr = joinVectorStrings(cmds), buf, options[] = {"INVITE", "NICK", "TOPIC", "KICK", "JOIN", "QUIT", "PRIVMSG", "MODE", "WHO", "PART"};
 	int i;
+	std::vector<std::string> &cmds = client->getCmds();
+	std::string cmdStr, buf, options[] = {"INVITE", "NICK", "TOPIC", "KICK", "JOIN", "QUIT", "PRIVMSG", "MODE", "WHO", "PART"};
+	
+	joinPartialCmdStrings(cmds);
+	cmdStr = cmds.front();
 
+	// for (std::vector<std::string>::iterator i = client->getCmds().begin(); i !=  client->getCmds().end(); ++i)
+	// 	std::cout << "client cmds after join " << client->getCmds().size() - (client->getCmds().end() - i) << " = " << *i << std::endl;
 	std::istringstream cmd(cmdStr);
 	if (cmd.fail())
 		return (ERR_UNRECOGNIZEDCMD(client->getID(), cmdStr, "Failed to allocate string"));
@@ -118,8 +116,11 @@ void Context::execClientCmds(int id)
 		parsePart(client, cmdStr);
 		break;
 	default:
-		return (ERR_UNRECOGNIZEDCMD(client->getID(), buf, "Unrecognized command"));
+		ERR_UNRECOGNIZEDCMD(client->getID(), buf, "Unrecognized command");
 	}
+	cmds.erase(cmds.begin());
+	if (cmds.size())
+		execClientCmds(id);
 }
 
 void Context::parseJoin(std::vector<Client>::iterator client, std::string &cmd)

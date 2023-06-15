@@ -22,7 +22,7 @@ bool	Context::loginInfoFound(std::vector<Client>::iterator &client)
 {
 	typedef std::vector<std::string>::iterator iter;
 	std::vector<std::string>	&cmds = client->getCmds();
-	joinPartialCmdStrings(client);
+	joinPartialCmdStrings(cmds);
 	unsigned int				i = 0x00000000;
 
 	for (iter it = cmds.begin(); it != cmds.end(); ++it)
@@ -103,8 +103,8 @@ void	Context::remove_client(int id_erase, int id_replace)
 void	Context::verifyLoginInfo(int id)
 {
 	std::vector<Client>::iterator		client = find_client_by_id(id); 
-	joinPartialCmdStrings(client);
 	std::vector<std::string>			&cmds = client->getCmds();
+	joinPartialCmdStrings(cmds);
 	std::vector<std::string>::iterator	it = cmds.begin();
 	std::string							pass = "", nick = "", user = "";
 

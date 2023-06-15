@@ -22,7 +22,7 @@ class Context
 
 		//Command parsers
 		static void	execClientCmds(int client_id);
-		static void	joinPartialCmdStrings(std::vector<Client>::iterator client);
+		static void	joinPartialCmdStrings(std::vector<std::string>	&cmds);
 		static void	parseJoin(std::vector<Client>::iterator client, std::string &cmd);
 		static void	parseInvite(std::vector<Client>::iterator client, std::string &cmd);
 		static void	parseWho(std::vector<Client>::iterator client, std::string &cmd);

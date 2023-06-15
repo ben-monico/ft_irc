@@ -101,7 +101,7 @@ void Client::removeChannel(std::string const &channel)
 void Client::removeFromAllChannels()
 {
 	std::map<std::string, std::string>::iterator it = _channelModes.begin();
-	for (; it != _channelModes.end(); it++)
+	for (; it != _channelModes.end(); ++it)
 		removeChannel(it->first);
 }
 

@@ -114,9 +114,7 @@ void Context::cmd_part(int client_id, std::string const & channelName, std::stri
 void Context::cmd_quit(int client_id, std::string const & reason)
 {
 	(void)reason;
-	std::vector<Client>::iterator client = find_client_by_id(client_id);
 
-	client->removeFromAllChannels();
 	server->closeConection(client_id);
 }
 
