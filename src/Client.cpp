@@ -93,7 +93,8 @@ void Client::removeChannel(std::string const &channel)
 	std::map<std::string, std::string>::iterator it = _channelModes.find(channel);
 	if (it != _channelModes.end())
 	{
-		Context::find_chan_by_name(channel)->removeClient(_id);
+		if (Context::isChannelInVector(Context::find_chan_by_name(channel)))
+			Context::find_chan_by_name(channel)->removeClient(_id);
 		_channelModes.erase(it);
 	}
 }
@@ -101,8 +102,12 @@ void Client::removeChannel(std::string const &channel)
 void Client::removeFromAllChannels()
 {
 	std::map<std::string, std::string>::iterator it = _channelModes.begin();
-	for (; it != _channelModes.end(); ++it)
+	while (it != _channelModes.end())
+	{
+		std::cout << " here " << std::endl;
 		removeChannel(it->first);
+		it = _channelModes.begin();
+	}
 }
 
 void Client::replaceIDInChannels(int old_id, int new_id)

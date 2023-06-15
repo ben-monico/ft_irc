@@ -27,9 +27,7 @@ std::string joinVectorStrings(std::vector<std::string> &vec)
 	std::string result;
 
 	for (std::vector<std::string>::iterator i = vec.begin(); i != vec.end(); ++i)
-	{
-		result += *i + ' ';
-	}
+		result += *i + (i + 1 == vec.end() ? "" : "  ");
 	return (result);
 }
 void	Context::joinPartialCmdStrings(std::vector<std::string>	&cmds)
@@ -72,7 +70,7 @@ void Context::execClientCmds(int id)
 	std::string cmdStr, buf, options[] = {"INVITE", "NICK", "TOPIC", "KICK", "JOIN", "QUIT", "PRIVMSG", "MODE", "WHO", "PART"};
 	
 	joinPartialCmdStrings(cmds);
-	cmdStr = cmds.front();
+	cmdStr = cmds[0];
 
 	// for (std::vector<std::string>::iterator i = client->getCmds().begin(); i !=  client->getCmds().end(); ++i)
 	// 	std::cout << "client cmds after join " << client->getCmds().size() - (client->getCmds().end() - i) << " = " << *i << std::endl;
@@ -102,7 +100,7 @@ void Context::execClientCmds(int id)
 		break;
 	case 5:
 		parseQuit(client, cmdStr);
-		break;
+		return;
 	case 6:
 		parsePrivmsg(client, cmdStr);
 		break;
@@ -258,9 +256,9 @@ void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 	{
 		seggies.erase(seggies.begin(), seggies.begin() + 3);
 		reason = joinVectorStrings(seggies);
-		reason = reason.substr(1, reason.size() - 1);
 		if (reason[0] != ':')
 			return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: " + seggies[0] + " #<channel> :<reason>"));
+		reason = reason.substr(1, reason.size() - 1);
 	}
 	else
 		reason = "no reason specified.";
@@ -301,7 +299,7 @@ void Context::parsePart(std::vector<Client>::iterator client, std::string &cmd)
 	std::vector<Channel>::iterator	channo;
 	std::string						cleanChan, reason;
 
-	if (seggies.size() != 3)
+	if (seggies.size() < 3)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: " + seggies[0] + " #<channel> :<reason>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
 	channo = find_chan_by_name(cleanChan);

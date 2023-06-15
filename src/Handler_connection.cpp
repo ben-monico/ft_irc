@@ -6,7 +6,7 @@
 /*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/15 17:25:44 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/15 17:57:02 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int	Handler::buildResponse(std::string buf, int position)
 	if (!Context::isUserInVector(user))
 		exit (pError("parseResponse", "user not found", position));
 	std::vector<std::string>	&cmds = user->getCmds();
-	if (!cmds.empty() && cmds.back().find("\r") != std::string::npos)
+	if (cmds.size() && cmds.back().find("\r") != std::string::npos)
 		cmds.erase(user->getCmds().begin(), user->getCmds().end());
 	while (!ss.eof())
 	{
@@ -68,7 +68,7 @@ int	Handler::buildResponse(std::string buf, int position)
 			cmds.push_back(cmd);
 	}
 	// cmds.pop_back();
-	return (cmds.back().find("\r") != std::string::npos);
+	return (cmds.size() && cmds.back().find("\r") != std::string::npos);
 }
 
 void	Handler::getLoginInfo(std::string buf, int position)
