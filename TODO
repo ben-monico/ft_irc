@@ -3,3 +3,4 @@
 [✅] Partial Sends might be leaving a \r behind
 [✅] MODE/WHO #channel whe njoining a channel error sometimes
 [✅] kick with reason not working
+[	] make default bot channel with everyone joining in it
