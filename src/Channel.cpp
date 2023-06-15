@@ -46,6 +46,8 @@ void Channel::getModes(int client_id, Handler *server, std::string const &host) 
 
 	if (onMode.size() > 1)
 		server->sendAllBytes(host + "324 " + Context::find_client_by_id(client_id)->getNick() + " #" + _name + " " + onMode + "\r\n", client_id);
+	else 
+		server->sendAllBytes(host + "324 " + Context::find_client_by_id(client_id)->getNick() + " #" + _name + "\r\n", client_id);
 }
 
 void Channel::setTopic(std::string const &topic) { _topic = topic; }

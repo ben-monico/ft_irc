@@ -57,7 +57,7 @@ int	Handler::bindSocketFD(struct addrinfo *servinfo)
 
 	for (struct addrinfo *tmp = servinfo; tmp; tmp = tmp->ai_next)
 	{
-		int k = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol);
+		int k = socket(PF_INET6, tmp->ai_socktype, tmp->ai_protocol);
 		if (k < 0)
 			continue;
 		if (setsockopt(k, SOL_SOCKET,SO_REUSEADDR, &yes, sizeof(yes)) < 0)

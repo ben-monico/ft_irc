@@ -176,6 +176,8 @@ void Context::parseMode(std::vector<Client>::iterator client, std::string &cmd)
 
 	if (seggies.back().empty())
 		seggies.pop_back();
+	for (std::vector<std::string>::iterator i = seggies.begin(); i != seggies.end(); ++i)
+		std::cout << "seggies " << seggies.end() - i << " = " << *i << std::endl;
 	if (seggies.size() < 2)
 		return (ERR_NEEDMOREPARAMS(client->getId(), seggies[0], "USAGE: " + seggies[0] + " +/-<options> <<params>>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
