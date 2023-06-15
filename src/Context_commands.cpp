@@ -6,8 +6,8 @@
 
 void Context::cmd_join(int client_id, std::string const &channelName, std::string const &key)
 {
-	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
+	std::vector<Client>::iterator client = findClientByID(client_id);
+	std::vector<Channel>::iterator channel = findChannelByName(channelName);
 
 	if (isChannelInVector(channel))
 	{
@@ -26,11 +26,10 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 	else
 	{
 		_channels.push_back(Channel(channelName));
-		channel = find_chan_by_name(channelName);
+		channel = findChannelByName(channelName);
 	}
 	std::string mode = (channel->getUserCount() == 0) ?  "@" : "+";
-	channel->addClient(client_id, mode);
-	client->addChannelMode(channelName, mode);
+	addClientToChannel(client, channel, mode);
 	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" \
 		+ channelName + "\r\n", server, -1);
 	RPL_TOPIC(client->getID(), *channel);
@@ -40,11 +39,11 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 
 void Context::cmd_setNick(int client_id, std::string const & nick)
 {
-	std::vector<Client>::iterator client = find_client_by_id(client_id);
+	std::vector<Client>::iterator client = findClientByID(client_id);
 	std::vector<Client>::iterator nickClient = find_client_by_nick(nick);
 	std::vector<Client>::iterator userClient = find_client_by_username(nick);
 
-	if (!isUserInVector(nickClient) && !isUserInVector(userClient) && nick != client->getUserName())
+	if (!isClientInVector(nickClient) && !isClientInVector(userClient) && nick != client->getUserName())
 	{
 		client->setNick(nick);
 		server->sendAllBytes(_hostname + " NICK " + nick + "\r\n", client->getID());
@@ -57,19 +56,19 @@ void Context::cmd_setNick(int client_id, std::string const & nick)
 
 void Context::cmd_setUserName(int client_id, std::string const & userName)
 {
-	std::vector<Client>::iterator client = find_client_by_id(client_id);
+	std::vector<Client>::iterator client = findClientByID(client_id);
 	std::vector<Client>::iterator nickClient = find_client_by_nick(userName);
-	if (!isUserInVector(nickClient))
+	if (!isClientInVector(nickClient))
 		client->setUserName(userName);
 }
 
 void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const &msg)
 {
-	std::vector<Client>::iterator sender = find_client_by_id(sender_id);
+	std::vector<Client>::iterator sender = findClientByID(sender_id);
 	if (recipient[0] == '#')
 	{
 		recipient.erase(0, 1);
-		std::vector<Channel>::iterator recipientChannel = find_chan_by_name(recipient);
+		std::vector<Channel>::iterator recipientChannel = findChannelByName(recipient);
 		if (!isChannelInVector(recipientChannel))
 			return ERR_NOSUCHCHANNEL(sender->getID(), recipient);
 		else if (!sender->isOnChannel(recipient))
@@ -92,7 +91,7 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 	else
 	{
 		std::vector<Client>::iterator recipientClient = find_client_by_nick(recipient);
-		if (isUserInVector(recipientClient))
+		if (isClientInVector(recipientClient))
 			server->sendAllBytes(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG " \
 			+ recipient + " :" + msg + "\r\n", recipientClient->getID());
 		else
@@ -102,19 +101,18 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 
 void Context::cmd_part(int client_id, std::string const & channelName, std::string const & reason)
 {
-	std::vector<Client>::iterator client = find_client_by_id(client_id);
-	std::vector<Channel>::iterator channel = find_chan_by_name(channelName);
+	std::vector<Client>::iterator client = findClientByID(client_id);
+	std::vector<Channel>::iterator channel = findChannelByName(channelName);
 	if (isChannelInVector(channel) && client->isInChannel(channelName))
 	{
 		channel->broadcastMsg(":" + client->getNick() + " PART #" + channelName + " :" + reason + "\r\n", server, -1);
-		client->removeChannel(channelName);
+		removeClientFromChannel(client, channel);
 	}
 }
-//missing: leaving message with reason
+//TODO: leaving message with reason
 void Context::cmd_quit(int client_id, std::string const & reason)
 {
 	(void)reason;
-
 	server->closeConection(client_id);
 }
 

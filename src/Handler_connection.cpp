@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Handler_connection.cpp                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: bcarreir <bcarreir@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/15 17:57:02 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/15 23:02:38 by bcarreir         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,11 @@ void	Handler::acceptIncomingConnection()
 
 int	Handler::buildResponse(std::string buf, int position)
 {
-	std::vector<Client>::iterator	user = Context::find_client_by_id((position));
+	std::vector<Client>::iterator	user = Context::findClientByID((position));
 	std::string						cmd;	
 	std::istringstream				ss(buf);
 
-	if (!Context::isUserInVector(user))
+	if (!Context::isClientInVector(user))
 		exit (pError("parseResponse", "user not found", position));
 	std::vector<std::string>	&cmds = user->getCmds();
 	if (cmds.size() && cmds.back().find("\r") != std::string::npos)
@@ -73,11 +73,11 @@ int	Handler::buildResponse(std::string buf, int position)
 
 void	Handler::getLoginInfo(std::string buf, int position)
 {
-	std::vector<Client>::iterator	user = Context::find_client_by_id((position));
+	std::vector<Client>::iterator	user = Context::findClientByID((position));
 	std::string						cmd;
 	std::istringstream				ss(buf);
 
-	if (!Context::isUserInVector(user))
+	if (!Context::isClientInVector(user))
 		exit (pError("parseResponse", "user not found", position));
 	std::vector<std::string>		&cmds = user->getCmds();
 	while (!ss.eof())
@@ -103,9 +103,9 @@ void	Handler::handleClientConnection(int position)
 		delFromFDsArray(position);
 		return ;
 	}
-	if (!Context::find_client_by_id((position))->getInit())
+	if (!Context::findClientByID((position))->getInit())
 		getLoginInfo(buf, position);
-		// Context::find_client_by_id((position))->init("cona", "cona2");
+		// Context::findClientByID((position))->init("cona", "cona2");
 	else if (buildResponse(buf, position))
 		Context::execClientCmds((position));
 }

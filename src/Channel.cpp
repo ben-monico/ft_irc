@@ -57,9 +57,9 @@ void Channel::getModes(int client_id, Handler *server, std::string const &host) 
 	!_key.empty() ? onMode += "k" : offMode += "k";
 
 	if (onMode.size() > 1)
-		server->sendAllBytes(host + "324 " + Context::find_client_by_id(client_id)->getNick() + " #" + _name + " " + onMode + "\r\n", client_id);
+		server->sendAllBytes(host + "324 " + Context::findClientByID(client_id)->getNick() + " #" + _name + " " + onMode + "\r\n", client_id);
 	else 
-		server->sendAllBytes(host + "324 " + Context::find_client_by_id(client_id)->getNick() + " #" + _name + "\r\n", client_id);
+		server->sendAllBytes(host + "324 " + Context::findClientByID(client_id)->getNick() + " #" + _name + "\r\n", client_id);
 }
 
 //Setters
@@ -73,14 +73,15 @@ void Channel::toggleRestrictTopic() { _topicOpOnly = _topicOpOnly ? false : true
 
 void Channel::toggleInviteOnly() { _inviteOnly = _inviteOnly ? false : true; }
 
-
 //Channel functions
 void Channel::addClient(int id, const std::string &mode)
 {
-	_usersID[id] = mode;
-	_userCount++;
-	if (mode == "@")
+	bool isUserIn = (_usersID.find(id) != _usersID.end());
+	if (!isUserIn)
+		_userCount++;
+	if (mode == "@" && (!isUserIn || _usersID[id] == "+"))
 		_chanOpCount++;
+	_usersID[id] = mode;
 }
 
 void Channel::changeClientMode(int id, const std::string &mode)
@@ -93,7 +94,7 @@ void Channel::changeClientMode(int id, const std::string &mode)
 		else if (it->second == "@" && mode == "+")
 		{
 			_chanOpCount--;
-			_chanOpCount == 0 ? autoOp() : (void)0;
+			_chanOpCount == 0 ? Context::autoOp(*this) : (void)0;
 		}
 		_usersID[id] = mode;
 	}
@@ -110,25 +111,7 @@ void Channel::removeClient(int id)
 		if (mode == "@")
 		{
 			_chanOpCount--;
-			_chanOpCount == 0 ? autoOp() :  (void)0;
-		}
-	}
-}
-
-void Channel::autoOp()
-{
-	std::map<int, std::string>::iterator it = _usersID.begin();
-
-	for (; it != _usersID.end(); it++)
-	{
-		if (it->second == "+")
-		{
-			_usersID[it->first] = "@";
-			std::vector<Client>::iterator client = Context::find_client_by_id(it->first);
-			client->addChannelMode(_name, "@");
-			_chanOpCount++;
-			broadcastMsg(":" + client->getNick() + " MODE #" + _name + " +o " + client->getNick() + "\r\n", Context::getServerPtr(), -1);
-			break;
+			_chanOpCount == 0 ? Context::autoOp(*this) :  (void)0;
 		}
 	}
 }

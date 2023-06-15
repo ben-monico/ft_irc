@@ -17,7 +17,11 @@ class Context
 		static void	verifyLoginInfo(int );
 		static void add_client(int);
 		static void	remove_client(int, int);
-
+		static void addClientToChannel(std::vector<Client>::iterator const &, std::vector<Channel>::iterator const &, std::string const& mode);
+		static void removeClientFromChannel(std::vector<Client>::iterator const &, std::vector<Channel>::iterator const &);
+		static void removeClientFromAllChannels(std::vector<Client>::iterator const &);
+		static void autoOp(Channel &channel);
+		static void replaceClientID(int old_id, int new_id);
 		static bool	loginInfoFound(std::vector<Client>::iterator &client);
 
 		//Command parsers
@@ -45,7 +49,7 @@ class Context
 		static void cmd_part(int client_id, std::string const & channelName, std::string const & reason);
 		static void cmd_quit(int client_id, std::string const & reason);
 
-	//Channel operations
+		//Channel operations
 		static void chanop_kickUser(int client_id, std::string const& channel, std::string const& target, const std::string &reason);
 		static void chanop_inviteUser(int client_id, std::string const& channel, std::string const& target);
 		static void chanop_topic(int client_id, std::string const& channel, std::string const& newtopic);
@@ -58,18 +62,16 @@ class Context
 
 
 		//Getters and checkers
-		static std::vector<Channel>::iterator	find_chan_by_name(std::string );
-		static std::vector<Client>::iterator	find_client_by_id(int);
+		static std::vector<Channel>::iterator	findChannelByName(std::string );
+		static std::vector<Client>::iterator	findClientByID(int);
 		static std::vector<Client>::iterator 	find_client_by_nick(std::string const&);
 		static std::vector<Client>::iterator 	find_client_by_username(std::string const&);
 		static std::vector<Client> &getClients();
 		static std::vector<Channel> &getChannels();
 		static Handler *getServerPtr();
-
-		static bool isUserInVector(std::vector<Client>::iterator );
+		static bool isClientInVector(std::vector<Client>::iterator );
 		static bool isChannelInVector(std::vector<Channel>::iterator );
 
-		static void RPL_WELCOME(int);
 		
 	private:
 		static std::string 			_hostname;
@@ -78,6 +80,7 @@ class Context
 		static std::vector<Channel>	_channels;
 
 		//Command Responses
+		static void RPL_WELCOME(int);
 		static void RPL_TOPIC(int, Channel&);
 		static void RPL_NOTOPIC(int, Channel&)
 ;		static void RPL_NAMREPLY(int, Channel&);

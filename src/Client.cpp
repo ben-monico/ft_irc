@@ -28,6 +28,11 @@ std::string Client::getChannelMode(std::string const & channel) const
 	return it->second;
 }
 
+std::map<std::string, std::string> Client::getChannels() const
+{
+	return _channelModes;
+}
+
 bool Client::isInChannel(std::string const &channel)
 {
 	if (_channelModes.find(channel) == _channelModes.end())
@@ -61,8 +66,6 @@ void Client::init(std::string nick, std::string userName)
 	_userName = userName;
 	_init = true;
 	std::cout << "Client " << nick << " initialized " << std::endl;
-	Context::RPL_WELCOME(_id);
-
 }
 
 void Client::addChannelMode(std::string const &channel, std::string const &mode)
@@ -92,27 +95,5 @@ void Client::removeChannel(std::string const &channel)
 {
 	std::map<std::string, std::string>::iterator it = _channelModes.find(channel);
 	if (it != _channelModes.end())
-	{
-		if (Context::isChannelInVector(Context::find_chan_by_name(channel)))
-			Context::find_chan_by_name(channel)->removeClient(_id);
 		_channelModes.erase(it);
-	}
-}
-
-void Client::removeFromAllChannels()
-{
-	std::map<std::string, std::string>::iterator it = _channelModes.begin();
-	while (it != _channelModes.end())
-	{
-		std::cout << " here " << std::endl;
-		removeChannel(it->first);
-		it = _channelModes.begin();
-	}
-}
-
-void Client::replaceIDInChannels(int old_id, int new_id)
-{
-	std::map<std::string, std::string>::iterator it = _channelModes.begin();
-	for (; it != _channelModes.end(); it++)
-		Context::find_chan_by_name(it->first)->replaceClientID(old_id, new_id);
 }

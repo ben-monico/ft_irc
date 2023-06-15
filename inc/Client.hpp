@@ -22,7 +22,7 @@ class Client
 		//Getters
 		std::string getNick() const;
 		std::string getUserName() const;
-		std::vector<std::string> getChannels() const;
+		std::map<std::string, std::string> getChannels() const;
 		std::string getChannelMode(std::string const & channel) const ;
 		int getID() const;
 		int	getInit() const;
@@ -33,20 +33,17 @@ class Client
 		void removeChannel(std::string const &channel);
 		void addChannelInvite(std::string const &channel);
 		void removeChannelInvite(std::string const &channel);
-		void removeFromAllChannels();
 		bool isInChannel(std::string const &channel);
 		bool isInvitedToChannel(std::string const &channel);
-		void replaceIDInChannels(int old_id, int new_id);
-
 
 	private:
-		std::vector<std::string> _cmds;
-		std::vector<std::string> _channelInvites;
-		std::map<std::string, std::string> _channelModes; //@ or + or nothing
-		int _id; //is his index in pollfds
+		int _id;
 		bool _init;
 		std::string _nick;
 		std::string _userName;
+		std::map<std::string, std::string> _channelModes;
+		std::vector<std::string> _channelInvites;
+		std::vector<std::string> _cmds;
 };
 
 #endif

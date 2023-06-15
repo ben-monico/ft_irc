@@ -64,7 +64,7 @@ void	Context::joinPartialCmdStrings(std::vector<std::string>	&cmds)
 // PRIVMSG <channel-pub/user-priv> :msg ✅
 void Context::execClientCmds(int id)
 {
-	std::vector<Client>::iterator client = find_client_by_id(id);
+	std::vector<Client>::iterator client = findClientByID(id);
 	int i;
 	std::vector<std::string> &cmds = client->getCmds();
 	std::string cmdStr, buf, options[] = {"INVITE", "NICK", "TOPIC", "KICK", "JOIN", "QUIT", "PRIVMSG", "MODE", "WHO", "PART"};
@@ -144,10 +144,10 @@ void Context::parseInvite(std::vector<Client>::iterator client, std::string &cmd
 	if (seggies.size() != 3)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: " + seggies[0] + " <target> #<channel>"));
 	target = find_client_by_nick(seggies[1]);
-	if (!isUserInVector(target))
+	if (!isClientInVector(target))
 		return (ERR_NOSUCHNICK(client->getID(), seggies[1]));
 	cleanChan = seggies[2].substr(1, seggies[2].size() - 1);
-	channo = find_chan_by_name(cleanChan);
+	channo = findChannelByName(cleanChan);
 	if (!isChannelInVector(channo))
 		return (ERR_NOSUCHCHANNEL(client->getID(), cleanChan));
 	if (channo->isUserInChannel(target->getID()))
@@ -164,7 +164,7 @@ void Context::parseWho(std::vector<Client>::iterator client, std::string &cmd)
 	if (seggies.size() != 2)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: " + seggies[0] + " #<channel>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
-	chan = find_chan_by_name(cleanChan);
+	chan = findChannelByName(cleanChan);
 	if (!isChannelInVector(chan))
 		return (ERR_NOSUCHCHANNEL(client->getID(), cleanChan));
 	RPL_WHOREPLY(client->getID(), *chan);
@@ -185,7 +185,7 @@ void Context::parseMode(std::vector<Client>::iterator client, std::string &cmd)
 		execModeOptions(seggies, client, cleanChan);
 	else if (seggies.size() == 2)
 	{
-		chan = find_chan_by_name(cleanChan);
+		chan = findChannelByName(cleanChan);
 		if (!isChannelInVector(chan))
 			return (ERR_NOSUCHCHANNEL(client->getID(), cleanChan));
 		RPL_CHANNELMODEIS(client->getID(), *chan);
@@ -212,7 +212,7 @@ void Context::parseTopic(std::vector<Client>::iterator client, std::string &cmd)
 	if (seggies.size() < 2)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: " + seggies[0] + "#<channel> :<topic string>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
-	channo = find_chan_by_name(cleanChan);
+	channo = findChannelByName(cleanChan);
 	if (!isChannelInVector(channo))
 		return (ERR_NOSUCHCHANNEL(client->getID(), cleanChan));
 	if (seggies.size() == 2)
@@ -240,11 +240,11 @@ void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 	if (seggies.size() < 3 || seggies.size() > 4)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: " + seggies[0] + " #<channel> :<reason>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
-	channo = find_chan_by_name(cleanChan);
+	channo = findChannelByName(cleanChan);
 	if (!isChannelInVector(channo))
 		return (ERR_NOSUCHCHANNEL(client->getID(), cleanChan));
 	target = find_client_by_nick(seggies[2]);
-	if (!isUserInVector(target))
+	if (!isClientInVector(target))
 		return (ERR_NOSUCHNICK(client->getID(), seggies[2]));
 	if (!channo->isUserInChannel(target->getID()))
 		return (ERR_USERNOTINCHANNEL(client->getID(), cleanChan, seggies[2]));
@@ -298,7 +298,7 @@ void Context::parsePart(std::vector<Client>::iterator client, std::string &cmd)
 	if (seggies.size() < 3)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: " + seggies[0] + " #<channel> :<reason>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
-	channo = find_chan_by_name(cleanChan);
+	channo = findChannelByName(cleanChan);
 	if (!isChannelInVector(channo))
 		return (ERR_NOSUCHCHANNEL(client->getID(), cleanChan));
 	if (!channo->isUserInChannel(client->getID()))

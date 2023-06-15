@@ -43,18 +43,18 @@ bool	Context::loginInfoFound(std::vector<Client>::iterator &client)
 }
 
 
-std::vector<Channel>::iterator	Context::find_chan_by_name(std::string name)
+std::vector<Channel>::iterator	Context::findChannelByName(std::string name)
 {
-	std::vector<Channel>::iterator it = Context::_channels.begin();
+	std::vector<Channel>::iterator it = _channels.begin();
 	for (; it != _channels.end(); ++it)
 		if (it->getName() == name)
 			break;
 	return it;	
 }
 
-std::vector<Client>::iterator Context::find_client_by_id(int id)
+std::vector<Client>::iterator Context::findClientByID(int id)
 {
-	std::vector<Client>::iterator it = Context::_clients.begin();
+	std::vector<Client>::iterator it = _clients.begin();
 	for (; it != _clients.end(); ++it)
 		if (it->getID() == id)
 			break;
@@ -63,7 +63,7 @@ std::vector<Client>::iterator Context::find_client_by_id(int id)
 
 std::vector<Client>::iterator  Context::find_client_by_nick(const std::string &nick)
 {
-	std::vector<Client>::iterator it = Context::_clients.begin();
+	std::vector<Client>::iterator it = _clients.begin();
 	for (; it != _clients.end(); ++it)
 		if (it->getNick() == nick)
 			break;
@@ -72,7 +72,7 @@ std::vector<Client>::iterator  Context::find_client_by_nick(const std::string &n
 
 std::vector<Client>::iterator 	Context::find_client_by_username(std::string const& username)
 {
-	std::vector<Client>::iterator it = Context::_clients.begin();
+	std::vector<Client>::iterator it = _clients.begin();
 	for (; it != _clients.end(); ++it)
 		if (it->getUserName() == username)
 			break;
@@ -86,23 +86,83 @@ void	Context::add_client(int client_id)
 
 void	Context::remove_client(int id_erase, int id_replace)
 {
-	std::vector<Client>::iterator clientToErase = Context::find_client_by_id(id_erase);
-	if (isUserInVector(clientToErase))
+	std::vector<Client>::iterator clientToErase = Context::findClientByID(id_erase);
+	if (isClientInVector(clientToErase))
 	{
-		clientToErase->removeFromAllChannels();
+		removeClientFromAllChannels(clientToErase);
 		_clients.erase(clientToErase);
-		std::vector<Client>::iterator clientToReplace = Context::find_client_by_id(id_replace);
-		if (id_erase != id_replace)
+		replaceClientID(id_replace, id_erase);
+	}
+}
+
+void Context::replaceClientID(int old_id, int new_id)
+{
+	std::vector<Client>::iterator client = Context::findClientByID(old_id);
+	if (isClientInVector(client) && old_id != new_id)
+	{
+		std::map<std::string, std::string> channels = client->getChannels();
+		std::map<std::string, std::string>::iterator it = channels.begin();
+		for (; it != channels.end(); ++it)
 		{
-			clientToReplace->setID(id_erase);
-			clientToReplace->replaceIDInChannels(id_replace, id_erase);
+			std::vector<Channel>::iterator channel = findChannelByName(it->first);
+			if (isChannelInVector(channel))
+				channel->replaceClientID(old_id, new_id);
+		}
+		client->setID(new_id);
+	}
+}
+
+void Context::addClientToChannel(std::vector<Client>::iterator const &client, std::vector<Channel>::iterator const &channel, std::string const& mode)
+{
+	if (isClientInVector(client) && isChannelInVector(channel))
+	{
+		channel->addClient(client->getID(), mode);
+		client->addChannelMode(channel->getName(), mode);
+	}
+}
+
+void Context::removeClientFromChannel(std::vector<Client>::iterator const &client, std::vector<Channel>::iterator const &channel)
+{
+	if (isClientInVector(client) && isChannelInVector(channel))
+	{
+		channel->removeClient(client->getID());
+		client->removeChannel(channel->getName());
+	}
+}
+
+void Context::removeClientFromAllChannels(std::vector<Client>::iterator const & client)
+{
+	if (isClientInVector(client))
+	{ 
+		std::map<std::string, std::string> channels = client->getChannels();
+		std::map<std::string, std::string>::iterator it = channels.begin();
+		for (; it != channels.end(); ++it)
+			removeClientFromChannel(client, findChannelByName(it->first));
+	}
+}
+
+void Context::autoOp(Channel &channel)
+{
+	std::cout << "tried autoop" << std::endl;
+	std::vector<Channel>::iterator channelit = findChannelByName(channel.getName());
+	std::map<int, std::string> users = channel.getUsersIn();
+	std::map<int, std::string>::iterator it = users.begin();
+	for (; it != users.end(); ++it)
+	{
+		std::vector<Client>::iterator client = findClientByID(it->first);
+		if (isClientInVector(client) && client->getChannelMode(channel.getName()) == "+")
+		{
+			removeClientFromChannel(client, channelit);
+			addClientToChannel(client, channelit, "@");
+			channel.broadcastMsg(":BOT!BOT@localhost MODE #" + channel.getName() + " +o " + client->getNick() + "\r\n", server, -1);
+			break;
 		}
 	}
 }
 
 void	Context::verifyLoginInfo(int id)
 {
-	std::vector<Client>::iterator		client = find_client_by_id(id); 
+	std::vector<Client>::iterator		client = findClientByID(id); 
 	std::vector<std::string>			&cmds = client->getCmds();
 	joinPartialCmdStrings(cmds);
 	std::vector<std::string>::iterator	it = cmds.begin();
@@ -129,7 +189,7 @@ void	Context::verifyLoginInfo(int id)
 	}
 	else if (!server->isPasswordMatch(pass))
 		ERR_PASSWDMISMATCH(id, nick);
-	else if (isUserInVector(find_client_by_nick(nick)) || isChannelInVector(find_chan_by_name(nick))
+	else if (isClientInVector(find_client_by_nick(nick)) || isChannelInVector(findChannelByName(nick))
 		|| !isNickValid(nick) || !isNickValid(user) || user == nick)
 	{
 		if (!isNickValid(nick) || !isNickValid(user))
@@ -142,10 +202,13 @@ void	Context::verifyLoginInfo(int id)
 		// server->closeConection(id);
 	}
 	else
+	{
 		client->init(nick, user);
+		RPL_WELCOME(id);
+	}
 }
 
-bool Context::isUserInVector(std::vector<Client>::iterator userGot) { return (userGot != _clients.end()); }
+bool Context::isClientInVector(std::vector<Client>::iterator userGot) { return (userGot != _clients.end()); }
 
 bool Context::isChannelInVector(std::vector<Channel>::iterator channelGot) { return (channelGot != _channels.end()); }
 
