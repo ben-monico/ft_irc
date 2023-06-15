@@ -10,6 +10,7 @@ Channel::Channel(std::string name)
 	_topic = "";
 	_userLimit = 0;
 	_userCount = 0;
+	_chanOpCount = 0;
 	_inviteOnly = false;
 	_topicOpOnly = false;
 	_key = "";
@@ -17,6 +18,7 @@ Channel::Channel(std::string name)
 
 Channel::~Channel() {}
 
+//Getters
 std::string Channel::getName() const { return _name; }
 
 std::string Channel::getTopic() const { return _topic; }
@@ -32,6 +34,16 @@ std::string Channel::getKey() const { return _key; }
 int Channel::getUserCount() const { return _userCount; }
 
 bool Channel::isFull() const { return (_userLimit != 0 && _userCount >= _userLimit); }
+
+std::map<int, std::string> Channel::getUsersIn() { return _usersID; }
+
+bool Channel::isUserInChannel(int userID) 
+{
+	std::map<int, std::string>::iterator it = _usersID.begin();
+
+	for ( ; it != _usersID.end() && it->first != userID; ++it) {}
+	return (it != _usersID.end());
+}
 
 void Channel::getModes(int client_id, Handler *server, std::string const &host) const
 {
@@ -50,6 +62,7 @@ void Channel::getModes(int client_id, Handler *server, std::string const &host) 
 		server->sendAllBytes(host + "324 " + Context::find_client_by_id(client_id)->getNick() + " #" + _name + "\r\n", client_id);
 }
 
+//Setters
 void Channel::setTopic(std::string const &topic) { _topic = topic; }
 
 void Channel::setUserLimit(int limit) { _userLimit = limit; }
@@ -60,44 +73,84 @@ void Channel::toggleRestrictTopic() { _topicOpOnly = _topicOpOnly ? false : true
 
 void Channel::toggleInviteOnly() { _inviteOnly = _inviteOnly ? false : true; }
 
-void Channel::decrementUserCount(int id)
+
+//Channel functions
+void Channel::addClient(int id, const std::string &mode)
 {
-	std::vector<int>::iterator it = std::find(_usersID.begin(), _usersID.end(), id);
+	_usersID[id] = mode;
+	_userCount++;
+	if (mode == "@")
+		_chanOpCount++;
+}
+
+void Channel::changeClientMode(int id, const std::string &mode)
+{
+	std::map<int, std::string>::iterator it = _usersID.find(id);
 	if (it != _usersID.end())
 	{
-		_usersID.erase(it);
-		_userCount--;
+		if (it->second == "+" && mode == "@")
+			_chanOpCount++;
+		else if (it->second == "@" && mode == "+")
+		{
+			_chanOpCount--;
+			_chanOpCount == 0 ? autoOp() : (void)0;
+		}
+		_usersID[id] = mode;
 	}
 }
 
-void Channel::incrementUserCount(int id)
+void Channel::removeClient(int id)
 {
-	_userCount++;
-	_usersID.push_back(id);
+	std::map<int, std::string>::iterator it = _usersID.find(id);
+	if (it != _usersID.end())
+	{
+		std::string mode = it->second;
+		_usersID.erase(it);
+		_userCount--;
+		if (mode == "@")
+		{
+			_chanOpCount--;
+			_chanOpCount == 0 ? autoOp() :  (void)0;
+		}
+	}
+}
+
+void Channel::autoOp()
+{
+	std::map<int, std::string>::iterator it = _usersID.begin();
+
+	for (; it != _usersID.end(); it++)
+	{
+		if (it->second == "+")
+		{
+			_usersID[it->first] = "@";
+			std::vector<Client>::iterator client = Context::find_client_by_id(it->first);
+			client->addChannelMode(_name, "@");
+			_chanOpCount++;
+			broadcastMsg(":" + client->getNick() + " MODE #" + _name + " +o " + client->getNick() + "\r\n", Context::getServerPtr(), -1);
+			break;
+		}
+	}
 }
 
 void Channel::broadcastMsg(std::string const &msg, Handler *server, int senderID)
 {
-	std::vector<int>::iterator it = _usersID.begin();
+	std::map<int, std::string>::iterator it = _usersID.begin();
+
 	for (; it != _usersID.end(); it++)
 	{
-		if (*it != senderID)
-			server->sendAllBytes(msg, *it);
+		if (it->first != senderID)
+			server->sendAllBytes(msg, it->first);
 	}
 }
 
-bool Channel::isUserInChannel(int userID) 
-{
-	std::vector<int>::iterator i = _usersID.begin();
-
-	for ( ; i != _usersID.end() && *i != userID; ++i) {}
-	return (i != _usersID.end());
-}
-
-
 void Channel::replaceClientID(int old_id, int new_id)
 {
-	std::vector<int>::iterator it = std::find(_usersID.begin(), _usersID.end(), old_id);
+	std::map<int, std::string>::iterator it = _usersID.find(old_id);
 	if (it != _usersID.end())
-		*it = new_id;
+	{
+		std::string mode = it->second;
+		_usersID.erase(it);
+		_usersID[new_id] = mode;
+	}
 }

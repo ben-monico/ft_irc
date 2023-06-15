@@ -30,14 +30,19 @@ void Context::RPL_TOPIC(int client_id, Channel &channel)
 
 void Context::RPL_WHOREPLY(int client_id, Channel &channel)
 {
-	std::string msg = "";
-	std::vector<int>::iterator it = channel._usersID.begin();
-	for (; it != channel._usersID.end(); ++it)
+	std::map<int, std::string> map = channel.getUsersIn();
+	std::map<int, std::string>::iterator it = map.begin();
+
+	if (map.empty())
+		std::cout << "Empty map" << std::endl;
+	for (; it != map.end(); ++it)
 	{
-		std::vector<Client>::iterator user = find_client_by_id(*it);
-		server->sendAllBytes(_hostname + "352 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " " + \
-			user->getNick() + " " + user->getUserName() + " localhost ircserv " + user->getNick() + " " + user->getChannelMode(channel.getName()) + " :0 realname\r\n", client_id);
+		std::vector<Client>::iterator user = find_client_by_id(it->first);
+			server->sendAllBytes(_hostname + "352 " + find_client_by_id(client_id)->getNick() + " #" + channel.getName() + " " \
+				+ user->getNick() + " " + user->getUserName() + " localhost ircserv " + user->getNick() + " " \
+				+ user->getChannelMode(channel.getName()) + " :0 realname\r\n", client_id);
 	}
+	
 }
 
 void Context::RPL_NAMREPLY(int client_id, Channel &channel)
@@ -83,6 +88,16 @@ void	Context::ERR_NICKNAMEINUSE(int client_id, const std::string &nick)
 	server->sendAllBytes(_hostname + "433 " + nick + " " + nick + " :Nickname is already in use\r\n",  client_id);
 }
 
+void	Context::ERR_ERRONEUSNICKNAME( int client_id, const std::string &nick)
+{
+	server->sendAllBytes(_hostname + "432 " + nick + " " + nick + " :Erroneus nickname" + "\r\n", client_id);
+}
+
+void	Context::ERR_USERNOTINCHANNEL( const int &client_id, const std::string &chan, const std::string &nick)
+{
+	server->sendAllBytes(_hostname + "441 " + nick + " " + chan + " :Target not in channel\r\n", client_id);
+}
+
 void Context::ERR_NOTONCHANNEL(int client_id, std::string const& channel_name)
 {
 	server->sendAllBytes(_hostname + "442 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :User not on channel\r\n", client_id);
@@ -91,6 +106,11 @@ void Context::ERR_NOTONCHANNEL(int client_id, std::string const& channel_name)
 void Context::ERR_USERONCHANNEL(int client_id, std::string const& nick, std::string const& channel_name)
 {
 	server->sendAllBytes(_hostname + "443 " + find_client_by_id(client_id)->getNick() + " " + nick + " #" + channel_name + " :is already on channel\r\n", client_id);
+}
+
+void	Context::ERR_NEEDMOREPARAMS( int client_id, const std::string reason)
+{
+	server->sendAllBytes(":BOT!BOT@localhost NOTICE 461 :" + reason + "\r\n", client_id);
 }
 
 void Context::ERR_PASSWDMISMATCH(int client_id, const std::string &nick)
@@ -117,19 +137,4 @@ void Context::ERR_BADCHANNELKEY(int client_id, std::string const& channel_name)
 void Context::ERR_CHANOPRIVSNEEDED(int client_id, std::string const& channel_name)
 {
 	server->sendAllBytes(_hostname + "482 " + find_client_by_id(client_id)->getNick() + " #" + channel_name + " :You're not channel operator\r\n", client_id);
-}
-
-void	Context::ERR_ERRONEUSNICKNAME( int client_id, const std::string &nick)
-{
-	server->sendAllBytes(_hostname + "432 " + nick + " " + nick + " :Erroneus nickname" + "\r\n", client_id);
-}
-
-void	Context::ERR_NEEDMOREPARAMS( int client_id, const std::string cmd, const std::string reason)
-{
-	server->sendAllBytes(_hostname + "461 " + cmd + " :" + reason + "\r\n", client_id);
-}
-
-void	Context::ERR_USERNOTINCHANNEL( const int &client_id, const std::string &chan, const std::string &nick)
-{
-	server->sendAllBytes(_hostname + "441 " + nick + " " + chan + " :Target not in channel\r\n", client_id);
 }

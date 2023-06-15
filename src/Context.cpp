@@ -13,6 +13,11 @@ void	Context::setServerPtr( Handler *serverPtr )
 	server = serverPtr;
 }
 
+Handler *Context::getServerPtr( void )
+{
+	return server;
+}
+
 bool	Context::loginInfoFound(std::vector<Client>::iterator &client)
 {
 	typedef std::vector<std::string>::iterator iter;
@@ -30,8 +35,8 @@ bool	Context::loginInfoFound(std::vector<Client>::iterator &client)
 	}
 	if (cmds.size() >= 3 && i != 0xFFFFFF)
 	{
-		ERR_NEEDMOREPARAMS(client->getId(), "login", "need more params");
-		server->closeConection(client->getId());
+		ERR_NEEDMOREPARAMS(client->getID(), "Login: need more params");
+		server->closeConection(client->getID());
 	}
 	return (i == 0xFFFFFF);
 }
@@ -50,7 +55,7 @@ std::vector<Client>::iterator Context::find_client_by_id(int id)
 {
 	std::vector<Client>::iterator it = Context::_clients.begin();
 	for (; it != _clients.end(); ++it)
-		if (it->getId() == id)
+		if (it->getID() == id)
 			break;
 	return it;	
 }
@@ -73,7 +78,6 @@ std::vector<Client>::iterator 	Context::find_client_by_username(std::string cons
 	return it;	
 }
 
-
 void	Context::add_client(int client_id)
 {
 	_clients.push_back(Client(client_id));
@@ -93,20 +97,6 @@ void	Context::remove_client(int id_erase, int id_replace)
 			clientToReplace->replaceIDInChannels(id_replace, id_erase);
 		}
 	}
-}
-
-void Context::addClientToChannel(int client_id, std::string const & channelname, std::string const &mode)
-{
-	std::vector<Client>::iterator it = find_client_by_id(client_id);
-	if (it  != _clients.end())
-		it->addChannelMode(channelname, mode);
-}
-
-void Context::removeClientFromChannel(int client_id, std::string const & channelname)
-{
-	std::vector<Client>::iterator it = find_client_by_id(client_id);
-	if (it  != _clients.end())
-		it->eraseChannel(channelname);
 }
 
 void	Context::verifyLoginInfo(int id)
@@ -133,7 +123,7 @@ void	Context::verifyLoginInfo(int id)
 		std::getline(username, user, ' ');
 	if (pass.empty() || nick.empty() || user.empty())
 	{
-		ERR_NEEDMOREPARAMS(id, "login", "missing password, nick, or user");
+		ERR_NEEDMOREPARAMS(id, "Login: missing password, nick, or user");
 		server->closeConection(id);
 	}
 	else if (!server->isPasswordMatch(pass))

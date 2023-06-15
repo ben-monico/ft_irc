@@ -34,12 +34,12 @@ fclean:	clean
 re:	fclean all
 
 e:	all
-	# @clear
+	@clear
 	./$(NAME) 1234
 
 h:	re
-	# @clear
-	./$(NAME) 1234
+	@clear
+	valgrind ./$(NAME) 1234
 
 cl:
 	# @clear

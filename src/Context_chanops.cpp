@@ -22,8 +22,7 @@ void Context::chanop_kickUser(int client_id, std::string const &channelName, std
 		channel->broadcastMsg(":" + chanop->getNick() + " KICK #" + channelName + " " + targetName +
 			 " :" + reason + "\r\n", server, -1);
 		target->removeChannelInvite(channelName);
-		target->eraseChannel(channelName);
-		channel->decrementUserCount(target->getId());
+		target->removeChannel(channelName);
 	}
 }
 
@@ -44,9 +43,9 @@ void Context::chanop_inviteUser(int client_id, std::string const &channel, std::
 	{
 		target->addChannelInvite(channel);
 		server->sendAllBytes(_hostname + "341 " + chanop->getNick() + " " + targetName + " #" + channel + " :Inviting " + \
-		targetName + " to join #" + channel + "\r\n", chanop->getId());
+		targetName + " to join #" + channel + "\r\n", chanop->getID());
 		server->sendAllBytes(":" + chanop->getNick() + "!" + chanop->getUserName() + "@localhost NOTICE " + \
-		targetName + "You have been invited to join #" + channel + " by " + chanop->getNick() + "\r\n", target->getId());
+		targetName + "You have been invited to join #" + channel + " by " + chanop->getNick() + "\r\n", target->getID());
 	}
 }
 
@@ -127,12 +126,15 @@ void Context::chanop_toggleOpPriv(int client_id, std::string const& channelName,
 		ERR_NOSUCHNICK(client_id, targetNick);
 	else if (!target->isInChannel(channelName))
 		ERR_NOTONCHANNEL(client_id, channelName);
+	else if (client->getNick() == targetNick)
+		return ;
 	else
 	{
 		target->getChannelMode(channelName) == toggle ? (void)0 : target->addChannelMode(channelName, toggle);
 		target->getChannelMode(channelName) == "@"
 		? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " +o " + targetNick + "\r\n", server, -1)
 		: channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -o " + targetNick + "\r\n", server, -1);
+		target->getChannelMode(channelName) == "@" ? channel->changeClientMode(target->getID(), "@") : channel->changeClientMode(target->getID(), "+");
 	}
 }
 
@@ -148,6 +150,6 @@ void Context::chanop_userLimit(int client_id, std::string const &channelName, st
 	{
 		channel->setUserLimit(atoi(userLimit.c_str()));
 		channel->getUserLimit()	? channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " +l " + userLimit + "\r\n", server, -1)
-								: channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -l " + userLimit + "\r\n", server, -1);
+			: channel->broadcastMsg(":" + client->getNick() + " MODE #" + channelName + " -l " + userLimit + "\r\n", server, -1);
 	}
 }

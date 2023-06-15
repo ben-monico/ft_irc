@@ -12,30 +12,30 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 	if (isChannelInVector(channel))
 	{
 		if (client->isOnChannel(channelName))
-			return ERR_USERONCHANNEL(client->getId(), client->getNick(), channelName);
+			return ERR_USERONCHANNEL(client->getID(), client->getNick(), channelName);
 		else
 		{
 			if (channel->getInviteOnly() && !client->isInvitedToChannel(channelName))
-				return ERR_INVITEONLYCHAN(client->getId(), channelName);
+				return ERR_INVITEONLYCHAN(client->getID(), channelName);
 			else if (channel->getKey() != key)
-				return ERR_BADCHANNELKEY(client->getId(), channelName);
+				return ERR_BADCHANNELKEY(client->getID(), channelName);
 			else if (channel->isFull())
-				return ERR_CHANNELISFULL(client->getId(), channelName);
+				return ERR_CHANNELISFULL(client->getID(), channelName);
 		}
-		client->addChannelMode(channelName, "+");
 	}
 	else
 	{
 		_channels.push_back(Channel(channelName));
 		channel = find_chan_by_name(channelName);
-		client->addChannelMode(channelName, "@");
 	}
-	channel->incrementUserCount(client_id);
-	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" +
-		channelName + "\r\n", server, -1);
-	RPL_TOPIC(client->getId(), *channel);
-	RPL_NAMREPLY(client->getId(), *channel);
-	RPL_ENDOFNAMES(client->getId(), *channel);
+	std::string mode = (channel->getUserCount() == 0) ?  "@" : "+";
+	channel->addClient(client_id, mode);
+	client->addChannelMode(channelName, mode);
+	channel->broadcastMsg(":" + client->getNick() + "!" + client->getUserName() + "@localhost JOIN #" \
+		+ channelName + "\r\n", server, -1);
+	RPL_TOPIC(client->getID(), *channel);
+	RPL_NAMREPLY(client->getID(), *channel);
+	RPL_ENDOFNAMES(client->getID(), *channel);
 }
 
 void Context::cmd_setNick(int client_id, std::string const & nick)
@@ -47,12 +47,12 @@ void Context::cmd_setNick(int client_id, std::string const & nick)
 	if (!isUserInVector(nickClient) && !isUserInVector(userClient) && nick != client->getUserName())
 	{
 		client->setNick(nick);
-		server->sendAllBytes(_hostname + " NICK " + nick + "\r\n", client->getId());
+		server->sendAllBytes(_hostname + " NICK " + nick + "\r\n", client->getID());
 	}
 	else if (!isNickValid(nick))
-		ERR_ERRONEUSNICKNAME(client->getId(), nick);
+		ERR_ERRONEUSNICKNAME(client->getID(), nick);
 	else
-		ERR_NICKNAMEINUSE(client->getId(), nick);
+		ERR_NICKNAMEINUSE(client->getID(), nick);
 }
 
 void Context::cmd_setUserName(int client_id, std::string const & userName)
@@ -71,17 +71,17 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 		recipient.erase(0, 1);
 		std::vector<Channel>::iterator recipientChannel = find_chan_by_name(recipient);
 		if (!isChannelInVector(recipientChannel))
-			return ERR_NOSUCHCHANNEL(sender->getId(), recipient);
+			return ERR_NOSUCHCHANNEL(sender->getID(), recipient);
 		else if (!sender->isOnChannel(recipient))
-			return ERR_CANNOTSENDTOCHAN(sender->getId(), recipient);
+			return ERR_CANNOTSENDTOCHAN(sender->getID(), recipient);
 		else if (msg[0] == '/')
 		{
 			if (msg.find("/help", 0) != std::string::npos)
-				return Bot::help(sender->getId());
+				return Bot::help(sender->getID());
 			else if (msg.find("/users", 0) != std::string::npos)
-				return Bot::users(sender->getId());
+				return Bot::users(sender->getID());
 			else if (msg.find("/channels", 0) != std::string::npos)
-				return Bot::channels(sender->getId());
+				return Bot::channels(sender->getID());
 			else
 				return ;
 		}
@@ -94,9 +94,9 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 		std::vector<Client>::iterator recipientClient = find_client_by_nick(recipient);
 		if (isUserInVector(recipientClient))
 			server->sendAllBytes(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG " \
-			+ recipient + " :" + msg + "\r\n", recipientClient->getId());
+			+ recipient + " :" + msg + "\r\n", recipientClient->getID());
 		else
-			return ERR_NOSUCHNICK(sender->getId(), recipient);
+			return ERR_NOSUCHNICK(sender->getID(), recipient);
 	}
 }
 
@@ -107,9 +107,17 @@ void Context::cmd_part(int client_id, std::string const & channelName, std::stri
 	if (isChannelInVector(channel) && client->isInChannel(channelName))
 	{
 		channel->broadcastMsg(":" + client->getNick() + " PART #" + channelName + " :" + reason + "\r\n", server, -1);
-		client->eraseChannel(channelName);
-		channel->decrementUserCount(client_id);
+		client->removeChannel(channelName);
 	}
+}
+//missing: leaving message with reason
+void Context::cmd_quit(int client_id, std::string const & reason)
+{
+	(void)reason;
+	std::vector<Client>::iterator client = find_client_by_id(client_id);
+
+	client->removeFromAllChannels();
+	server->closeConection(client_id);
 }
 
 void	Context::execModeOptions(std::vector<std::string> vec, std::vector<Client>::iterator client, const std::string &chan)
@@ -118,26 +126,26 @@ void	Context::execModeOptions(std::vector<std::string> vec, std::vector<Client>:
 	{
 		if (vec[2][1] == 'o')
 			for (std::vector<std::string>::iterator i = vec.begin() + 3; i != vec.end(); ++i)
-				chanop_toggleOpPriv(client->getId(), chan, *i, "@");
+				chanop_toggleOpPriv(client->getID(), chan, *i, "@");
 		if (vec[2][1] == 'l')
-			chanop_userLimit(client->getId(), chan, vec[3]);
+			chanop_userLimit(client->getID(), chan, vec[3]);
 		if (vec[2][1] == 'k')
-			vec.size() > 3 ? chanop_key(client->getId(), chan, vec[3]) : chanop_key(client->getId(), chan, "");
+			vec.size() > 3 ? chanop_key(client->getID(), chan, vec[3]) : chanop_key(client->getID(), chan, "");
 		if (vec[2].find("i") != std::string::npos)
-			chanop_toggleInviteOnly(client->getId(), chan, true);
+			chanop_toggleInviteOnly(client->getID(), chan, true);
 		if (vec[2].find("t") != std::string::npos)
-			chanop_toggleTopicRestriction(client->getId(), chan, true);
+			chanop_toggleTopicRestriction(client->getID(), chan, true);
 		return ;
 	}
 	if (vec[2][1] == 'o')
 		for (std::vector<std::string>::iterator i = vec.begin() + 3; i != vec.end(); ++i)
-			chanop_toggleOpPriv(client->getId(), chan, *i, "+");
+			chanop_toggleOpPriv(client->getID(), chan, *i, "+");
 	if (vec[2].find("i") != std::string::npos)
-		chanop_toggleInviteOnly(client->getId(), chan, false);
+		chanop_toggleInviteOnly(client->getID(), chan, false);
 	if (vec[2].find("t") != std::string::npos)
-		chanop_toggleTopicRestriction(client->getId(), chan, false);
+		chanop_toggleTopicRestriction(client->getID(), chan, false);
 	if (vec[2].find("k") != std::string::npos)
-		chanop_key(client->getId(), chan, "");
+		chanop_key(client->getID(), chan, "");
 	if (vec[2].find("l") != std::string::npos)
-		chanop_userLimit(client->getId(), chan, "0");
+		chanop_userLimit(client->getID(), chan, "0");
 }
