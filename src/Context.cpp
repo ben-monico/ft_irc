@@ -21,7 +21,8 @@ Handler *Context::getServerPtr( void )
 bool	Context::loginInfoFound(std::vector<Client>::iterator &client)
 {
 	typedef std::vector<std::string>::iterator iter;
-	std::vector<std::string>	cmds = client->getCmds();
+	std::vector<std::string>	&cmds = client->getCmds();
+	joinPartialCmdStrings(client);
 	unsigned int				i = 0x00000000;
 
 	for (iter it = cmds.begin(); it != cmds.end(); ++it)

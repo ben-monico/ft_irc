@@ -69,7 +69,11 @@ void	Context::joinPartialCmdStrings(std::vector<Client>::iterator client)
 void Context::execClientCmds(int id)
 {
 	std::vector<Client>::iterator client = find_client_by_id(id);
+	for (std::vector<std::string>::iterator i = client->getCmds().begin(); i !=  client->getCmds().end(); ++i)
+		std::cout << "client cmds " << client->getCmds().size() - (client->getCmds().end() - i) << " = " << *i << std::endl;
 	joinPartialCmdStrings(client);
+	for (std::vector<std::string>::iterator i = client->getCmds().begin(); i !=  client->getCmds().end(); ++i)
+		std::cout << "client cmds after join " << client->getCmds().size() - (client->getCmds().end() - i) << " = " << *i << std::endl;
 	std::vector<std::string> &cmds = client->getCmds();
 	std::string cmdStr = joinVectorStrings(cmds), buf, options[] = {"INVITE", "NICK", "TOPIC", "KICK", "JOIN", "QUIT", "PRIVMSG", "MODE", "WHO", "PART"};
 	int i;

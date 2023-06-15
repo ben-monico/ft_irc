@@ -6,7 +6,7 @@
 /*   By: leferrei <leferrei@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 16:48:23 by bcarreir          #+#    #+#             */
-/*   Updated: 2023/06/14 20:02:03 by leferrei         ###   ########.fr       */
+/*   Updated: 2023/06/15 17:25:44 by leferrei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,9 +64,10 @@ int	Handler::buildResponse(std::string buf, int position)
 	while (!ss.eof())
 	{
 		std::getline(ss, cmd, '\n');
-		cmds.push_back(cmd);
+		if (cmd.size())
+			cmds.push_back(cmd);
 	}
-	cmds.pop_back();
+	// cmds.pop_back();
 	return (cmds.back().find("\r") != std::string::npos);
 }
 
@@ -104,6 +105,7 @@ void	Handler::handleClientConnection(int position)
 	}
 	if (!Context::find_client_by_id((position))->getInit())
 		getLoginInfo(buf, position);
+		// Context::find_client_by_id((position))->init("cona", "cona2");
 	else if (buildResponse(buf, position))
 		Context::execClientCmds((position));
 }
