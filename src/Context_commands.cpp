@@ -109,10 +109,22 @@ void Context::cmd_part(int client_id, std::string const & channelName, std::stri
 		removeClientFromChannel(client, channel);
 	}
 }
-//TODO: leaving message with reason
+
 void Context::cmd_quit(int client_id, std::string const & reason)
 {
-	(void)reason;
+	std::vector<Client>::iterator client = findClientByID(client_id);
+	if (isClientInVector(client))
+	{ 
+		std::map<std::string, std::string> channels = client->getChannels();
+		std::map<std::string, std::string>::iterator it = channels.begin();
+		for (; it != channels.end(); ++it)
+		{
+			std::vector<Channel>::iterator channel = findChannelByName(it->first);
+			if (isChannelInVector(channel))
+				channel->broadcastMsg(":" + client->getNick() + " PART #" + channel->getName() + " :" + reason \
+				+ "\r\n", server, client->getID());
+		}
+	}
 	server->closeConection(client_id);
 }
 

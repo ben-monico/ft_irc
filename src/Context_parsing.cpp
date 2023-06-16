@@ -224,12 +224,6 @@ void Context::parseTopic(std::vector<Client>::iterator client, std::string &cmd)
 	return (chanop_topic(client->getID(), cleanChan, topic[0] ? topic.substr(1, topic.size() - 1) : ""));
 }
 
-void Context::parseList(std::vector<Client>::iterator client, std::string &cmd)
-{
-	(void) client;
-	(void) cmd;
-}
-
 void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 {
 	std::vector<std::string>				seggies = splitByChar(cmd, ' ');
@@ -266,10 +260,6 @@ void Context::parsePrivmsg(std::vector<Client>::iterator client, std::string &cm
 	std::vector<std::string>	seggies = splitByChar(cmd, ' ');
 	std::string					target, msg;
 
-	std::cout << "seggis size privmsg = " << seggies.size() << " & cmd is " << cmd << std::endl;
-	//print every seggie
-	for (std::vector<std::string>::iterator it = seggies.begin(); it != seggies.end(); it++)
-		std::cout << "seggie = " << *it << std::endl;
 	if(seggies.size() < 3)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: /PRIVMSG #<channel>/<target> :<msg>"));
 	target = seggies[1];
@@ -282,11 +272,12 @@ void Context::parsePrivmsg(std::vector<Client>::iterator client, std::string &cm
 
 }
 
-//missing: leaving message with reason
 void Context::parseQuit(std::vector<Client>::iterator client, std::string &cmd)
 {
-	(void)cmd;
-	cmd_quit(client->getID(), "REASON");
+	std::string reason = cmd.substr(5, cmd.size() - 5);
+	if (reason.empty() || reason[0] != ':')
+		reason = "no reason specified.";
+	cmd_quit(client->getID(), reason.substr(1, reason.size() - 1));
 }
 
 void Context::parsePart(std::vector<Client>::iterator client, std::string &cmd)
