@@ -137,7 +137,11 @@ void Context::removeClientFromAllChannels(std::vector<Client>::iterator const & 
 		std::map<std::string, std::string> channels = client->getChannels();
 		std::map<std::string, std::string>::iterator it = channels.begin();
 		for (; it != channels.end(); ++it)
-			removeClientFromChannel(client, findChannelByName(it->first));
+		{
+			std::vector<Channel>::iterator channel = findChannelByName(it->first);
+			channel->broadcastMsg(":" + client->getNick() + " PART #" + channel->getName() + " :" + client->getNick() + " has quit the server\r\n", server, -1);
+			removeClientFromChannel(client, channel);
+		}
 	}
 }
 
