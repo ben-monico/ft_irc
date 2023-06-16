@@ -48,6 +48,7 @@ class Context
 		static void cmd_sendPM(int client_id, std::string recipient, std::string const& msg);
 		static void cmd_part(int client_id, std::string const & channelName, std::string const & reason);
 		static void cmd_quit(int client_id, std::string const & reason);
+		static void bot_cmds(int client_id, std::string const & msg);
 
 		//Channel operations
 		static void chanop_kickUser(int client_id, std::string const& channel, std::string const& target, const std::string &reason);

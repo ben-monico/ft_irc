@@ -65,7 +65,9 @@ void Context::cmd_setUserName(int client_id, std::string const & userName)
 void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const &msg)
 {
 	std::vector<Client>::iterator sender = findClientByID(sender_id);
-	if (recipient[0] == '#')
+	if (msg[0] == '/')
+		return bot_cmds(sender_id, msg);
+	else if (recipient[0] == '#')
 	{
 		recipient.erase(0, 1);
 		std::vector<Channel>::iterator recipientChannel = findChannelByName(recipient);
@@ -73,27 +75,16 @@ void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const
 			return ERR_NOSUCHCHANNEL(sender->getID(), recipient);
 		else if (!sender->isOnChannel(recipient))
 			return ERR_CANNOTSENDTOCHAN(sender->getID(), recipient);
-		else if (msg[0] == '/')
-		{
-			if (msg.find("/help", 0) != std::string::npos)
-				return Bot::help(sender->getID());
-			else if (msg.find("/users", 0) != std::string::npos)
-				return Bot::users(sender->getID());
-			else if (msg.find("/channels", 0) != std::string::npos)
-				return Bot::channels(sender->getID());
-			else
-				return ;
-		}
 		else
-			recipientChannel->broadcastMsg(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG #" + \
-				recipient + " :" + msg + "\r\n", server, sender_id);
+			recipientChannel->broadcastMsg(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG #" \
+				+ recipient + " :" + msg + "\r\n", server, sender_id);
 	}
 	else
 	{
 		std::vector<Client>::iterator recipientClient = find_client_by_nick(recipient);
 		if (isClientInVector(recipientClient))
 			server->sendAllBytes(":" + sender->getNick() + "!" + sender->getUserName() + "@localhost PRIVMSG " \
-			+ recipient + " :" + msg + "\r\n", recipientClient->getID());
+				+ recipient + " :" + msg + "\r\n", recipientClient->getID());
 		else
 			return ERR_NOSUCHNICK(sender->getID(), recipient);
 	}
@@ -156,4 +147,16 @@ void	Context::execModeOptions(std::vector<std::string> vec, std::vector<Client>:
 		chanop_key(client->getID(), chan, "");
 	if (vec[2].find("l") != std::string::npos)
 		chanop_userLimit(client->getID(), chan, "0");
+}
+
+void Context::bot_cmds(int client_id, std::string const & msg)
+{
+	if (msg.find("/help", 0) != std::string::npos)
+		return Bot::help(client_id);
+	else if (msg.find("/users", 0) != std::string::npos)
+		return Bot::users(client_id);
+	else if (msg.find("/channels", 0) != std::string::npos)
+		return Bot::channels(client_id);
+	else
+		return Bot::error(client_id);
 }

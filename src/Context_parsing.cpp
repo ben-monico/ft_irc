@@ -231,7 +231,7 @@ void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 	std::vector<Client>::iterator			target;
 	std::string								cleanChan, reason;
 
-	if (seggies.size() < 3 || seggies.size() > 4)
+	if (seggies.size() < 3)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: /KICK #<channel> :<reason>"));
 	cleanChan = seggies[1].substr(1, seggies[1].size() - 1);
 	channo = findChannelByName(cleanChan);
@@ -242,7 +242,7 @@ void Context::parseKick(std::vector<Client>::iterator client, std::string &cmd)
 		return (ERR_NOSUCHNICK(client->getID(), seggies[2]));
 	if (!channo->isUserInChannel(target->getID()))
 		return (ERR_USERNOTINCHANNEL(client->getID(), cleanChan, seggies[2]));
-	if (seggies.size() == 4)
+	if (seggies.size() >= 4)
 	{
 		seggies.erase(seggies.begin(), seggies.begin() + 3);
 		reason = joinVectorStrings(seggies);

@@ -1,5 +1,6 @@
 #ifndef HANDLER_HPP
 # define HANDLER_HPP
+
 # define MYPORT "30035" // the port users will be connecting to
 # define BACKLOG 10 // how many pending connections queue will hold
 

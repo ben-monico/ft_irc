@@ -2,6 +2,7 @@
 #include <Channel.hpp>
 #include <Handler.hpp>
 #include <sstream>
+#include <Bot.hpp>
 
 std::vector<Channel> Context::_channels;
 std::vector<Client> Context::_clients;
@@ -208,6 +209,7 @@ void	Context::verifyLoginInfo(int id)
 	{
 		client->init(nick, user);
 		RPL_WELCOME(id);
+		Bot::welcome(id);
 	}
 }
 

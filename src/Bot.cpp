@@ -25,6 +25,11 @@ void	Bot::help(int id)
 	server->sendAllBytes(":BOT!BOT@localhost PRIVMSG " + Context::findClientByID(id)->getNick() + " :\t//help //users //channels\r\n", id);
 }
 
+void Bot::error(int id)
+{
+	server->sendAllBytes(":BOT!BOT@localhost PRIVMSG " + Context::findClientByID(id)->getNick() + " :Invalid command. Type //help for more information\r\n", id);
+}
+
 void Bot::channels(int id)
 {
 	std::vector<Channel>::iterator it = Context::getChannels().begin();
@@ -41,4 +46,10 @@ void Bot::users(int id)
 	for (; it != Context::getClients().end(); ++it)
 		userList += " " + it->getNick();
 	server->sendAllBytes(userList + "\r\n", id);
+}
+
+void Bot::welcome(int id)
+{
+	server->sendAllBytes(":BOT!BOT@localhost PRIVMSG " + Context::findClientByID(id)->getNick() \
+	+ " :Hi! Welcome to IRCSERV. I'm BOT, your assistant bot. If you need information regarding the server just send '//help'\r\n", id);
 }
