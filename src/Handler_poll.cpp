@@ -57,7 +57,7 @@ void	Handler::handlePollResults()
 	{
 		if (!_pollFDsArray[i].revents)
 			continue ;
-		if (!i) //is self aka listener fd
+		if (!i)
 			acceptIncomingConnection();
 		else
 			handleClientConnection(i);
