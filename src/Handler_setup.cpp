@@ -25,7 +25,7 @@ addrinfo *Handler::getServerInfo()
 
 	ft_bzero(&hints, sizeof(hints));
 	hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
-	hints.ai_family = AF_INET6; // don't care IPv4 or IPv6
+	hints.ai_family = AF_UNSPEC; // don't care IPv4 or IPv6
 	hints.ai_flags = AI_PASSIVE; // fill in my IP for me
 	if ((status = getaddrinfo(NULL, _port.c_str(), &hints, &res)))
 		exit(pError("getaddrinfo error", gai_strerror(status), status));
@@ -57,8 +57,8 @@ int	Handler::bindSocketFD(struct addrinfo *servinfo)
 
 	for (struct addrinfo *tmp = servinfo; tmp; tmp = tmp->ai_next)
 	{
-		int k = socket(PF_INET6, tmp->ai_socktype, tmp->ai_protocol);
-		if (k < 0)
+		int k = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol);
+		if (k < 0 || tmp->ai_family != AF_INET6)
 			continue;
 		if (setsockopt(k, SOL_SOCKET,SO_REUSEADDR, &yes, sizeof(yes)) < 0)
 			exit(pError("setsockopt: ", "failed to free up port", 2));

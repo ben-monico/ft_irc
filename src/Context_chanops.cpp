@@ -57,7 +57,10 @@ void Context::chanop_topic(int client_id, std::string const &channelName, std::s
 	else if (channel->getTopicOpOnly() && client->getChannelMode(channelName) != "@")
 		return ERR_CHANOPRIVSNEEDED(client_id, channelName);
 	else
+	{
+		channel->setTopic(newtopic);
 		channel->broadcastMsg(":" + client->getNick() + " TOPIC #" + channelName + " :" + newtopic + "\r\n", server, -1);
+	}
 }
 
 // MODES

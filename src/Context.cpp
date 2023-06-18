@@ -28,6 +28,7 @@ bool	Context::loginInfoFound(std::vector<Client>::iterator &client)
 
 	for (iter it = cmds.begin(); it != cmds.end(); ++it)
 	{
+		std::cout << *it << " in info f" << std::endl;
 		if (!it->compare(0, 5, "USER "))
 			i += 0xFF;
 		else if (!it->compare(0, 5, "NICK "))
@@ -186,6 +187,9 @@ void	Context::verifyLoginInfo(int id)
 	std::stringstream	username(user);
 	if (!username.eof())
 		std::getline(username, user, ' ');
+	if (user.find('\r') != std::string::npos)
+		user = user.substr(0, user.size() - 1);
+	std::cout << pass + " " << nick + " " << user << std::endl;
 	if (pass.empty() || nick.empty() || user.empty())
 	{
 		ERR_NEEDMOREPARAMS(id, "Login: missing password, nick, or user");

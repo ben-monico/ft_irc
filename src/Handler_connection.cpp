@@ -73,7 +73,6 @@ void	Handler::getLoginInfo(std::string buf, int position)
 		if (cmd.length())
 			cmds.push_back(cmd);
 	}
-
 	if (Context::loginInfoFound(user))
 		Context::verifyLoginInfo(position);
 }
