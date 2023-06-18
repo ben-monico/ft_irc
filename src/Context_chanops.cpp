@@ -54,7 +54,7 @@ void Context::chanop_topic(int client_id, std::string const &channelName, std::s
 	std::vector<Client>::iterator client = findClientByID(client_id);
 	if (!isChannelInVector(channel))
 		return ERR_NOSUCHCHANNEL(client_id, channelName);
-	else if (client->getChannelMode(channelName) != "@")
+	else if (channel->getTopicOpOnly() && client->getChannelMode(channelName) != "@")
 		return ERR_CHANOPRIVSNEEDED(client_id, channelName);
 	else
 		channel->broadcastMsg(":" + client->getNick() + " TOPIC #" + channelName + " :" + newtopic + "\r\n", server, -1);

@@ -92,7 +92,7 @@ class Context
 		static void ERR_NOSUCHNICK(int, std::string const&);
 		static void ERR_CHANNELISFULL(int client_id, std::string const& channel_name);
 		static void ERR_INVITEONLYCHAN(int client_id, std::string const& channel_name);
-		static void ERR_BADCHANNELKEY(int client_id, std::string const& channel_name);
+		static void ERR_BADCHANNELKEY(int client_id, std::string const& channel_name, bool hasKey);
 		static void ERR_PASSWDMISMATCH(int client_id, const std::string &nick);
 		static void ERR_CHANOPRIVSNEEDED(int, std::string const&);
 		static void	ERR_UNRECOGNIZEDCMD(const int &client_id, const std::string &cmd, const std::string reason);

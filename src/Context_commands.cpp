@@ -8,9 +8,10 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 {
 	std::vector<Client>::iterator client = findClientByID(client_id);
 	std::vector<Channel>::iterator channel = findChannelByName(channelName);
-
+	bool setPasswdOnCreation = false;
 	if (isChannelInVector(channel))
 	{
+		bool hasKey = (channel->getKey() != "");
 		if (client->isOnChannel(channelName))
 			return ERR_USERONCHANNEL(client->getID(), client->getNick(), channelName);
 		else
@@ -18,7 +19,7 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 			if (channel->getInviteOnly() && !client->isInvitedToChannel(channelName))
 				return ERR_INVITEONLYCHAN(client->getID(), channelName);
 			else if (channel->getKey() != key)
-				return ERR_BADCHANNELKEY(client->getID(), channelName);
+				return ERR_BADCHANNELKEY(client->getID(), channelName, hasKey);
 			else if (channel->isFull())
 				return ERR_CHANNELISFULL(client->getID(), channelName);
 		}
@@ -27,6 +28,7 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 	{
 		_channels.push_back(Channel(channelName));
 		channel = findChannelByName(channelName);
+		setPasswdOnCreation = (!key.empty()) ?  true : false;
 	}
 	std::string mode = (channel->getUserCount() == 0) ?  "@" : "+";
 	addClientToChannel(client, channel, mode);
@@ -35,6 +37,7 @@ void Context::cmd_join(int client_id, std::string const &channelName, std::strin
 	RPL_TOPIC(client->getID(), *channel);
 	RPL_NAMREPLY(client->getID(), *channel);
 	RPL_ENDOFNAMES(client->getID(), *channel);
+	setPasswdOnCreation ? chanop_key(client_id, channelName, key) : (void)0;
 }
 
 void Context::cmd_setNick(int client_id, std::string const & nick)

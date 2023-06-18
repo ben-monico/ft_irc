@@ -129,9 +129,10 @@ void Context::ERR_INVITEONLYCHAN(int client_id, std::string const& channel_name)
 	server->sendAllBytes(_hostname + "473 " + findClientByID(client_id)->getNick() + " #" + channel_name + " :Cannot join channel (+i)\r\n", client_id);
 }
 
-void Context::ERR_BADCHANNELKEY(int client_id, std::string const& channel_name)
+void Context::ERR_BADCHANNELKEY(int client_id, std::string const& channel_name, bool hasKey)
 {
-	server->sendAllBytes(_hostname + "475 " + findClientByID(client_id)->getNick() + " #" + channel_name + " :Cannot join channel (+k)\r\n", client_id);
+	std::string msg = (!hasKey) ? " - no key given." : "";
+	server->sendAllBytes(_hostname + "475 " + findClientByID(client_id)->getNick() + " #" + channel_name + " :Cannot join channel (+k)" + msg +"\r\n", client_id);
 }
 
 void Context::ERR_CHANOPRIVSNEEDED(int client_id, std::string const& channel_name)
