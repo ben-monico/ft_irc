@@ -37,11 +37,13 @@ class Handler
 		int		buildResponse(std::string buf, int position);
 		int		bindSocketFD(struct addrinfo *servinfo);
 		void	_init( void );
-		addrinfo	*getServerInfo();
+		void	cleanServerData( void );
+		addrinfo			*getServerInfo();
 		struct pollfd		*_pollFDsArray;
 		int					_socketFD;
 		int					_fdsCount;
 		int					_fdsSize;
+		int					_pollCount;
 		const std::string	_port;
 		const std::string	_password;
 
@@ -51,8 +53,9 @@ class Handler
 		void	closeConection( int position );
 		void	sendAllBytes(std::string const &msg, int clientId);
 		bool	isPasswordMatch(std::string pw) const;
-		Handler( std::string port, std::string password): _fdsCount(0), _fdsSize(8), _port(port), _password(password) { _init(); }
-		~Handler() { if (_pollFDsArray) { delete [] _pollFDsArray; } }
+		void	setPollCountToEnd( void );
+		Handler( std::string port, std::string password);
+		~Handler();
 };
 
 #endif

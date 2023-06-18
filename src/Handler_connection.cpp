@@ -3,24 +3,7 @@
 #include <ircserv.hpp>
 #include <Client.hpp>
 #include <sstream>
-
-void	Handler::sendAllBytes(std::string const &msg, int clientId)
-{
-	int bytesSent;
-
-	std::cout << ">> Sending response to fd in position " << clientId << ":\n" << msg << "#====================#" << std::endl;
-	while ((bytesSent = send(_pollFDsArray[clientId].fd, msg.c_str(), strlen(msg.c_str()), 0)) != (int)msg.size())
-	{
-		if (bytesSent == -1)
-			return ((void)pError("send error", "error sending bytes to clients", 1));	
-		bytesSent += send(_pollFDsArray[clientId].fd, &msg[bytesSent], strlen(msg.c_str()) - bytesSent, 0);
-	}
-}
-
-void	Handler::closeConection( int position )
-{
-	delFromFDsArray(position);
-}
+#include <climits>
 
 void	Handler::acceptIncomingConnection()
 {
@@ -97,18 +80,13 @@ void	Handler::handleClientConnection(int position)
 
 void	Handler::handleClientServerConnections()
 {
-	int	pollCount;
-	
 	addToFDsArray(_socketFD);
 	while (1)
 	{
-		pollCount = poll(_pollFDsArray, _fdsCount, -1);
-		if (pollCount < 0)
-		{
-			delete [] _pollFDsArray;
-			exit(pError("pollcount", "failed to poll", 8));
-		}
-		else if (pollCount)
+		_pollCount = poll(_pollFDsArray, _fdsCount, -1);
+		if (_pollCount < 0)
+			cleanServerData();
+		else if (_pollCount)
 			handlePollResults();
 	}
 	if (_pollFDsArray)

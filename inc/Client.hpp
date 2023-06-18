@@ -10,8 +10,8 @@ class Channel;
 class Client
 {
 	public:
-		Client(int id) :_id(id), _init(false) { }
-		~Client() { }
+		Client( int id );
+		~Client();
 		void init(std::string nick, std::string userName);
 		
 		//Setters

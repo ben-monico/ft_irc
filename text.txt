@@ -1,0 +1,3 @@
+NICK conho 
+PASS 1234 
+USER cona 

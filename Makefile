@@ -4,7 +4,7 @@ SRCS		=	src/main.cpp	src/utils.cpp	src/Client.cpp	src/Channel.cpp			\
 				src/Context.cpp	src/Context_responses.cpp	src/Context_parsing.cpp		\
 				src/Context_commands.cpp	src/Context_chanops.cpp						\
 				src/Handler_poll.cpp src/Handler_connection.cpp src/Handler_setup.cpp	\
-				src/Bot.cpp
+				src/Bot.cpp	src/Handler.cpp
 
 SRCS_DIR	=	src
 
@@ -45,4 +45,5 @@ cl:
 	# @clear
 	@c++ -std=c++98 -Wall -Wextra -Werror -g -I. src/client.cpp -o client
 	./client
-.PHONY: all clean fclean re e cl
+
+.PHONY: all clean fclean re e h cl

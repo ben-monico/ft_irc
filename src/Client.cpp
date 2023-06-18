@@ -2,6 +2,13 @@
 #include <Context.hpp>
 #include <Channel.hpp>
 
+Client::Client(int id) :_id(id), _init(false)
+{
+	std::cout << "Connection established with client " << id << std::endl;
+}
+
+Client::~Client() { }
+
 //Setters
 void Client::setNick(std::string const &nick) { _nick = nick; }
 
@@ -65,7 +72,6 @@ void Client::init(std::string nick, std::string userName)
 	_nick = nick;
 	_userName = userName;
 	_init = true;
-	std::cout << "Client " << nick << " initialized " << std::endl;
 }
 
 void Client::addChannelMode(std::string const &channel, std::string const &mode)

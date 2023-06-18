@@ -37,9 +37,9 @@ void	Context::joinPartialCmdStrings(std::vector<std::string>	&cmds)
 
 	for (std::vector<std::string>::iterator i = cmds.begin(); i != cmds.end(); ++i)
 	{
-		if (cmd.find("\r") == std::string::npos || i->find("\r") == std::string::npos)
+		if (cmd.find('\r') == std::string::npos || i->find('\r') == std::string::npos)
 			cmd += *i;
-		if (cmd.find("\r") != std::string::npos)
+		if (cmd.find('\r') != std::string::npos || i + 1 == cmds.end())
 		{
 			joinedCmds.push_back(cmd);
 			cmd = "";

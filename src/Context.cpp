@@ -28,7 +28,6 @@ bool	Context::loginInfoFound(std::vector<Client>::iterator &client)
 
 	for (iter it = cmds.begin(); it != cmds.end(); ++it)
 	{
-		std::cout << *it << " in info f" << std::endl;
 		if (!it->compare(0, 5, "USER "))
 			i += 0xFF;
 		else if (!it->compare(0, 5, "NICK "))
@@ -148,7 +147,6 @@ void Context::removeClientFromAllChannels(std::vector<Client>::iterator const & 
 
 void Context::autoOp(Channel &channel)
 {
-	std::cout << "tried autoop" << std::endl;
 	std::vector<Channel>::iterator channelit = findChannelByName(channel.getName());
 	std::map<int, std::string> users = channel.getUsersIn();
 	std::map<int, std::string>::iterator it = users.begin();
@@ -189,7 +187,6 @@ void	Context::verifyLoginInfo(int id)
 		std::getline(username, user, ' ');
 	if (user.find('\r') != std::string::npos)
 		user = user.substr(0, user.size() - 1);
-	std::cout << pass + " " << nick + " " << user << std::endl;
 	if (pass.empty() || nick.empty() || user.empty())
 	{
 		ERR_NEEDMOREPARAMS(id, "Login: missing password, nick, or user");

@@ -81,6 +81,23 @@ void	Handler::listenBoundSocket()
 		exit (pError("socketerr", "failed to listen on all bound sockets", 4));
 }
 
+
+void	Handler::cleanServerData( void )
+{
+	for (std::vector<Client>::iterator i = Context::getClients().begin(); i != Context::getClients().end(); ++i)
+		sendAllBytes(":localhost NOTICE QUIT :Server is shutting down.\r\n", i->getID());
+	for (int i = _fdsCount - 1; i >= 0; --i)
+		close(_pollFDsArray[i].fd);
+	clean();
+	delete [] _pollFDsArray;
+	std::cout << White << "#============================================"
+		<< "============================================#" << NC << std::endl;
+	std::cout << LightRed << "Server: " << NC << "server shutting down" << std::endl;
+	std::cout << White << "#============================================"
+		<< "============================================#" << NC << std::endl;
+	exit(0);
+}
+
 void	Handler::_init( void )
 {
 	struct addrinfo		*servinfo;
@@ -93,13 +110,4 @@ void	Handler::_init( void )
 	freeaddrinfo(servinfo);
 	Context::setServerPtr(this);
 	Bot::setServerPtr(this);
-}
-
-void	Handler::start( void )
-{
-	if (_socketFD == -1)
-		exit(pError("_socketFDs", "no bound socket fds, please init", 9));
-	printHostname();
-	listenBoundSocket();
-	handleClientServerConnections();
 }
