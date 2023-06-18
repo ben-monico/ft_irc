@@ -46,7 +46,7 @@ void Context::cmd_setNick(int client_id, std::string const & nick)
 	std::vector<Client>::iterator nickClient = find_client_by_nick(nick);
 	std::vector<Client>::iterator userClient = find_client_by_username(nick);
 
-	if (!isClientInVector(nickClient) && !isClientInVector(userClient) && nick != client->getUserName())
+	if (!isClientInVector(nickClient) && !isClientInVector(userClient))
 	{
 		// ":<oldnickname> NICK :<newnickname>"
 		for (std::vector<Client>::iterator i = _clients.begin(); i != _clients.end(); ++i)

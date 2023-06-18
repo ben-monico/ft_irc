@@ -198,7 +198,8 @@ void	Context::verifyLoginInfo(int id)
 	else if (!server->isPasswordMatch(pass))
 		ERR_PASSWDMISMATCH(id, nick);
 	else if (isClientInVector(find_client_by_nick(nick)) || isChannelInVector(findChannelByName(nick))
-		|| !isNickValid(nick) || !isNickValid(user) || user == nick)
+		|| isClientInVector(find_client_by_username(nick)) || isChannelInVector(findChannelByName(user))
+		|| !isNickValid(nick) || !isNickValid(user))
 	{
 		if (!isNickValid(nick) || !isNickValid(user))
 			ERR_ERRONEUSNICKNAME(id, nick);

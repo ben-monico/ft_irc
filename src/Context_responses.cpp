@@ -85,7 +85,11 @@ void	Context::ERR_UNRECOGNIZEDCMD(const int &client_id, const std::string &cmd, 
 
 void	Context::ERR_NICKNAMEINUSE(int client_id, const std::string &nick)
 {
-	server->sendAllBytes(_hostname + "433 " + nick + " " + nick + " :Nickname is already in use\r\n",  client_id);
+	std::vector<Client>::iterator	client = findClientByID(client_id);
+	if (!isClientInVector(client))
+		return (ERR_NOSUCHNICK(client_id, nick));
+	std::string	oldNick = client->getNick().empty() ? nick : client->getNick();
+	server->sendAllBytes(_hostname + "433 " + oldNick + " " + nick + " :Nickname is already in use\r\n",  client_id);
 }
 
 void	Context::ERR_ERRONEUSNICKNAME( int client_id, const std::string &nick)
