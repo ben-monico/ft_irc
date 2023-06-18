@@ -55,7 +55,6 @@ int	Handler::buildResponse(std::string buf, int position)
 		if (cmd.size())
 			cmds.push_back(cmd);
 	}
-	// cmds.pop_back();
 	return (cmds.size() && cmds.back().find("\r") != std::string::npos);
 }
 
@@ -93,7 +92,6 @@ void	Handler::handleClientConnection(int position)
 	}
 	if (!Context::findClientByID((position))->getInit())
 		getLoginInfo(buf, position);
-		// Context::findClientByID((position))->init("cona", "cona2");
 	else if (buildResponse(buf, position))
 		Context::execClientCmds((position));
 }

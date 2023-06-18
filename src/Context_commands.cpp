@@ -65,7 +65,7 @@ void Context::cmd_setUserName(int client_id, std::string const & userName)
 void Context::cmd_sendPM(int sender_id, std::string recipient, std::string const &msg)
 {
 	std::vector<Client>::iterator sender = findClientByID(sender_id);
-	if (msg[0] == '/')
+	if (msg[0] == '/' || !recipient.compare("BOT"))
 		return bot_cmds(sender_id, msg);
 	else if (recipient[0] == '#')
 	{

@@ -260,9 +260,14 @@ void Context::parsePrivmsg(std::vector<Client>::iterator client, std::string &cm
 
 void Context::parseQuit(std::vector<Client>::iterator client, std::string &cmd)
 {
-	std::string reason = cmd.substr(5, cmd.size() - 5);
-	if (reason.empty() || reason[0] != ':')
-		reason = "no reason specified.";
+	std::vector<std::string>	seggies = splitByChar(cmd, ' ');
+	std::string					reason;
+	if (seggies.size() < 2)
+		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: /QUIT :<reason>"));
+	seggies.erase(seggies.begin());
+	reason = joinVectorStrings(seggies);
+	if (reason[0] != ':')
+		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: /QUIT :<reason>"));
 	cmd_quit(client->getID(), reason.substr(1, reason.size() - 1));
 }
 
