@@ -52,8 +52,7 @@ class Handler
 		void	sendAllBytes(std::string const &msg, int clientId);
 		bool	isPasswordMatch(std::string pw) const;
 		Handler( std::string port, std::string password): _fdsCount(0), _fdsSize(8), _port(port), _password(password) { _init(); }
-		~Handler() { }
-	
+		~Handler() { if (_pollFDsArray) { delete [] _pollFDsArray; } }
 };
 
 #endif
