@@ -113,6 +113,9 @@ void	Handler::handleClientServerConnections()
 			handlePollResults();
 	}
 	if (_pollFDsArray)
+	{
 		delete [] _pollFDsArray;
+		_pollFDsArray = 0;
+	}
 }
 
