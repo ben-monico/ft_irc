@@ -3,12 +3,11 @@
 
 int	main(int argc, char **argv)
 {
-	if (argc != 2)
+	if (argc != 3)
 	{
 		std::cerr << "Incorrect arguments" << std::endl;
 		return (1);
 	}
-	Handler	server(argv[1]);
-	server.init();
+	Handler	server(argv[1], argv[2]);
 	server.start();
 }

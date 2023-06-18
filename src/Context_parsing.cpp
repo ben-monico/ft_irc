@@ -262,6 +262,7 @@ void Context::parseQuit(std::vector<Client>::iterator client, std::string &cmd)
 {
 	std::vector<std::string>	seggies = splitByChar(cmd, ' ');
 	std::string					reason;
+	
 	if (seggies.size() < 2)
 		return (ERR_NEEDMOREPARAMS(client->getID(), "USAGE: /QUIT :<reason>"));
 	seggies.erase(seggies.begin());

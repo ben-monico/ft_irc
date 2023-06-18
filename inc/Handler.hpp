@@ -1,7 +1,6 @@
 #ifndef HANDLER_HPP
 # define HANDLER_HPP
 
-# define MYPORT "30035" // the port users will be connecting to
 # define BACKLOG 10 // how many pending connections queue will hold
 
 #include <unistd.h>
@@ -37,11 +36,13 @@ class Handler
 		void	getLoginInfo(std::string buf, int position);
 		int		buildResponse(std::string buf, int position);
 		int		bindSocketFD(struct addrinfo *servinfo);
+		void	_init( void );
 		addrinfo	*getServerInfo();
 		struct pollfd		*_pollFDsArray;
 		int					_socketFD;
 		int					_fdsCount;
 		int					_fdsSize;
+		const std::string	_port;
 		const std::string	_password;
 
 	public:
@@ -49,9 +50,8 @@ class Handler
 		void	start( void );
 		void	closeConection( int position );
 		void	sendAllBytes(std::string const &msg, int clientId);
-		void	init( void );
 		bool	isPasswordMatch(std::string pw) const;
-		Handler(std::string password): _fdsCount(0), _fdsSize(8), _password(password) { }
+		Handler( std::string port, std::string password): _fdsCount(0), _fdsSize(8), _port(port), _password(password) { _init(); }
 		~Handler() { }
 	
 };

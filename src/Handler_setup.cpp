@@ -27,7 +27,7 @@ addrinfo *Handler::getServerInfo()
 	hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
 	hints.ai_family = AF_INET6; // don't care IPv4 or IPv6
 	hints.ai_flags = AI_PASSIVE; // fill in my IP for me
-	if ((status = getaddrinfo(NULL, MYPORT, &hints, &res)))
+	if ((status = getaddrinfo(NULL, _port.c_str(), &hints, &res)))
 		exit(pError("getaddrinfo error", gai_strerror(status), status));
 	return (res);
 }
@@ -43,7 +43,7 @@ void	Handler::printHostname()
 		<< "=======================================#" << std::endl;
 	std::cout << "I" << LightBlue << " Server info:" << White << std::setw(69) << "I\nI "<< NC;
 	std::cout << " Hostname:\t"<< host << std::setw(80 - ft_strlen(host) - 10) << White << "I\nI";
-	std::cout << NC << "  Port Number:\t" << MYPORT << std::setw(80 - ft_strlen((char *)MYPORT) - 10);
+	std::cout << NC << "  Port Number:\t" << _port << std::setw(80 - ft_strlen((char *)_port.c_str()) - 10);
 	std::cout << White << "I\n";
 	
 	std::cout << White << "#======================================="
@@ -81,9 +81,12 @@ void	Handler::listenBoundSocket()
 		exit (pError("socketerr", "failed to listen on all bound sockets", 4));
 }
 
-void	Handler::init( void )
+void	Handler::_init( void )
 {
 	struct addrinfo		*servinfo;
+	if (!isNumeric(_port) || atoi(_port.c_str()) < 1024
+		|| atoi(_port.c_str()) > 0xFFFF || _port.length() > 5)
+		exit(pError("porterror", "port number out of range or incorrectly formatted", 1));
 	servinfo = getServerInfo();
 	_pollFDsArray = 0;
 	_socketFD = bindSocketFD(servinfo);
