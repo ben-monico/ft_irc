@@ -4,8 +4,8 @@
 Handler::Handler( std::string port, std::string password): _fdsCount(0), _fdsSize(8), _port(port), _password(password)
 {
 	_init();
-
 }
+
 Handler::~Handler()
 {
 	if (_pollFDsArray)
@@ -16,7 +16,6 @@ void	Handler::start( void )
 {
 	if (_socketFD == -1)
 		exit(pError("_socketFDs", "no bound socket fds, please init", 9));
-	// printHostname();
 	listenBoundSocket();
 	handleClientServerConnections();
 }
