@@ -33,8 +33,6 @@ void Context::RPL_WHOREPLY(int client_id, Channel &channel)
 	std::map<int, std::string> map = channel.getUsersIn();
 	std::map<int, std::string>::iterator it = map.begin();
 
-	if (map.empty())
-		std::cout << "Empty map" << std::endl;
 	for (; it != map.end(); ++it)
 	{
 		std::vector<Client>::iterator user = findClientByID(it->first);

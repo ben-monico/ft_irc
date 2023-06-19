@@ -2,6 +2,7 @@
 #include <Context.hpp>
 #include <ircserv.hpp>
 #include <Bot.hpp>
+#include <cctype>
 
 int	Handler::pError(std::string category, std::string error, int code)
 {
@@ -104,6 +105,9 @@ void	Handler::_init( void )
 	if (!isNumeric(_port) || atoi(_port.c_str()) < 1024
 		|| atoi(_port.c_str()) > 0xFFFF || _port.length() > 5)
 		exit(pError("porterror", "port number out of range or incorrectly formatted", 1));
+	if (_password.empty()) exit(pError("passworderror", "password cannot be empty", 1));
+	for (unsigned int i = 0; i < _password.length() && _password[i]; ++i)
+		if (isspace(_password[i])) exit(pError("passworderror", "password cannot contain whitespace", 1));
 	servinfo = getServerInfo();
 	_pollFDsArray = 0;
 	_socketFD = bindSocketFD(servinfo);
